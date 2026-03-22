@@ -1164,7 +1164,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 <div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
   <div class="gh-setup-box">
     <div class="smh">
-      <span class="smt" id="ghPinTitle">🔐 Crie um PIN de 4 dígitos</span>
+      <span class="smt" id="ghPinTitle">🔐 Digite seu PIN</span>
       <button class="mcl" onclick="ghClosePinModal()">✕</button>
     </div>
     <div class="smb">
@@ -1222,7 +1222,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔐</span><span id="toastMsg">PIN criado! Publicar disponível por 30 min.</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔓</span><span id="toastMsg">Desbloqueado! Publicar disponível por 30 min.</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
@@ -3080,7 +3080,33 @@ function renderGoalsList(goals){
     const patNaMeta=patNoMes(g.meses);
     const viavel=patNaMeta>=g.valor;
     const pct=Math.min(100,(patNaMeta/Math.max(g.valor,1))*100);
-    const anoCalend=yrNowG+Math.floor(g.meses/12);
+    const anoCalend = yrNowG + Math.floor(g.meses/12);
+
+    // Opção B — % do patrimônio previsto (peso da meta)
+    const pesoPct = patNaMeta > 0 ? (g.valor / patNaMeta * 100).toFixed(1) : '—';
+
+    // Opção A — patrimônio líquido após a retirada
+    const patApos = Math.max(0, patNaMeta - g.valor);
+
+    // Opção C — meses para recuperar o nível pré-retirada após a meta
+    // Simula aportes + juros a partir de patApos até atingir patNaMeta novamente
+    let mesesRecup = null;
+    if (patApos < patNaMeta) {
+      const taxa = parseFloat(document.getElementById('taxaAnual')?.value) || 10;
+      const taxaM = Math.pow(1 + taxa/100, 1/12) - 1;
+      const ap0 = snaps?.[0]?.apN || 0;
+      const reaj = (parseFloat(document.getElementById('reajuste')?.value) || 5) / 100;
+      const anosReaj = Math.floor(g.meses / 12);
+      let ap = ap0 * Math.pow(1 + reaj, anosReaj);
+      let pat = patApos, m = 0;
+      while (pat < patNaMeta && m < 120) {
+        pat = pat * (1 + taxaM) + ap;
+        m++;
+        if (m % 12 === 0) ap *= (1 + reaj);
+      }
+      mesesRecup = m < 120 ? m : null;
+    }
+
     return `<div class="goal-card">
       <div class="goal-card-header">
         <div class="goal-card-icon" style="background:${cat.color}22;color:${cat.color}">${cat.icon}</div>
@@ -3091,11 +3117,18 @@ function renderGoalsList(goals){
         <button class="goal-card-del" onclick="deleteGoal(${g.id})" title="Excluir">🗑</button>
       </div>
       <div class="goal-card-body">
-        <div class="goal-row"><span class="goal-row-label">Valor necessário</span><span class="goal-row-val" style="color:${cat.color}">${fmt(g.valor)}</span></div>
+        <div class="goal-row">
+          <span class="goal-row-label">Valor necessário</span>
+          <span class="goal-row-val">
+            <span style="color:${cat.color}">${fmt(g.valor)}</span>
+            <span style="font-size:10px;color:var(--t3);font-family:var(--fb);margin-left:5px">(${pesoPct}% do patrimônio)</span>
+          </span>
+        </div>
         <div class="goal-row"><span class="goal-row-label">Patrimônio previsto no prazo</span><span class="goal-row-val" style="color:${viavel?'var(--ac)':'var(--re)'}">${fmt(patNaMeta)}</span></div>
         <div class="goal-progress-wrap"><div class="goal-progress-bar" style="width:${pct}%;background:${viavel?cat.color:'var(--re)'}"></div></div>
         <div class="goal-row"><span class="goal-row-label">Prazo</span><span class="goal-row-val">${g.meses} meses · ${anoCalend}</span></div>
-        <div class="goal-row"><span class="goal-row-label">Impacto no patrimônio</span><span class="goal-row-val" style="color:var(--re)">−${fmt(g.valor)}</span></div>
+        <div class="goal-row"><span class="goal-row-label">Patrimônio após a retirada</span><span class="goal-row-val" style="color:var(--go)">${fmt(patApos)}</span></div>
+        <div class="goal-row"><span class="goal-row-label">Tempo para recuperar</span><span class="goal-row-val" style="color:var(--t2)">${mesesRecup !== null ? mesesRecup + ' meses' : '> 10 anos'}</span></div>
         <div>${viavel
           ?`<span class="goal-status gs-ok">✅ Meta atingível no prazo</span>`
           :`<span class="goal-status gs-warn">⚠️ Faltam ${fmt(g.valor-patNaMeta)} no prazo</span>`}
