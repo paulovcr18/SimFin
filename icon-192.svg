@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="#10141c"/>
+  <!-- Accent glow circle -->
+  <circle cx="96" cy="88" r="62" fill="none" stroke="#5dd4a0" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.3"/>
+  <!-- Dollar / line chart icon -->
+  <!-- Chart line -->
+  <polyline points="28,140 60,110 88,120 120,72 164,44"
+            fill="none" stroke="#5dd4a0" stroke-width="6"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Dots on line -->
+  <circle cx="28"  cy="140" r="5" fill="#5dd4a0"/>
+  <circle cx="60"  cy="110" r="5" fill="#5dd4a0"/>
+  <circle cx="88"  cy="120" r="5" fill="#5dd4a0"/>
+  <circle cx="120" cy="72"  r="5" fill="#5dd4a0"/>
+  <circle cx="164" cy="44"  r="7" fill="#fff" stroke="#5dd4a0" stroke-width="3"/>
+  <!-- "SF" text -->
+  <text x="96" y="178" font-family="Georgia, serif" font-size="18" font-weight="bold"
+        fill="#5dd4a0" text-anchor="middle" letter-spacing="2">SimFin</text>
+</svg>
