@@ -596,12 +596,12 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <div class="saves-wrap" id="savesWrap">
         <button class="act-btn ac" onclick="toggleSavesDrop(event)" title="Simulações salvas">
           <span class="act-btn-icon">📁</span>
-          <span id="savesCountLbl">Salvas (2)</span>
+          <span id="savesCountLbl">Salvas (1)</span>
         </button>
         <div class="saves-drop" id="savesDrop">
           <div class="saves-drop-header">
             <span class="saves-drop-title">📁 Simulações Salvas</span>
-            <span class="saves-drop-count" id="savesDropCount">2 / 10</span>
+            <span class="saves-drop-count" id="savesDropCount">1 / 10</span>
           </div>
           <div class="saves-drop-list" id="savesDropList">
     <div class="sdrop-item" onclick="loadSave(0);closeSavesDrop()" title="Carregar simulação">
@@ -611,14 +611,6 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 16:40</div>
       </div>
       <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(0)" title="Excluir">🗑</button>
-    </div>
-    <div class="sdrop-item" onclick="loadSave(1);closeSavesDrop()" title="Carregar simulação">
-      <div style="font-size:16px;flex-shrink:0">📋</div>
-      <div class="sdrop-item-info">
-        <div class="sdrop-item-name">Simulação 22/03/2026</div>
-        <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 16:47</div>
-      </div>
-      <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(1)" title="Excluir">🗑</button>
     </div></div>
           <div class="saves-drop-footer">
             <button class="saves-new-btn" onclick="closeSavesDrop();openSaveModal()">＋ Salvar simulação atual</button>
@@ -677,7 +669,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         </button>
       </div>
       <div class="drive-sync-status">
-        <span>🕐</span> Última sync: 22/03, 17:55
+        <span>🕐</span> Última sync: 22/03, 18:16
       </div></div>
       </div>
     </div>
