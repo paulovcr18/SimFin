@@ -572,10 +572,10 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <div class="topbar-left">
     <div class="logo">SimFin <span>· Financeiro Familiar</span></div>
     <div class="nav-tabs-group">
-      <button class="nav-tab" id="tabSimulador" onclick="switchScreen('simulador')">
+      <button class="nav-tab active" id="tabSimulador" onclick="switchScreen('simulador')">
         <span class="nav-tab-icon">📊</span> Simulador
       </button>
-      <button class="nav-tab active" id="tabAcomp" onclick="switchScreen('acompanhamento')">
+      <button class="nav-tab" id="tabAcomp" onclick="switchScreen('acompanhamento')">
         <span class="nav-tab-icon">📈</span> Acompanhamento
       </button>
       <button class="nav-tab" id="tabMetas" onclick="switchScreen('metas')">
@@ -607,8 +607,8 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
     <div class="sdrop-item" onclick="loadSave(0);closeSavesDrop()" title="Carregar simulação">
       <div style="font-size:16px;flex-shrink:0">📋</div>
       <div class="sdrop-item-info">
-        <div class="sdrop-item-name">Simulação 22/03/2026</div>
-        <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 16:40</div>
+        <div class="sdrop-item-name">Cenário Possivel 10 anos</div>
+        <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 01:20</div>
       </div>
       <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(0)" title="Excluir">🗑</button>
     </div></div>
@@ -643,33 +643,21 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
     <!-- Google Drive Sync -->
     <div style="position:relative" id="driveWrap">
-      <button class="drive-btn connected" id="driveBtn" onclick="toggleDriveMenu(event)" title="Sincronizar com Google Drive">
+      <button class="drive-btn" id="driveBtn" onclick="toggleDriveMenu(event)" title="Sincronizar com Google Drive">
         <span class="drive-icon">☁️</span>
         <span id="driveBtnLabel">Drive</span>
-        <div class="drive-dot on" id="driveDot"></div>
+        <div class="drive-dot off" id="driveDot"></div>
       </button>
       <div class="drive-menu" id="driveMenu">
         <div id="driveMenuContent">
-      <div class="drive-menu-header">
-        <div class="drive-menu-avatar" style="background:var(--bg5);display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
-        <div>
-          <div class="drive-menu-name">Conectado</div>
-          <div class="drive-menu-email"></div>
-        </div>
-      </div>
-      <div class="drive-menu-body">
-        <button class="drive-menu-item" onclick="drivePush();closeDriveMenu()">
-          <span>⬆️</span> Salvar agora no Drive
+      <div style="padding:16px;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">☁️</div>
+        <div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">Sincronizar com Google Drive</div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:14px;line-height:1.5">Seus dados ficam salvos na sua conta do Google Drive e sincronizam entre todos os seus dispositivos.</div>
+        <button class="saves-new-btn" onclick="driveConnect()" style="width:100%">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:16px;height:16px;vertical-align:middle;margin-right:6px">
+          Entrar com Google
         </button>
-        <button class="drive-menu-item" onclick="drivePull();closeDriveMenu()">
-          <span>⬇️</span> Carregar do Drive
-        </button>
-        <button class="drive-menu-item danger" onclick="driveDisconnect()">
-          <span>🔌</span> Desconectar
-        </button>
-      </div>
-      <div class="drive-sync-status">
-        <span>🕐</span> Última sync: 22/03, 18:16
       </div></div>
       </div>
     </div>
@@ -687,7 +675,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </header>
 
 <!-- SIMULADOR SCREEN -->
-<div id="screenSimulador" class="screen active" style="display: none;">
+<div id="screenSimulador" class="screen active" style="display:contents">
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="stitle">👤 Pessoa 1</div>
@@ -782,7 +770,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <div class="ig">
     <label>Horizonte de Investimento</label>
     <input type="range" id="anos" min="5" max="40" value="20" step="1" oninput="updAno();calc()">
-    <div class="rl"><span>5 anos</span><span id="anosLabel" style="color:var(--ac);font-weight:600">10 anos</span><span>40 anos</span></div>
+    <div class="rl"><span>5 anos</span><span id="anosLabel" style="color:var(--ac);font-weight:600">20 anos</span><span>40 anos</span></div>
   </div>
   <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" oninput="calc()"></div>
   <div class="ig"><label>Patrimônio Inicial (R$)</label><input type="number" id="patrimonioInicial" value="" min="0" oninput="calc()"></div>
@@ -795,38 +783,38 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <div class="cg">
     <div class="card cg_">
       <div class="cl">Renda Operacional do Casal</div>
-      <div class="cv ac" id="cardRenda">R$&nbsp;12.157,26</div>
-      <div class="cs" id="cardRendaSub">Operacional: R$&nbsp;12.157,26 · Diluída: R$&nbsp;15.198,13</div>
+      <div class="cv ac" id="cardRenda">R$&nbsp;0,00</div>
+      <div class="cs" id="cardRendaSub">Operacional: R$&nbsp;0,00 · Diluída: R$&nbsp;0,00</div>
     </div>
     <div class="card cgo">
       <div class="cl">Aporte Mensal Inicial</div>
-      <div class="cv go" id="cardAporte">R$&nbsp;3.647,18</div>
-      <div class="cs" id="cardAporteSub">30% da renda operacional mensal</div>
+      <div class="cv go" id="cardAporte">R$&nbsp;0,00</div>
+      <div class="cs" id="cardAporteSub">35% da renda operacional mensal</div>
     </div>
     <div class="card cgb">
       <div class="cl">Projeção Patrimonial Final</div>
-      <div class="cv bl" id="cardProj">R$&nbsp;894.441,21</div>
-      <div class="cs" id="cardProjSub">em 10 anos · 10% a.a.</div>
+      <div class="cv bl" id="cardProj">R$&nbsp;0,00</div>
+      <div class="cs" id="cardProjSub">em 20 anos · 10% a.a.</div>
     </div>
   </div>
 
   <!-- STRIP -->
   <div class="strip">
-    <div class="ss" id="fgtsStrip" style="opacity: 1;">
+    <div class="ss" id="fgtsStrip" style="opacity: 0.4;">
       <div class="ssl">💼 FGTS Acumulado Anual</div>
-      <div class="ssv go" id="fgtsVal">R$&nbsp;14.112,00</div>
+      <div class="ssv go" id="fgtsVal">R$&nbsp;0,00</div>
       <div class="sss" id="fgtsNote">patrimônio trabalhista · não incluso na renda</div>
     </div>
     <div class="ss">
       <div class="ssl">📡 Rendimento Passivo Mensal</div>
-      <div class="ssv ac" id="rendPass">R$&nbsp;7.132,40</div>
-      <div class="sss" id="rendPassSub">no ano 10 · taxa 10% a.a.</div>
+      <div class="ssv ac" id="rendPass">R$&nbsp;0,00</div>
+      <div class="sss" id="rendPassSub">no ano 20 · taxa 10% a.a.</div>
     </div>
     <div class="ss">
       <div class="ssl">🏁 Liberdade Financeira</div>
-      <div class="ssv" id="libVal" style="color: var(--go);">83.8%</div>
-      <div class="sss" id="libSub">rendimento R$&nbsp;7.132,40 vs. gastos R$&nbsp;8.510,08/mês</div>
-      <div class="sbar-bg"><div class="sbar" id="libBar" style="width: 83.8111%;"></div></div>
+      <div class="ssv" id="libVal" style="color: var(--re);">0.0%</div>
+      <div class="sss" id="libSub">rendimento R$&nbsp;0,00 vs. gastos R$&nbsp;0,00/mês</div>
+      <div class="sbar-bg"><div class="sbar" id="libBar" style="width:0%"></div></div>
     </div>
   </div>
 
@@ -841,12 +829,12 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <div class="pgrid">
         <div>
           <div style="font-size:11px;color:var(--ac);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--ac);display:inline-block"></span>Pessoa 1</div>
-          <table id="tP1"><thead><tr><th>Item</th><th>Mensal / Evento</th><th>Anual</th></tr></thead><tbody><tr><td>💰 Salário Bruto</td><td class="">R$&nbsp;11.500,00</td><td class="" style="">R$&nbsp;138.000,00</td></tr><tr><td>🔻 INSS</td><td class="rn">-R$&nbsp;988,09</td><td class="rn" style="">-R$&nbsp;11.857,10</td></tr><tr><td>🔻 IRRF 2026</td><td class="rn">-R$&nbsp;1.982,04</td><td class="rn" style="">-R$&nbsp;23.784,54</td></tr><tr><td>✅ Líquido Mensal</td><td class="rb">R$&nbsp;8.529,86</td><td class="rb" style="">R$&nbsp;102.358,36</td></tr><tr><td>🎁 VR/VA</td><td class="rp">R$&nbsp;700,00</td><td class="rp" style="">R$&nbsp;8.400,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Recebimentos anuais ───</td></tr><tr><td>🎄 13° Líq. (IR excl. fonte)</td><td class="rp">R$&nbsp;8.529,86 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🌴 Férias+1/3 Líq.</td><td class="rp">R$&nbsp;11.309,03 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🏆 PLR Líquida</td><td class="rp">R$&nbsp;9.775,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>💼 FGTS (patrimônio)</td><td class="ro">R$&nbsp;920,00</td><td class="ro" style="">R$&nbsp;11.040,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Síntese ───</td></tr><tr><td>💵 Renda Operacional/mês</td><td class="rb">R$&nbsp;9.229,86</td><td class="rb" style="">(evento anual)</td></tr><tr><td>📅 Renda Real Diluída/mês</td><td class="rb">R$&nbsp;11.697,69</td><td class="rb" style="">(evento anual)</td></tr></tbody></table>
+          <table id="tP1"><thead><tr><th>Item</th><th>Mensal / Evento</th><th>Anual</th></tr></thead><tbody><tr><td>💰 Salário Bruto</td><td class="">R$&nbsp;0,00</td><td class="" style="">R$&nbsp;0,00</td></tr><tr><td>🔻 INSS</td><td class="rn">-R$&nbsp;0,00</td><td class="rn" style="">-R$&nbsp;0,00</td></tr><tr><td>🔻 IRRF 2026</td><td class="rn">-R$&nbsp;0,00</td><td class="rn" style="">-R$&nbsp;0,00</td></tr><tr><td>✅ Líquido Mensal</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">R$&nbsp;0,00</td></tr><tr><td>🎁 VR/VA</td><td class="rp">R$&nbsp;0,00</td><td class="rp" style="">R$&nbsp;0,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Recebimentos anuais ───</td></tr><tr><td>🎄 13° Líq. (IR excl. fonte)</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🌴 Férias+1/3 Líq.</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🏆 PLR Líquida</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>💼 FGTS (patrimônio)</td><td class="ro">R$&nbsp;0,00</td><td class="ro" style="">R$&nbsp;0,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Síntese ───</td></tr><tr><td>💵 Renda Operacional/mês</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">(evento anual)</td></tr><tr><td>📅 Renda Real Diluída/mês</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">(evento anual)</td></tr></tbody></table>
           <div style="font-size:9px;color:var(--t3);margin-top:6px;padding:0 2px">¹ Recebido pontualmente (não mensal): 13° em dez · Férias em jul-ago · PLR conforme ACT</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--go);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--go);display:inline-block"></span>Pessoa 2</div>
-          <table id="tP2"><thead><tr><th>Item</th><th>Mensal / Evento</th><th>Anual</th></tr></thead><tbody><tr><td>💰 Salário Bruto</td><td class="">R$&nbsp;3.200,00</td><td class="" style="">R$&nbsp;38.400,00</td></tr><tr><td>🔻 INSS</td><td class="rn">-R$&nbsp;272,60</td><td class="rn" style="">-R$&nbsp;3.271,20</td></tr><tr><td>🔻 IRRF 2026</td><td class="rn">-R$&nbsp;0,00</td><td class="rn" style="">-R$&nbsp;0,00</td></tr><tr><td>✅ Líquido Mensal</td><td class="rb">R$&nbsp;2.927,40</td><td class="rb" style="">R$&nbsp;35.128,80</td></tr><tr><td>🎁 VR/VA</td><td class="rp">R$&nbsp;0,00</td><td class="rp" style="">R$&nbsp;0,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Recebimentos anuais ───</td></tr><tr><td>🎄 13° Líq. (IR excl. fonte)</td><td class="rp">R$&nbsp;2.882,45 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🌴 Férias+1/3 Líq.</td><td class="rp">R$&nbsp;3.994,07 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🏆 PLR Líquida</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>💼 FGTS (patrimônio)</td><td class="ro">R$&nbsp;256,00</td><td class="ro" style="">R$&nbsp;3.072,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Síntese ───</td></tr><tr><td>💵 Renda Operacional/mês</td><td class="rb">R$&nbsp;2.927,40</td><td class="rb" style="">(evento anual)</td></tr><tr><td>📅 Renda Real Diluída/mês</td><td class="rb">R$&nbsp;3.500,44</td><td class="rb" style="">(evento anual)</td></tr></tbody></table>
+          <table id="tP2"><thead><tr><th>Item</th><th>Mensal / Evento</th><th>Anual</th></tr></thead><tbody><tr><td>💰 Salário Bruto</td><td class="">R$&nbsp;0,00</td><td class="" style="">R$&nbsp;0,00</td></tr><tr><td>🔻 INSS</td><td class="rn">-R$&nbsp;0,00</td><td class="rn" style="">-R$&nbsp;0,00</td></tr><tr><td>🔻 IRRF 2026</td><td class="rn">-R$&nbsp;0,00</td><td class="rn" style="">-R$&nbsp;0,00</td></tr><tr><td>✅ Líquido Mensal</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">R$&nbsp;0,00</td></tr><tr><td>🎁 VR/VA</td><td class="rp">R$&nbsp;0,00</td><td class="rp" style="">R$&nbsp;0,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Recebimentos anuais ───</td></tr><tr><td>🎄 13° Líq. (IR excl. fonte)</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🌴 Férias+1/3 Líq.</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>🏆 PLR Líquida</td><td class="rp">R$&nbsp;0,00 ¹</td><td class="rp" style="color:var(--t3);font-size:11px">(evento anual)</td></tr><tr><td>💼 FGTS (patrimônio)</td><td class="ro">R$&nbsp;0,00</td><td class="ro" style="">R$&nbsp;0,00</td></tr><tr style="background:var(--bg6)"><td colspan="3" style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:5px 12px">─── Síntese ───</td></tr><tr><td>💵 Renda Operacional/mês</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">(evento anual)</td></tr><tr><td>📅 Renda Real Diluída/mês</td><td class="rb">R$&nbsp;0,00</td><td class="rb" style="">(evento anual)</td></tr></tbody></table>
           <div style="font-size:9px;color:var(--t3);margin-top:6px;padding:0 2px">¹ Recebido pontualmente (não mensal): 13° em dez · Férias em jul-ago · PLR conforme ACT</div>
         </div>
       </div>
@@ -860,36 +848,36 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <table id="tBudget">
         <thead><tr><th style="width:30%">Categoria</th><th>%</th><th>Valor (R$)</th><th style="width:28%">Participação</th></tr></thead>
         <tbody><tr><td>🏠 Moradia</td>
-      <td style="font-family:var(--fm);text-align:right">15%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;1.823,59</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:15%;height:6px;border-radius:3px;background:#6aace6"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">15%</div></td></tr><tr><td>🍽 Alimentação</td>
-      <td style="font-family:var(--fm);text-align:right">15%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;1.823,59</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:15%;height:6px;border-radius:3px;background:#5dd4a0"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">15%</div></td></tr><tr><td>🚗 Transporte</td>
-      <td style="font-family:var(--fm);text-align:right">10%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;1.215,73</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:10%;height:6px;border-radius:3px;background:#e6b86a"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">10%</div></td></tr><tr><td>💡 Contas</td>
-      <td style="font-family:var(--fm);text-align:right">3%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;364,72</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:3%;height:6px;border-radius:3px;background:#c86ae6"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">3%</div></td></tr><tr><td>🎉 Lazer</td>
-      <td style="font-family:var(--fm);text-align:right">27%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;3.282,46</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:27%;height:6px;border-radius:3px;background:#e06c6c"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">27%</div></td></tr><tr><td>📈 Investimento</td>
-      <td style="font-family:var(--fm);text-align:right">30%</td>
-      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;3.647,18</td>
-      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:30%;height:6px;border-radius:3px;background:#5dd4a0"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">30%</div></td></tr></tbody><tfoot><tr class="rb"><td>Total</td>
-    <td style="font-family:var(--fm);text-align:right;color:var(--ac)">100%</td>
-    <td style="font-family:var(--fm);text-align:right">R$&nbsp;12.157,26</td>
+      <td style="font-family:var(--fm);text-align:right">16%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:16%;height:6px;border-radius:3px;background:#6aace6"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">16%</div></td></tr><tr><td>🍽 Alimentação</td>
+      <td style="font-family:var(--fm);text-align:right">11%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:11%;height:6px;border-radius:3px;background:#5dd4a0"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">11%</div></td></tr><tr><td>🚗 Transporte</td>
+      <td style="font-family:var(--fm);text-align:right">11%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:11%;height:6px;border-radius:3px;background:#e6b86a"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">11%</div></td></tr><tr><td>💡 Contas</td>
+      <td style="font-family:var(--fm);text-align:right">5%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:5%;height:6px;border-radius:3px;background:#c86ae6"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">5%</div></td></tr><tr><td>🎉 Lazer</td>
+      <td style="font-family:var(--fm);text-align:right">11%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:11%;height:6px;border-radius:3px;background:#e06c6c"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">11%</div></td></tr><tr><td>📈 Investimento</td>
+      <td style="font-family:var(--fm);text-align:right">35%</td>
+      <td style="font-family:var(--fm);text-align:right;color:var(--t1)">R$&nbsp;0,00</td>
+      <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:35%;height:6px;border-radius:3px;background:#5dd4a0"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">35%</div></td></tr></tbody><tfoot><tr class="rb"><td>Total</td>
+    <td style="font-family:var(--fm);text-align:right;color:var(--ac)">89%</td>
+    <td style="font-family:var(--fm);text-align:right">R$&nbsp;0,00</td>
     <td style="font-size:10px;color:var(--t3)">✅ Balanceado</td></tr>
     <tr style="background:var(--bg6)"><td colspan="4" style="font-size:10px;color:var(--t3);padding:6px 12px">
-      📊 Base de cálculo: <strong style="color:var(--t2)">R$&nbsp;12.157,26/mês operacional</strong> · 
-      Capacidade de aporte anual diluída: <strong style="color:var(--ac)">R$&nbsp;15.198,13/mês</strong>
+      📊 Base de cálculo: <strong style="color:var(--t2)">R$&nbsp;0,00/mês operacional</strong> · 
+      Capacidade de aporte anual diluída: <strong style="color:var(--ac)">R$&nbsp;0,00/mês</strong>
     </td></tr></tfoot>
       </table>
     </div>
@@ -898,43 +886,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <!-- MILESTONES -->
   <div class="panel">
     <div class="ph2"><span style="font-size:16px">🏆</span><span class="pt">Marcos Financeiros da Jornada</span><span style="font-size:10px;color:var(--t3);margin-left:auto">Clique para ver snapshot</span></div>
-    <div class="pb"><div class="ms-list" id="msList">
-    <div class="ms-item" style="animation:mIn .3s ease 0s both" onclick="openM(2)">
-      <div class="ms-dot" style="color:#5dd4a0;background:#5dd4a0"></div>
-      <div style="flex:1;min-width:0">
-        <div class="ms-yr">2028 · Ano 2</div>
-        <div class="ms-ti">🌱 R$ 100 mil acumulados</div>
-        <div class="ms-vl" style="color:#5dd4a0">R$&nbsp;133.721,05</div>
-      </div>
-      <div style="font-size:10px;color:var(--t3);text-align:right;flex-shrink:0">
-        <div>Renda: R$ 16.1K/mês</div>
-        <div style="color:#5dd4a0;margin-top:2px;font-size:9px">→ ver snapshot</div>
-      </div>
-    </div>
-    <div class="ms-item" style="animation:mIn .3s ease 0.06s both" onclick="openM(4)">
-      <div class="ms-dot" style="color:#6aace6;background:#6aace6"></div>
-      <div style="flex:1;min-width:0">
-        <div class="ms-yr">2030 · Ano 4</div>
-        <div class="ms-ti">🌿 R$ 250 mil acumulados</div>
-        <div class="ms-vl" style="color:#6aace6">R$&nbsp;265.156,47</div>
-      </div>
-      <div style="font-size:10px;color:var(--t3);text-align:right;flex-shrink:0">
-        <div>Renda: R$ 17.1K/mês</div>
-        <div style="color:#6aace6;margin-top:2px;font-size:9px">→ ver snapshot</div>
-      </div>
-    </div>
-    <div class="ms-item" style="animation:mIn .3s ease 0.12s both" onclick="openM(7)">
-      <div class="ms-dot" style="color:#e6b86a;background:#e6b86a"></div>
-      <div style="flex:1;min-width:0">
-        <div class="ms-yr">2033 · Ano 7</div>
-        <div class="ms-ti">💎 R$ 500 mil acumulados</div>
-        <div class="ms-vl" style="color:#e6b86a">R$&nbsp;528.149,41</div>
-      </div>
-      <div style="font-size:10px;color:var(--t3);text-align:right;flex-shrink:0">
-        <div>Renda: R$ 18.6K/mês</div>
-        <div style="color:#e6b86a;margin-top:2px;font-size:9px">→ ver snapshot</div>
-      </div>
-    </div></div></div>
+    <div class="pb"><div class="ms-list" id="msList"><div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Ajuste os valores para visualizar marcos financeiros</div></div></div>
   </div>
 
   <!-- CHART -->
@@ -950,13 +902,13 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div><!-- end screenSimulador -->
 
 <!-- ACOMPANHAMENTO SCREEN -->
-<div id="screenAcompanhamento" class="screen-full" style="display: flex;">
+<div id="screenAcompanhamento" class="screen-full" style="display:none">
 
   <!-- REGISTRO DO MÊS -->
   <div class="track-form">
     <div class="track-form-header">
       <div class="track-form-title">➕ Registrar Mês</div>
-      <div style="font-size:11px;color:var(--t3)" id="trackPatrimonioAnteriorInfo">1º registro — sem mês anterior</div>
+      <div style="font-size:11px;color:var(--t3)" id="trackPatrimonioAnteriorInfo"></div>
     </div>
     <div class="track-form-body">
       <div class="track-row">
@@ -973,7 +925,9 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
           <input type="number" id="trackPatrimonio" min="0" placeholder="Ex: 51.180" oninput="updateTrackCalc()">
         </div>
       </div>
-      <div class="track-calc-info" id="trackCalcInfo"><span style="color:var(--t3)">Preencha os campos para ver o cálculo</span></div>
+      <div class="track-calc-info" id="trackCalcInfo">
+        <span style="color:var(--t3);font-size:11px">Preencha os campos acima para ver o cálculo do rendimento</span>
+      </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="track-btn primary" onclick="saveTrackEntry()">✓ Registrar</button>
       </div>
@@ -981,64 +935,16 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   </div>
 
   <!-- INSIGHTS -->
-  <div class="panel" id="trackInsightsPanel" style="display: block;">
+  <div class="panel" id="trackInsightsPanel" style="display:none">
     <div class="ph2"><span style="font-size:16px">💡</span><span class="pt">Insights — Como você está em relação ao planejado</span></div>
-    <div class="pb"><div class="insights-grid" id="trackInsights">
-    <div class="insight-card ic-red">
-      <div class="insight-icon">🏦</div>
-      <div class="insight-title">Patrimônio Real vs. Simulado</div>
-      <div class="insight-value" style="color:var(--re)">R$&nbsp;38.500,00</div>
-      <div class="insight-desc"><strong style="color:var(--re)">-R$&nbsp;95.221,05</strong> abaixo do simulado (R$&nbsp;133.721,05).
-      </div>
-      <div class="insight-badge" style="background:var(--reg);color:var(--re)">⚠️ Aportar +R$&nbsp;15.996,73/mês por 6 meses para recuperar</div>
-    </div>
-    <div class="insight-card ic-green">
-      <div class="insight-icon">📊</div>
-      <div class="insight-title">Taxa Real Média</div>
-      <div class="insight-value" style="color:var(--ac)">
-        12.2% a.a.
-      </div>
-      <div class="insight-desc">
-        Acima do simulado (10% a.a.). Ótima rentabilidade! 🎯
-      </div>
-    </div>
-    <div class="insight-card ic-green">
-      <div class="insight-icon">✨</div>
-      <div class="insight-title">Rendimento Total Acumulado</div>
-      <div class="insight-value" style="color:var(--ac)">
-        +R$&nbsp;700,00
-      </div>
-      <div class="insight-desc">
-        Sobre R$&nbsp;7.800,00 aportados — multiplicador de <strong>9.0%</strong>.
-        2 meses positivos, 0 negativos.
-      </div>
-    </div>
-      <div class="insight-card ic-gold">
-        <div class="insight-icon">💪</div>
-        <div class="insight-title">Consistência de Aportes</div>
-        <div class="insight-value" style="color:var(--go)">
-          71%
-        </div>
-        <div class="insight-desc">
-          Boa consistência. Tente manter o aporte mensal planejado.
-        </div>
-      </div>
-      <div class="insight-card ic-purple">
-        <div class="insight-icon">🔮</div>
-        <div class="insight-title">Projeção Ajustada pela Taxa Real</div>
-        <div class="insight-value" style="color:var(--pu)">R$ 1.07M</div>
-        <div class="insight-desc">
-          Usando sua taxa real de 12.2% a.a. com 117 meses restantes.
-          Simulado original: R$ 894.4K.
-        </div>
-      </div></div></div>
+    <div class="pb"><div class="insights-grid" id="trackInsights"></div></div>
   </div>
 
   <!-- GRÁFICO COMPARATIVO -->
-  <div class="panel" id="trackChartPanel" style="display: block;">
+  <div class="panel" id="trackChartPanel" style="display:none">
     <div class="ph2"><span style="font-size:16px">📈</span><span class="pt">Realizado vs. Simulado</span></div>
     <div class="pb">
-      <div class="compare-chart-wrap"><canvas id="compareChart" width="1323" height="400" style="display: block; box-sizing: border-box; height: 320px; width: 1058px;"></canvas></div>
+      <div class="compare-chart-wrap"><canvas id="compareChart"></canvas></div>
     </div>
   </div>
 
@@ -1047,60 +953,16 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
     <div class="ph2">
       <span style="font-size:16px">📋</span>
       <span class="pt">Histórico de Registros</span>
-      <span style="margin-left:auto;font-size:11px;color:var(--t3)" id="trackHistCount">3 meses registrados</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--t3)" id="trackHistCount"></span>
     </div>
     <div class="pb">
       <div id="trackHistArea">
-    <div class="track-table-wrap">
-      <table class="track-table">
-        <thead>
-          <tr>
-            <th style="text-align:left">Mês</th>
-            <th>Aporte</th>
-            <th>Rendimento</th>
-            <th>Taxa/mês</th>
-            <th>Taxa anual.</th>
-            <th>Patrimônio</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody><tr>
-      <td>mar. de 26 </td>
-      <td class="pos">R$&nbsp;0,00</td>
-      <td class="neu">—</td>
-      <td class="neu">—</td>
-      <td class="neu">— a.a.</td>
-      <td class="pos">R$&nbsp;30.000,00</td>
-      <td><button class="del-btn" onclick="deleteTrackEntry('2026-03')" title="Excluir">🗑</button></td>
-    </tr><tr>
-      <td>abr. de 26 <span class="semaforo sem-red">▼ abaixo do plano</span></td>
-      <td class="pos">R$&nbsp;3.800,00</td>
-      <td class="pos">+R$&nbsp;100,00</td>
-      <td class="pos">0.30%</td>
-      <td class="neu">3.6% a.a.</td>
-      <td class="pos">R$&nbsp;33.900,00</td>
-      <td><button class="del-btn" onclick="deleteTrackEntry('2026-04')" title="Excluir">🗑</button></td>
-    </tr><tr>
-      <td>mai. de 26 <span class="semaforo sem-green">▲ acima do plano</span></td>
-      <td class="pos">R$&nbsp;4.000,00</td>
-      <td class="pos">+R$&nbsp;600,00</td>
-      <td class="pos">1.58%</td>
-      <td class="pos">20.7% a.a.</td>
-      <td class="pos">R$&nbsp;38.500,00</td>
-      <td><button class="del-btn" onclick="deleteTrackEntry('2026-05')" title="Excluir">🗑</button></td>
-    </tr></tbody>
-        <tfoot>
-          <tr>
-            <td>Total / Acumulado</td>
-            <td>R$&nbsp;7.800,00</td>
-            <td class="pos">+R$&nbsp;700,00</td>
-            <td colspan="2">—</td>
-            <td>R$&nbsp;38.500,00</td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div></div>
+        <div class="track-empty">
+          <div class="track-empty-icon">📭</div>
+          <div class="track-empty-title">Nenhum registro ainda</div>
+          <div class="track-empty-sub">Registre o primeiro mês acima. Você só precisa informar o aporte que fez e o saldo atual da carteira — o rendimento é calculado automaticamente.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1295,7 +1157,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">📋</span><span id="toastMsg">"Simulação 22/03/2026" carregada!</span></div>
+<div class="toast show" id="toast"><span class="toast-icon" id="toastIcon">🐙</span><span id="toastMsg">Token salvo! Clique em Publicar para enviar ao GitHub.</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
@@ -3659,95 +3521,178 @@ function renderTrackInsights(entries) {
   if (entries.length < 1) { panel.style.display = 'none'; return; }
   panel.style.display = 'block';
 
-  const taxaSim   = parseFloat(document.getElementById('taxaAnual')?.value) || 10;
-  const pctInvest = parseFloat(document.getElementById('pctInvest')?.value) || 35;
+  const taxaSim    = parseFloat(document.getElementById('taxaAnual')?.value) || 10;
+  const taxaSimMes = Math.pow(1 + taxaSim/100, 1/12) - 1;
+  const reaj       = (parseFloat(document.getElementById('reajuste')?.value) || 5) / 100;
+  const anosTotal  = parseInt(document.getElementById('anos')?.value) || 20;
 
-  // Cálculos
-  const comRend = entries.filter(e => e.rendimento !== null);
-  const ultPatr = entries[entries.length-1]?.patrimonio || 0;
-  const totalAp = entries.reduce((s,e) => s + (e.aporte||0), 0);
-  const totalRend = comRend.reduce((s,e) => s + e.rendimento, 0);
+  // ── Dados base ──
+  const comRend    = entries.filter(e => e.rendimento !== null);
+  const ultEntry   = entries[entries.length-1];
+  const ultPatr    = ultEntry?.patrimonio || 0;
+  const ultMes     = ultEntry?.mes || '';
+  const totalAp    = entries.reduce((s,e) => s + (e.aporte||0), 0);
+  const totalRend  = comRend.reduce((s,e) => s + e.rendimento, 0);
+  const negativos  = comRend.filter(e => e.rendimento < 0).length;
+  const positivos  = comRend.filter(e => e.rendimento > 0).length;
 
-  const taxasAnuais = comRend.map(e => e.taxaAnual).filter(t => t !== null);
-  const taxaMediaReal = taxasAnuais.length ? taxasAnuais.reduce((a,b)=>a+b,0)/taxasAnuais.length : null;
+  // ── Taxa real: média ponderada pelo patrimônio (mais precisa que média simples) ──
+  // Usa XIRR simplificado: taxa geométrica encadeada dos meses com rendimento
+  let taxaMediaReal = null;
+  if (comRend.length >= 1) {
+    // Produto das taxas mensais (1+r1)(1+r2)...(1+rN) → taxa composta
+    const produto = comRend.reduce((acc, e) => {
+      const tm = e.taxaMensal !== null ? e.taxaMensal / 100 : 0;
+      return acc * (1 + tm);
+    }, 1);
+    const taxaMesMedia = Math.pow(produto, 1/comRend.length) - 1;
+    taxaMediaReal = (Math.pow(1 + taxaMesMedia, 12) - 1) * 100;
+  }
 
-  const negativos = comRend.filter(e => e.rendimento < 0).length;
-  const positivos = comRend.filter(e => e.rendimento > 0).length;
-
-  // Patrimônio simulado no mesmo período
+  // ── Patrimônio simulado no mês exato do último registro ──
+  // FIX: usa patNoMes() com interpolação, calculando meses desde o início
   let patSimulado = null;
-  if (typeof snaps !== 'undefined' && snaps.length && entries.length) {
+  let mesesDecorridos = 0;
+  if (typeof snaps !== 'undefined' && snaps.length > 1 && entries.length > 0) {
     const firstMes = entries[0].mes;
-    const lastMes  = entries[entries.length-1].mes;
-    const mesesDecorridos = (() => {
-      const [fy,fm] = firstMes.split('-').map(Number);
-      const [ly,lm] = lastMes.split('-').map(Number);
-      return (ly - fy) * 12 + (lm - fm);
-    })();
-    const snapIdx = Math.min(mesesDecorridos, snaps.length-1);
-    if (snapIdx > 0 && snaps[snapIdx]) patSimulado = snaps[snapIdx].pat;
+    const [fy,fm] = firstMes.split('-').map(Number);
+    const [ly,lm] = ultMes.split('-').map(Number);
+    mesesDecorridos = (ly - fy) * 12 + (lm - fm);
+    // patNoMes interpola entre anos do snap → valor correto para qualquer mês
+    patSimulado = typeof patNoMes === 'function'
+      ? patNoMes(mesesDecorridos)
+      : null;
   }
 
-  const desvioPatr = patSimulado !== null ? ultPatr - patSimulado : null;
-  const desvioClass = desvioPatr === null ? 'ic-blue' :
-                      desvioPatr >= 0 ? 'ic-green' : 'ic-red';
+  const desvioPatr  = patSimulado !== null ? ultPatr - patSimulado : null;
+  const desvioClass = desvioPatr === null ? 'ic-blue' : desvioPatr >= 0 ? 'ic-green' : 'ic-red';
+  const ultMesLabel = ultMes ? new Date(ultMes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) : '';
 
-  // Projeção: quanto falta aportar por mês para recuperar desvio em 6 meses
+  // ── Recuperação de desvio: cálculo correto com juros compostos ──
+  // Quanto aportar a mais por mês para recuperar o desvio em N meses,
+  // considerando que o patrimônio atual também cresce com juros
   let recuperacao = null;
+  let mesesRecuperar = 6;
   if (desvioPatr !== null && desvioPatr < 0) {
-    const taxaMes = (Math.pow(1+taxaSim/100, 1/12)-1);
-    recuperacao = Math.abs(desvioPatr) / 6 * (1 + taxaMes);
+    // FV do desvio em N meses a taxa simulada = quanto ainda faltará
+    // Aporte extra necessário = FV_desvio / ((1+r)^N - 1) * r  (anuidade)
+    const fvDesvio = Math.abs(desvioPatr) * Math.pow(1 + taxaSimMes, mesesRecuperar);
+    if (taxaSimMes > 0) {
+      recuperacao = fvDesvio * taxaSimMes / (Math.pow(1 + taxaSimMes, mesesRecuperar) - 1);
+    } else {
+      recuperacao = Math.abs(desvioPatr) / mesesRecuperar;
+    }
   }
 
-  // Consistência de aportes
-  const aportesSim = (() => {
-    if (typeof snaps === 'undefined') return null;
+  // ── Consistência: compara com aporte simulado REAJUSTADO para cada mês ──
+  // FIX: não usa snaps[0].apN fixo — reconstrói o aporte esperado mês a mês
+  let consistencia = null;
+  if (typeof snaps !== 'undefined' && snaps.length && entries.length > 0) {
     const ap0 = snaps[0]?.apN || 0;
-    return ap0;
-  })();
-  const consistencia = aportesSim && totalAp > 0
-    ? (totalAp / (aportesSim * entries.length) * 100).toFixed(0)
-    : null;
+    if (ap0 > 0) {
+      // Aporte esperado em cada mês (reajustado anualmente)
+      const firstMes = entries[0].mes;
+      const [fy0,fm0] = firstMes.split('-').map(Number);
+      let totalSimulado = 0;
+      entries.forEach(e => {
+        const [ey,em] = e.mes.split('-').map(Number);
+        const mesesDesdePrimeiro = (ey-fy0)*12 + (em-fm0);
+        const anosReaj = Math.floor(mesesDesdePrimeiro / 12);
+        const aporteEsperado = ap0 * Math.pow(1 + reaj, anosReaj);
+        totalSimulado += aporteEsperado;
+      });
+      consistencia = totalSimulado > 0
+        ? Math.min(200, (totalAp / totalSimulado * 100)).toFixed(0)
+        : null;
+    }
+  }
+
+  // ── Projeção ajustada: usa patrimônio REAL atual + taxa real ──
+  // FIX: mesesRestantes = total do horizonte MENOS meses já decorridos desde o INÍCIO
+  let patFinalAjustado = null;
+  let mesesRestantes   = 0;
+  if (taxaMediaReal !== null && ultPatr > 0) {
+    const taxaMesReal = Math.pow(1 + taxaMediaReal/100, 1/12) - 1;
+    // Meses passados desde o início da simulação (não só dos registros)
+    mesesRestantes = Math.max(0, anosTotal * 12 - mesesDecorridos);
+    let patFinal = ultPatr;
+    let ap = ultEntry?.aporte || (snaps?.[0]?.apN || 0);
+    // Reajusta o aporte para o momento atual
+    const anosJaPassados = Math.floor(mesesDecorridos / 12);
+    ap = (snaps?.[0]?.apN || ap) * Math.pow(1 + reaj, anosJaPassados);
+    let mc = 0;
+    while (mc < mesesRestantes) {
+      patFinal = patFinal * (1 + taxaMesReal) + ap;
+      mc++;
+      if (mc % 12 === 0) ap *= (1 + reaj);
+    }
+    patFinalAjustado = patFinal;
+  }
+
+  const patSimFinal = snaps?.length ? snaps[snaps.length-1]?.pat || 0 : 0;
 
   const cards = [];
 
-  // Card 1 — Patrimônio real vs simulado
+  // ── Card 1: Patrimônio Real vs. Simulado ──
   cards.push(`
     <div class="insight-card ${desvioClass}">
       <div class="insight-icon">🏦</div>
       <div class="insight-title">Patrimônio Real vs. Simulado</div>
-      <div class="insight-value" style="color:${desvioPatr===null?'var(--bl)':desvioPatr>=0?'var(--ac)':'var(--re)'}">${fmt(ultPatr)}</div>
-      <div class="insight-desc">${desvioPatr === null
-        ? 'Configure a simulação para comparar com o planejado.'
-        : desvioPatr >= 0
-          ? `<strong style="color:var(--ac)">+${fmt(desvioPatr)}</strong> acima do simulado (${fmt(patSimulado)}). Você está à frente do plano! 🚀`
-          : `<strong style="color:var(--re)">${fmt(desvioPatr)}</strong> abaixo do simulado (${fmt(patSimulado)}).`}
+      <div class="insight-value" style="color:${desvioPatr===null?'var(--bl)':desvioPatr>=0?'var(--ac)':'var(--re)'}">
+        ${fmt(ultPatr)}
       </div>
-      ${recuperacao ? `<div class="insight-badge" style="background:var(--reg);color:var(--re)">⚠️ Aportar +${fmt(recuperacao)}/mês por 6 meses para recuperar</div>` : ''}
+      <div class="insight-desc">
+        ${desvioPatr === null
+          ? 'Configure a simulação para comparar com o planejado.'
+          : `Em <strong>${ultMesLabel}</strong> o simulado previa <strong>${fmt(patSimulado)}</strong>.
+             Desvio: <strong style="color:${desvioPatr>=0?'var(--ac)':'var(--re)'}">${desvioPatr>=0?'+':''}${fmt(desvioPatr)}</strong>
+             ${desvioPatr >= 0 ? '🚀 Você está à frente do plano!' : ''}`}
+      </div>
+      ${recuperacao ? `
+        <div class="insight-badge" style="background:var(--reg);color:var(--re);margin-top:8px;display:block;padding:6px 10px;border-radius:8px;font-size:11px;line-height:1.4">
+          ⚠️ Para recuperar em ${mesesRecuperar} meses:<br>
+          aportar <strong>+${fmt(recuperacao)}/mês</strong> além do planejado
+        </div>` : ''}
     </div>`);
 
-  // Card 2 — Taxa real média
+  // ── Card 2: Taxa Real Média ──
+  const taxaColor2 = taxaMediaReal === null ? 'var(--bl)'
+    : taxaMediaReal >= taxaSim ? 'var(--ac)'
+    : taxaMediaReal >= taxaSim*0.7 ? 'var(--go)'
+    : 'var(--re)';
+  const taxaClass2 = taxaMediaReal === null ? 'ic-blue'
+    : taxaMediaReal >= taxaSim ? 'ic-green'
+    : taxaMediaReal >= taxaSim*0.7 ? 'ic-gold'
+    : 'ic-red';
+  // Diferença em pontos percentuais vs. simulado
+  const diffTaxa = taxaMediaReal !== null ? (taxaMediaReal - taxaSim).toFixed(1) : null;
   cards.push(`
-    <div class="insight-card ${taxaMediaReal === null ? 'ic-blue' : taxaMediaReal >= taxaSim*0.8 ? 'ic-green' : taxaMediaReal >= 0 ? 'ic-gold' : 'ic-red'}">
+    <div class="insight-card ${taxaClass2}">
       <div class="insight-icon">📊</div>
       <div class="insight-title">Taxa Real Média</div>
-      <div class="insight-value" style="color:${taxaMediaReal === null ? 'var(--bl)' : taxaMediaReal >= taxaSim*0.8 ? 'var(--ac)' : taxaMediaReal >= 0 ? 'var(--go)' : 'var(--re)'}">
+      <div class="insight-value" style="color:${taxaColor2}">
         ${taxaMediaReal !== null ? taxaMediaReal.toFixed(1) + '% a.a.' : '—'}
       </div>
       <div class="insight-desc">
         ${taxaMediaReal === null
           ? 'Registre pelo menos 2 meses para calcular.'
-          : taxaMediaReal >= taxaSim
-            ? `Acima do simulado (${taxaSim}% a.a.). Ótima rentabilidade! 🎯`
-            : taxaMediaReal >= taxaSim * 0.8
-              ? `Próxima do simulado (${taxaSim}% a.a.). Dentro do esperado.`
-              : taxaMediaReal >= 0
-                ? `Abaixo do simulado (${taxaSim}% a.a.). Considere revisar a alocação.`
-                : `Rentabilidade negativa no período. Renda variável em queda.`}
+          : `vs. ${taxaSim}% simulado
+             <span style="color:${taxaMediaReal>=taxaSim?'var(--ac)':'var(--re)'};font-weight:600">
+               (${diffTaxa > 0?'+':''}${diffTaxa} p.p.)
+             </span><br>
+             ${taxaMediaReal >= taxaSim
+               ? 'Rentabilidade acima do plano! 🎯'
+               : taxaMediaReal >= taxaSim*0.7
+                 ? 'Dentro do esperado. Continue assim.'
+                 : taxaMediaReal >= 0
+                   ? 'Abaixo do plano. Revise a alocação.'
+                   : 'Rentabilidade negativa. Renda variável em queda.'}`}
       </div>
     </div>`);
 
-  // Card 3 — Rendimento total
+  // ── Card 3: Rendimento Total ──
+  const melhorMes = comRend.length ? comRend.reduce((a,b) => (b.rendimento||0)>(a.rendimento||0)?b:a) : null;
+  const piorMes   = comRend.length ? comRend.reduce((a,b) => (b.rendimento||0)<(a.rendimento||0)?b:a) : null;
   cards.push(`
     <div class="insight-card ${totalRend >= 0 ? 'ic-green' : 'ic-red'}">
       <div class="insight-icon">${totalRend >= 0 ? '✨' : '📉'}</div>
@@ -3756,14 +3701,20 @@ function renderTrackInsights(entries) {
         ${totalRend >= 0 ? '+' : ''}${fmt(totalRend)}
       </div>
       <div class="insight-desc">
-        Sobre ${fmt(totalAp)} aportados — multiplicador de <strong>${totalAp > 0 ? ((totalRend/totalAp)*100).toFixed(1) : 0}%</strong>.
-        ${positivos} ${positivos === 1 ? 'mês positivo' : 'meses positivos'}, ${negativos} ${negativos === 1 ? 'negativo' : 'negativos'}.
+        Sobre <strong>${fmt(totalAp)}</strong> aportados
+        (${totalAp > 0 ? ((totalRend/totalAp)*100).toFixed(1) : 0}% de retorno).<br>
+        ${positivos} positivo${positivos!==1?'s':''}, ${negativos} negativo${negativos!==1?'s':''}
+        ${melhorMes ? `· Melhor: <strong style="color:var(--ac)">${new Date(melhorMes.mes+'-02').toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})} (+${fmt(melhorMes.rendimento)})</strong>` : ''}
+        ${piorMes && piorMes.rendimento < 0 ? `· Pior: <strong style="color:var(--re)">${new Date(piorMes.mes+'-02').toLocaleDateString('pt-BR',{month:'short',year:'2-digit'})} (${fmt(piorMes.rendimento)})</strong>` : ''}
       </div>
     </div>`);
 
-  // Card 4 — Consistência de aportes
+  // ── Card 4: Consistência ──
   if (consistencia !== null) {
     const cNum = parseInt(consistencia);
+    // Calcula aporte médio realizado vs. esperado
+    const apMedioReal = entries.length > 0 ? totalAp / entries.length : 0;
+    const apMedioEsp  = snaps?.[0]?.apN || 0;
     cards.push(`
       <div class="insight-card ${cNum >= 90 ? 'ic-green' : cNum >= 70 ? 'ic-gold' : 'ic-red'}">
         <div class="insight-icon">💪</div>
@@ -3772,39 +3723,31 @@ function renderTrackInsights(entries) {
           ${consistencia}%
         </div>
         <div class="insight-desc">
+          Média realizada: <strong>${fmt(apMedioReal)}/mês</strong>
+          vs. planejado: <strong>${fmt(apMedioEsp)}/mês</strong>.<br>
           ${cNum >= 90
-            ? 'Excelente disciplina! Você está aportando conforme o planejado. 🏆'
+            ? '🏆 Disciplina excelente! Mantendo o plano.'
             : cNum >= 70
-              ? 'Boa consistência. Tente manter o aporte mensal planejado.'
-              : 'Aportes abaixo do planejado. Revise o orçamento para aumentar a regularidade.'}
+              ? 'Boa consistência. Tente fechar o gap.'
+              : `Abaixo do planejado. Faltaram ~${fmt(apMedioEsp - apMedioReal)}/mês em média.`}
         </div>
       </div>`);
   }
 
-  // Card 5 — Projeção ajustada
-  if (taxaMediaReal !== null && ultPatr > 0) {
-    const taxaMesReal = Math.pow(1 + taxaMediaReal/100, 1/12) - 1;
-    const aporteAtual = entries[entries.length-1]?.aporte || 0;
-    const anosRestantes = parseInt(document.getElementById('anos')?.value) || 20;
-    const mesesPassados = entries.length;
-    const mesesRestantes = Math.max(0, anosRestantes * 12 - mesesPassados);
-    let patFinal = ultPatr;
-    let ap = aporteAtual;
-    const reaj = (parseFloat(document.getElementById('reajuste')?.value) || 5) / 100;
-    let mesCount = 0;
-    while (mesCount < mesesRestantes) {
-      patFinal = patFinal * (1 + taxaMesReal) + ap;
-      mesCount++;
-      if (mesCount % 12 === 0) ap *= (1 + reaj);
-    }
+  // ── Card 5: Projeção ajustada ──
+  if (patFinalAjustado !== null) {
+    const difProj = patFinalAjustado - patSimFinal;
     cards.push(`
       <div class="insight-card ic-purple">
         <div class="insight-icon">🔮</div>
         <div class="insight-title">Projeção Ajustada pela Taxa Real</div>
-        <div class="insight-value" style="color:var(--pu)">${fmtK(patFinal)}</div>
+        <div class="insight-value" style="color:var(--pu)">${fmtK(patFinalAjustado)}</div>
         <div class="insight-desc">
-          Usando sua taxa real de ${taxaMediaReal.toFixed(1)}% a.a. com ${mesesRestantes} meses restantes.
-          ${typeof snaps !== 'undefined' && snaps.length ? `Simulado original: ${fmtK(snaps[snaps.length-1]?.pat || 0)}.` : ''}
+          Taxa real ${taxaMediaReal.toFixed(1)}% a.a. · ${mesesRestantes} meses restantes<br>
+          Simulado original: <strong>${fmtK(patSimFinal)}</strong>
+          <span style="color:${difProj>=0?'var(--ac)':'var(--re)'}">
+            (${difProj>=0?'+':''}${fmtK(difProj)})
+          </span>
         </div>
       </div>`);
   }
