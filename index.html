@@ -72,6 +72,9 @@ body{background:var(--bg9);color:var(--t1);font-family:var(--fb);font-size:14px;
 .gh-btn.ready:hover{box-shadow:0 4px 16px rgba(93,212,160,.2)}
 .gh-btn.publishing{opacity:.6;pointer-events:none}
 .gh-btn.error{border-color:rgba(224,108,108,.35);color:var(--re);background:var(--reg)}
+.gh-pin-key{padding:14px;border-radius:10px;border:1px solid var(--bd);background:var(--bg6);color:var(--t1);font-size:18px;font-weight:600;cursor:pointer;font-family:var(--fm);transition:background .1s;-webkit-tap-highlight-color:transparent}
+.gh-pin-key:hover{background:var(--bg5)}
+.gh-pin-key:active{background:var(--bg5);transform:scale(.95)}
 .gh-setup-modal{position:fixed;inset:0;background:rgba(5,8,14,.88);backdrop-filter:blur(10px);z-index:9800;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
 .gh-setup-modal.open{opacity:1;pointer-events:all}
 .gh-setup-box{background:var(--bg8);border:1px solid var(--bda);border-radius:16px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.8);transform:scale(.96);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
@@ -205,6 +208,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
 /* ANIMATIONS */
 @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ghShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 @keyframes mIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 
@@ -570,7 +574,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
   <!-- ZONA ESQUERDA: Logo + Nav -->
   <div class="topbar-left">
-    <div class="logo">SimFin <span>· Financeiro Familiar</span></div>
+    <div class="logo" id="simfinLogo" onclick="ghLogoClick()" style="cursor:default;user-select:none">SimFin <span>· Financeiro Familiar</span></div>
     <div class="nav-tabs-group">
       <button class="nav-tab active" id="tabSimulador" onclick="switchScreen('simulador')">
         <span class="nav-tab-icon">📊</span> Simulador
@@ -662,9 +666,9 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       </div>
     </div>
 
-    <!-- GitHub Publish -->
-    <div style="position:relative">
-      <button class="gh-btn ready publishing" id="ghBtn" onclick="ghPublish()" title="Publicar no GitHub Pages (token configurado)">
+    <!-- GitHub Publish — 100% invisível. Acesso: clicar no logo 5x OU Shift+G -->
+    <div style="position: relative; display: block;" id="ghWrap">
+      <button class="gh-btn ready publishing" id="ghBtn" onclick="ghPublish()" title="Publicar no GitHub Pages">
         <span id="ghBtnIcon">⏳</span>
         <span id="ghBtnLabel">Publicando...</span>
       </button>
@@ -1130,34 +1134,95 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   </div>
 </div>
 
+<!-- GITHUB UNLOCK MODAL -->
+<div class="gh-setup-modal" id="ghUnlockModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="gh-setup-box">
+    <div class="smh">
+      <span class="smt">🔐 Modo Publicação</span>
+      <button class="mcl" onclick="document.getElementById('ghUnlockModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="smb">
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;background:var(--bg6);border-radius:8px;padding:12px">
+        Digite a senha para ativar o botão de publicação neste dispositivo.
+        <br><br>
+        <strong style="color:var(--t3)">Para acessar esta tela: segure <kbd style="background:var(--bg5);padding:1px 6px;border-radius:4px;font-family:var(--fm)">Shift</kbd> e pressione <kbd style="background:var(--bg5);padding:1px 6px;border-radius:4px;font-family:var(--fm)">P</kbd> três vezes.</strong>
+      </div>
+      <div class="track-ig">
+        <label style="font-size:11px;color:var(--t2);font-weight:500">Senha de publicação</label>
+        <input class="sm-input" id="ghUnlockInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')ghUnlock()">
+      </div>
+      <div class="sm-row">
+        <button class="sm-btn cancel" onclick="document.getElementById('ghUnlockModal').classList.remove('open')">Cancelar</button>
+        <button class="sm-btn confirm" onclick="ghUnlock()">Desbloquear ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- GITHUB SETUP MODAL -->
+<!-- PIN MODAL — para desbloquear o botão Publicar -->
+<div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
+  <div class="gh-setup-box">
+    <div class="smh">
+      <span class="smt" id="ghPinTitle">🔐 Crie um PIN de 4 dígitos</span>
+      <button class="mcl" onclick="ghClosePinModal()">✕</button>
+    </div>
+    <div class="smb">
+      <!-- PIN dots display -->
+      <div style="display:flex;justify-content:center;gap:12px;margin:4px 0 8px">
+        <div id="ghDot0" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot1" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot2" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot3" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+      </div>
+      <!-- PIN numpad -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto">
+        <button onclick="ghPinPress('1')" class="gh-pin-key">1</button>
+        <button onclick="ghPinPress('2')" class="gh-pin-key">2</button>
+        <button onclick="ghPinPress('3')" class="gh-pin-key">3</button>
+        <button onclick="ghPinPress('4')" class="gh-pin-key">4</button>
+        <button onclick="ghPinPress('5')" class="gh-pin-key">5</button>
+        <button onclick="ghPinPress('6')" class="gh-pin-key">6</button>
+        <button onclick="ghPinPress('7')" class="gh-pin-key">7</button>
+        <button onclick="ghPinPress('8')" class="gh-pin-key">8</button>
+        <button onclick="ghPinPress('9')" class="gh-pin-key">9</button>
+        <div></div>
+        <button onclick="ghPinPress('0')" class="gh-pin-key">0</button>
+        <button onclick="ghPinPress('⌫')" class="gh-pin-key" style="font-size:16px">⌫</button>
+      </div>
+      <div id="ghPinError" style="font-size:11px;color:var(--re);text-align:center;min-height:16px;margin-top:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOKEN MODAL — aparece após PIN correto, para configurar token -->
 <div class="gh-setup-modal" id="ghSetupModal" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="gh-setup-box">
     <div class="smh">
-      <span class="smt">🐙 Configurar publicação no GitHub</span>
+      <span class="smt">🐙 Token do GitHub</span>
       <button class="mcl" onclick="document.getElementById('ghSetupModal').classList.remove('open')">✕</button>
     </div>
     <div class="smb">
       <div style="font-size:12px;color:var(--t2);line-height:1.6;background:var(--bg6);border-radius:8px;padding:12px">
-        O token fica salvo <strong>apenas neste dispositivo</strong> (localStorage). Nunca vai para o código público.
+        Token salvo <strong>apenas neste dispositivo</strong>. Nunca vai para o código público.
       </div>
       <div class="track-ig">
         <label style="font-size:11px;color:var(--t2);font-weight:500">Personal Access Token (ghp_...)</label>
         <input class="sm-input" id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onkeydown="if(event.key==='Enter')ghSaveToken()">
       </div>
       <div style="font-size:11px;color:var(--t3)">
-        Gere em: github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → permissão <strong>repo</strong>
+        github.com → Settings → Developer settings → Personal access tokens → permissão <strong>repo</strong>
       </div>
       <div class="sm-row">
         <button class="sm-btn cancel" onclick="document.getElementById('ghSetupModal').classList.remove('open')">Cancelar</button>
-        <button class="sm-btn confirm" onclick="ghSaveToken()">Salvar token ✓</button>
+        <button class="sm-btn confirm" onclick="ghSaveToken()">Salvar ✓</button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast show" id="toast"><span class="toast-icon" id="toastIcon">🐙</span><span id="toastMsg">Token salvo! Clique em Publicar para enviar ao GitHub.</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔐</span><span id="toastMsg">PIN criado! Publicar disponível por 30 min.</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
@@ -3115,30 +3180,139 @@ function renderGoalsChart(goals){
 
 
 // ════════════════════════════════════════════════════════════════
-// GITHUB PUBLISH
-// Token salvo APENAS no localStorage deste dispositivo
-// Nunca vai para o código público no GitHub
+// GITHUB PUBLISH — PIN PROTEGIDO
+// • Botão 100% invisível para visitantes
+// • Acesso: clicar no logo 5x ou Shift+G
+// • PIN de 4 dígitos definido na primeira vez
+// • Token salvo APENAS no localStorage
+// • Auto-lock após 30 min
 // ════════════════════════════════════════════════════════════════
 
-const GH_TOKEN_KEY = 'simfin_gh_token';
-const GH_REPO      = 'paulovcr18/SimFin';
-const GH_FILE      = 'index.html';
-const GH_BRANCH    = 'main';
+const GH_TOKEN_KEY  = 'simfin_gh_token';
+const GH_PIN_KEY    = 'simfin_gh_pin_hash';
+const GH_UNLOCK_KEY = 'simfin_gh_unlocked_at';
+const GH_REPO       = 'paulovcr18/SimFin';
+const GH_FILE       = 'index.html';
+const GH_BRANCH     = 'main';
+const GH_LOCK_MS    = 30 * 60 * 1000;
 
-function ghGetToken() {
-  return localStorage.getItem(GH_TOKEN_KEY) || '';
+function ghHashPin(pin) {
+  let h = 5381;
+  for (let i = 0; i < pin.length; i++) h = (h * 33) ^ pin.charCodeAt(i);
+  return 'p' + (h >>> 0).toString(36);
 }
+
+function ghIsUnlocked() {
+  const at = parseInt(localStorage.getItem(GH_UNLOCK_KEY) || '0');
+  if (!at || !localStorage.getItem(GH_PIN_KEY)) return false;
+  if (Date.now() - at > GH_LOCK_MS) { localStorage.removeItem(GH_UNLOCK_KEY); return false; }
+  return true;
+}
+function ghRenew() {
+  if (ghIsUnlocked()) localStorage.setItem(GH_UNLOCK_KEY, Date.now().toString());
+}
+document.addEventListener('click', ghRenew);
+
+// ── Logo: 5 cliques rápidos ──
+let ghLogoClicks = [];
+function ghLogoClick() {
+  ghLogoClicks = [...ghLogoClicks.filter(t => Date.now() - t < 3000), Date.now()];
+  if (ghLogoClicks.length >= 5) { ghLogoClicks = []; ghOpenPin(); }
+}
+
+// ── Shift+G no teclado ──
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (e.shiftKey && e.key === 'G') ghOpenPin();
+});
+
+// ── PIN modal ──
+let ghPinBuffer = '';
+
+function ghOpenPin() {
+  ghPinBuffer = '';
+  ghUpdateDots();
+  document.getElementById('ghPinError').textContent = '';
+  const hasPin = !!localStorage.getItem(GH_PIN_KEY);
+  document.getElementById('ghPinTitle').textContent = hasPin ? '🔐 Digite seu PIN' : '🔐 Crie um PIN de 4 dígitos';
+  document.getElementById('ghPinModal').classList.add('open');
+}
+
+function ghClosePinModal() {
+  ghPinBuffer = '';
+  ghUpdateDots();
+  document.getElementById('ghPinModal').classList.remove('open');
+}
+
+function ghUpdateDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('ghDot' + i);
+    if (!dot) return;
+    dot.style.background  = i < ghPinBuffer.length ? 'var(--ac)' : 'var(--bg5)';
+    dot.style.borderColor = i < ghPinBuffer.length ? 'var(--ac)' : 'var(--bd)';
+  }
+}
+
+function ghPinPress(val) {
+  if (val === '⌫') { ghPinBuffer = ghPinBuffer.slice(0,-1); ghUpdateDots(); return; }
+  if (ghPinBuffer.length >= 4) return;
+  ghPinBuffer += String(val);
+  ghUpdateDots();
+  if (ghPinBuffer.length === 4) setTimeout(ghPinSubmit, 150);
+}
+
+document.addEventListener('keydown', e => {
+  const modal = document.getElementById('ghPinModal');
+  if (!modal?.classList.contains('open')) return;
+  if (e.key >= '0' && e.key <= '9') { e.preventDefault(); ghPinPress(e.key); }
+  if (e.key === 'Backspace')         { e.preventDefault(); ghPinPress('⌫'); }
+  if (e.key === 'Escape')             ghClosePinModal();
+});
+
+function ghPinSubmit() {
+  const saved = localStorage.getItem(GH_PIN_KEY);
+  const hash  = ghHashPin(ghPinBuffer);
+
+  if (!saved) {
+    // Primeira vez — define o PIN
+    localStorage.setItem(GH_PIN_KEY, hash);
+    localStorage.setItem(GH_UNLOCK_KEY, Date.now().toString());
+    ghClosePinModal();
+    ghUpdateUI();
+    if (!localStorage.getItem(GH_TOKEN_KEY)) {
+      setTimeout(() => {
+        document.getElementById('ghTokenInput').value = '';
+        document.getElementById('ghSetupModal').classList.add('open');
+        setTimeout(() => document.getElementById('ghTokenInput').focus(), 200);
+      }, 300);
+    }
+    showToast('PIN criado! Publicar disponível por 30 min.', '🔐');
+  } else if (hash === saved) {
+    localStorage.setItem(GH_UNLOCK_KEY, Date.now().toString());
+    ghClosePinModal();
+    ghUpdateUI();
+    showToast('Desbloqueado! Publicar disponível por 30 min.', '🔓');
+  } else {
+    document.getElementById('ghPinError').textContent = 'PIN incorreto. Tente novamente.';
+    const box = document.querySelector('#ghPinModal .gh-setup-box');
+    if (box) { box.style.animation='none'; box.offsetHeight; box.style.animation='ghShake .4s ease'; }
+    ghPinBuffer = '';
+    setTimeout(() => { ghUpdateDots(); document.getElementById('ghPinError').textContent = ''; }, 800);
+  }
+}
+
+function ghGetToken() { return localStorage.getItem(GH_TOKEN_KEY) || ''; }
 
 function ghSaveToken() {
   const token = document.getElementById('ghTokenInput').value.trim();
   if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-    showToast('Token inválido — deve começar com ghp_', '❌', 3000);
-    return;
+    showToast('Token inválido — deve começar com ghp_', '❌', 3000); return;
   }
   localStorage.setItem(GH_TOKEN_KEY, token);
   document.getElementById('ghSetupModal').classList.remove('open');
   ghUpdateUI();
-  showToast('Token salvo! Clique em Publicar para enviar ao GitHub.', '🐙');
+  showToast('Token salvo! Clique em 🚀 Publicar.', '🐙');
 }
 
 function ghClearToken() {
@@ -3148,110 +3322,86 @@ function ghClearToken() {
 }
 
 function ghUpdateUI() {
+  const wrap = document.getElementById('ghWrap');
+  if (!wrap) return;
+  const unlocked = ghIsUnlocked();
+  const hasToken = !!ghGetToken();
+  wrap.style.display = unlocked ? 'block' : 'none';
   const btn   = document.getElementById('ghBtn');
   const icon  = document.getElementById('ghBtnIcon');
   const label = document.getElementById('ghBtnLabel');
   if (!btn) return;
-  const hasToken = !!ghGetToken();
-  btn.className = 'gh-btn' + (hasToken ? ' ready' : '');
+  btn.className     = 'gh-btn' + (hasToken ? ' ready' : '');
   icon.textContent  = hasToken ? '🚀' : '🐙';
-  label.textContent = hasToken ? 'Publicar' : 'Publicar';
-  btn.title = hasToken
-    ? 'Publicar no GitHub Pages (token configurado)'
-    : 'Configurar token para publicar no GitHub';
-}
-
-async function ghPublish() {
-  const token = ghGetToken();
-
-  // Sem token → abre modal de configuração
-  if (!token) {
+  label.textContent = 'Publicar';
+  btn.title         = hasToken ? 'Publicar no GitHub Pages' : 'Configurar token';
+  btn.onclick       = hasToken ? ghPublish : () => {
     document.getElementById('ghTokenInput').value = '';
     document.getElementById('ghSetupModal').classList.add('open');
     setTimeout(() => document.getElementById('ghTokenInput').focus(), 200);
-    return;
+  };
+}
+
+async function ghPublish() {
+  if (!ghIsUnlocked()) {
+    showToast('Sessão expirada. Clique no logo 5x para reativar.', '🔐', 3000);
+    ghUpdateUI(); return;
+  }
+  const token = ghGetToken();
+  if (!token) {
+    document.getElementById('ghTokenInput').value = '';
+    document.getElementById('ghSetupModal').classList.add('open'); return;
   }
 
-  const btn   = document.getElementById('ghBtn');
-  const icon  = document.getElementById('ghBtnIcon');
+  const btn = document.getElementById('ghBtn');
+  const icon = document.getElementById('ghBtnIcon');
   const label = document.getElementById('ghBtnLabel');
   btn.className = 'gh-btn ready publishing';
-  icon.textContent  = '⏳';
-  label.textContent = 'Publicando...';
+  icon.textContent = '⏳'; label.textContent = 'Publicando...';
 
   try {
-    // 1. Busca o SHA atual do arquivo (necessário para atualizar)
     const metaRes = await fetch(
       `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}`,
       { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
     );
-
     if (metaRes.status === 401) {
-      localStorage.removeItem(GH_TOKEN_KEY);
-      ghUpdateUI();
-      showToast('Token inválido ou expirado. Configure novamente.', '❌', 4000);
-      return;
+      localStorage.removeItem(GH_TOKEN_KEY); ghUpdateUI();
+      showToast('Token inválido ou expirado. Configure novamente.', '❌', 4000); return;
     }
     if (!metaRes.ok) throw new Error(`Erro ao buscar arquivo: ${metaRes.status}`);
+    const { sha } = await metaRes.json();
 
-    const meta = await metaRes.json();
-    const sha  = meta.sha;
+    const html = document.documentElement.outerHTML;
+    const b64  = btoa(unescape(encodeURIComponent(html)));
+    const now  = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
-    // 2. Codifica o HTML atual em base64
-    const html    = document.documentElement.outerHTML;
-    const b64     = btoa(unescape(encodeURIComponent(html)));
-    const now     = new Date().toLocaleString('pt-BR', {timeZone:'America/Sao_Paulo'});
-
-    // 3. Envia o arquivo atualizado
-    const updateRes = await fetch(
+    const upRes = await fetch(
       `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,
       {
         method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github+json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: `SimFin update - ${now}`,
-          content: b64,
-          sha,
-          branch: GH_BRANCH,
-        })
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `SimFin update - ${now}`, content: b64, sha, branch: GH_BRANCH })
       }
     );
+    if (!upRes.ok) { const e = await upRes.json(); throw new Error(e.message || `HTTP ${upRes.status}`); }
 
-    if (!updateRes.ok) {
-      const err = await updateRes.json();
-      throw new Error(err.message || `HTTP ${updateRes.status}`);
-    }
-
-    icon.textContent  = '✅';
-    label.textContent = 'Publicado!';
+    icon.textContent = '✅'; label.textContent = 'Publicado!';
     showToast('Publicado no GitHub! Em ~2 min o site atualiza.', '🚀', 5000);
-
-    // Volta ao estado normal após 3s
-    setTimeout(() => {
-      btn.className = 'gh-btn ready';
-      icon.textContent  = '🚀';
-      label.textContent = 'Publicar';
-    }, 3000);
+    ghRenew();
+    setTimeout(() => { btn.className='gh-btn ready'; icon.textContent='🚀'; label.textContent='Publicar'; }, 3000);
 
   } catch(e) {
-    console.error('[GitHub] Publish error:', e);
-    btn.className = 'gh-btn error';
-    icon.textContent  = '❌';
-    label.textContent = 'Erro';
-    showToast('Erro ao publicar: ' + e.message, '❌', 5000);
-    setTimeout(() => {
-      btn.className = ghGetToken() ? 'gh-btn ready' : 'gh-btn';
-      icon.textContent  = ghGetToken() ? '🚀' : '🐙';
-      label.textContent = 'Publicar';
-    }, 4000);
+    console.error('[GitHub]', e);
+    btn.className='gh-btn error'; icon.textContent='❌'; label.textContent='Erro';
+    showToast('Erro: ' + e.message, '❌', 5000);
+    setTimeout(() => { btn.className='gh-btn ready'; icon.textContent='🚀'; label.textContent='Publicar'; }, 4000);
   }
 }
 
-// Inicializa UI do botão ao carregar
+// Verifica expiração a cada minuto
+setInterval(() => { if (!ghIsUnlocked()) ghUpdateUI(); }, 60000);
+
+// Inicializa UI ao carregar
 window.addEventListener('load', () => setTimeout(ghUpdateUI, 200));
 
 // ── Init ──
