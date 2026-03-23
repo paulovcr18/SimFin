@@ -3634,47 +3634,49 @@ function reminderUpdateUI() {
   }
 }
 
+// ── Monta URL com parâmetros GET (evita CORS do navegador) ──
+function reminderBuildUrl(baseUrl, params) {
+  const u = new URL(baseUrl);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
+  return u.toString();
+}
+
+async function reminderFetch(url) {
+  const res  = await fetch(url);
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { throw new Error('Resposta inválida do script'); }
+}
+
 async function reminderSchedule() {
-  const cfg = reminderLoadConfig();
-  const url = document.getElementById('reminderScriptUrl')?.value?.trim();
+  const cfg   = reminderLoadConfig();
+  const url   = document.getElementById('reminderScriptUrl')?.value?.trim();
   const email = document.getElementById('reminderEmail')?.value?.trim();
   const dia   = parseInt(document.getElementById('reminderDia')?.value);
 
   if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
   if (!email) { showToast('Informe seu e-mail', '⚠️'); return; }
-  if (!url.includes('script.google.com')) {
-    showToast('URL inválida — deve ser do script.google.com', '❌'); return;
-  }
+  if (!url.includes('script.google.com')) { showToast('URL inválida', '❌'); return; }
 
-  showToast('Configurando lembrete...', '⏳', 60000);
+  showToast('Configurando lembrete...', '⏳', 30000);
 
   try {
     const token = cfg.token || ('tk_' + Date.now().toString(36));
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action:  'schedule',
-        email,
-        dia,
-        appUrl:  'https://paulovcr18.github.io/SimFin/',
-        nome:    'SimFin',
-        token,
-      })
+    const fullUrl = reminderBuildUrl(url, {
+      action: 'schedule', email, dia,
+      appUrl: 'https://paulovcr18.github.io/SimFin/',
+      nome: 'SimFin', token,
     });
-
-    const data = await res.json();
+    const data = await reminderFetch(fullUrl);
     if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
 
-    // Salva config com token
-    const newCfg = { scriptUrl: url, email, dia, token: data.token || token, ativo: true };
-    localStorage.setItem(REMINDER_KEY, JSON.stringify(newCfg));
+    localStorage.setItem(REMINDER_KEY, JSON.stringify({
+      scriptUrl: url, email, dia, token: data.token || token, ativo: true
+    }));
     reminderUpdateUI();
-    showToast(`Lembrete ativo! Você receberá e-mails todo dia ${dia}.`, '🔔', 5000);
-
+    showToast(`🔔 Lembrete ativo! E-mail todo dia ${dia} do mês.`, '🔔', 5000);
   } catch(e) {
     console.error('[Reminder]', e);
-    showToast('Erro: ' + e.message + ' · Verifique a URL do script', '❌', 6000);
+    showToast('Erro: ' + e.message, '❌', 6000);
   }
 }
 
@@ -3683,56 +3685,36 @@ async function reminderTest() {
   const email = document.getElementById('reminderEmail')?.value?.trim();
 
   if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
-  if (!email) { showToast('Informe seu e-mail para o teste', '⚠️'); return; }
+  if (!email) { showToast('Informe seu e-mail', '⚠️'); return; }
 
-  showToast('Enviando e-mail de teste...', '📧', 10000);
+  showToast('Enviando e-mail de teste...', '📧', 15000);
 
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'test',
-        email,
-        appUrl: 'https://paulovcr18.github.io/SimFin/',
-        nome:   'SimFin',
-      })
+    const fullUrl = reminderBuildUrl(url, {
+      action: 'test', email,
+      appUrl: 'https://paulovcr18.github.io/SimFin/',
+      nome: 'SimFin',
     });
-    const data = await res.json();
+    const data = await reminderFetch(fullUrl);
     if (!data.ok) throw new Error(data.error);
-    showToast('E-mail de teste enviado! Verifique sua caixa de entrada.', '✅', 5000);
+    showToast('E-mail de teste enviado! Verifique sua caixa.', '✅', 5000);
   } catch(e) {
-    showToast('Erro ao enviar teste: ' + e.message, '❌', 5000);
+    showToast('Erro: ' + e.message, '❌', 5000);
   }
 }
 
 async function reminderCancel() {
   const cfg = reminderLoadConfig();
-  if (!cfg.scriptUrl || !cfg.token) {
-    // Cancela só localmente
-    cfg.ativo = false;
-    localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
-    reminderUpdateUI();
-    showToast('Lembrete cancelado localmente', '🔕', 3000);
-    return;
+  if (cfg.scriptUrl && cfg.token) {
+    try {
+      const fullUrl = reminderBuildUrl(cfg.scriptUrl, { action: 'cancel', token: cfg.token });
+      await reminderFetch(fullUrl);
+    } catch(e) { console.warn('[Reminder cancel]', e); }
   }
-
-  try {
-    const res = await fetch(cfg.scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'cancel', token: cfg.token })
-    });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
-  } catch(e) {
-    console.warn('[Reminder cancel]', e);
-  }
-
   cfg.ativo = false;
   localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
   reminderUpdateUI();
-  showToast('Lembrete cancelado com sucesso', '🔕', 3000);
+  showToast('Lembrete cancelado', '🔕', 3000);
 }
 
 // ── Init ──
