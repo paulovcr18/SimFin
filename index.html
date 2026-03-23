@@ -584,6 +584,49 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 /* ── Inflação ── */
 .inf-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;background:rgba(167,139,250,.12);color:var(--pu)}
 
+/* ══════════════════════════════
+   ABA CARTEIRA
+══════════════════════════════ */
+.cart-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.cart-asset{background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .18s}
+.cart-asset:hover{border-color:rgba(255,255,255,.14)}
+.cart-asset-header{padding:12px 14px 8px;display:flex;align-items:center;gap:10px}
+.cart-asset-ticker{font-family:var(--fm);font-size:14px;font-weight:700;color:var(--t1)}
+.cart-asset-name{font-size:10px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-asset-body{padding:0 14px 12px;display:flex;flex-direction:column;gap:6px}
+.cart-asset-row{display:flex;justify-content:space-between;font-size:12px}
+.cart-asset-label{color:var(--t3)}
+.cart-asset-val{font-family:var(--fm);color:var(--t1)}
+.cart-asset-price{font-family:var(--fm);font-size:18px;font-weight:500;color:var(--t1);padding:4px 14px 0}
+.cart-asset-change{font-size:11px;font-weight:600;padding:0 14px 6px}
+.cart-asset-change.pos{color:var(--ac)}
+.cart-asset-change.neg{color:var(--re)}
+.cart-asset-change.neu{color:var(--t3)}
+.cart-asset-del{background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;padding:3px 6px;border-radius:5px;transition:all .12s;margin-left:auto}
+.cart-asset-del:hover{color:var(--re);background:var(--reg)}
+.cart-total{background:var(--bg7);border:1px solid var(--bda);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.cart-total-val{font-family:var(--fm);font-size:24px;font-weight:500;color:var(--ac)}
+.cart-total-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.cart-form{background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.cart-form-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.cart-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.cart-ig{display:flex;flex-direction:column;gap:4px}
+.cart-ig label{font-size:11px;color:var(--t2);font-weight:500}
+.cart-ig input{background:var(--bg6);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-family:var(--fm);font-size:13px;padding:8px 12px;width:100%;transition:border-color .2s,box-shadow .2s;text-transform:uppercase}
+.cart-ig input:focus{outline:none;border-color:var(--acd);box-shadow:0 0 0 3px var(--acg)}
+.cart-brapi-key{display:flex;align-items:center;gap:8px;background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--t3)}
+.cart-brapi-key input{background:transparent;border:none;color:var(--t2);font-size:11px;font-family:var(--fm);flex:1;outline:none}
+.cart-status{font-size:11px;padding:6px 10px;border-radius:6px;display:flex;align-items:center;gap:6px}
+.cart-status.ok{background:var(--acg);color:var(--ac)}
+.cart-status.err{background:var(--reg);color:var(--re)}
+.cart-status.load{background:var(--gog);color:var(--go)}
+.cart-import-zone{border:2px dashed var(--bd);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .18s;background:var(--bg7)}
+.cart-import-zone:hover{border-color:var(--bda);background:var(--acg)}
+.cart-import-zone.drag{border-color:var(--ac);background:var(--acg)}
+.cart-import-icon{font-size:32px;margin-bottom:8px;opacity:.6}
+.cart-import-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px}
+.cart-import-sub{font-size:11px;color:var(--t3)}
+
 /* PRINT */
 @media print{
   body{background:#fff!important;color:#111!important}
@@ -637,8 +680,8 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <button class="nav-tab active" id="tabSimulador" onclick="switchScreen('simulador')">
         <span class="nav-tab-icon">📊</span> Simulador
       </button>
-      <button class="nav-tab" id="tabAcomp" onclick="switchScreen('acompanhamento')">
-        <span class="nav-tab-icon">📈</span> Acompanhamento
+      <button class="nav-tab" id="tabFinancas" onclick="switchScreen('financas')">
+        <span class="nav-tab-icon">💼</span> Finanças
       </button>
       <button class="nav-tab" id="tabMetas" onclick="switchScreen('metas')">
         <span class="nav-tab-icon">🎯</span> Metas
@@ -839,8 +882,27 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
     <div class="rl"><span>5 anos</span><span id="anosLabel" style="color:var(--ac);font-weight:600">20 anos</span><span>40 anos</span></div>
   </div>
   <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" oninput="calc()"></div>
-  <div class="ig"><label>Patrimônio Inicial (R$)</label><input type="number" id="patrimonioInicial" value="" min="0" oninput="calc()"></div>
-  <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" oninput="calc()" title="Usada para mostrar o valor real (poder de compra) no gráfico e snapshots"></div>
+  <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" oninput="calc()"></div>
+  <hr class="dv">
+  <div class="stitle">💰 Patrimônio Atual</div>
+  <div style="font-size:10px;color:var(--t3);margin-bottom:8px;line-height:1.5">Os três valores são somados como patrimônio inicial da projeção.</div>
+  <div class="ig">
+    <label>📈 Investimentos (R$)</label>
+    <input type="number" id="patInvestimentos" value="" min="0" oninput="calcPatrimonio()" placeholder="Ações, FIIs, Tesouro...">
+  </div>
+  <div class="ig">
+    <label>🏦 FGTS (R$)</label>
+    <input type="number" id="patFGTS" value="" min="0" oninput="calcPatrimonio()" placeholder="Saldo FGTS acumulado">
+  </div>
+  <div class="ig">
+    <label>🛡 Reserva de Emergência (R$)</label>
+    <input type="number" id="patReserva" value="" min="0" oninput="calcPatrimonio()" placeholder="Reserva em conta/CDB">
+  </div>
+  <div style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+    <span style="font-size:11px;color:var(--t3)">Total para projeção</span>
+    <span style="font-family:var(--fm);font-size:13px;color:var(--ac);font-weight:500" id="patTotal">R$&nbsp;0,00</span>
+  </div>
+  <input type="hidden" id="patrimonioInicial" value="0">
 </aside>
 
 <!-- MAIN -->
@@ -968,8 +1030,130 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </main>
 </div><!-- end screenSimulador -->
 
-<!-- ACOMPANHAMENTO SCREEN -->
-<div id="screenAcompanhamento" class="screen-full" style="display:none">
+<!-- FINANÇAS SCREEN — Carteira + Acompanhamento unificados -->
+<div id="screenFinancas" class="screen-full" style="display:none">
+
+  <!-- ═══ SEÇÃO 1: CARTEIRA ═══ -->
+  <div style="display:flex;align-items:center;gap:10px;padding:4px 0 2px">
+    <div style="font-size:18px">💼</div>
+    <div style="font-size:14px;font-weight:700;color:var(--t1)">Carteira de Investimentos</div>
+    <div style="height:1px;background:var(--bd);flex:1"></div>
+    <button onclick="carteiraRefresh()" id="cartRefreshBtn" style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--bg6);color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .15s">🔄 Atualizar cotações</button>
+  </div>
+
+  <!-- Total patrimônio carteira -->
+  <div class="cart-total" id="cartTotalArea" style="display:none">
+    <div>
+      <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Patrimônio em Carteira</div>
+      <div class="cart-total-val" id="cartTotalVal">R$ 0,00</div>
+      <div class="cart-total-sub" id="cartTotalSub">—</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span id="cartLastUpdate" style="font-size:10px;color:var(--t3)"></span>
+      <button onclick="carteiraUsarTotal()" style="font-size:11px;padding:6px 12px;border-radius:7px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);cursor:pointer;font-family:var(--fb);font-weight:600">📥 Usar como saldo do mês</button>
+    </div>
+  </div>
+
+  <!-- Adicionar ativo manual -->
+  <div class="cart-form">
+    <div class="ph2"><span style="font-size:15px">➕</span><span class="pt">Adicionar Ativo</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3)">Ações · FIIs · Tesouro Direto</span>
+    </div>
+    <div class="cart-form-body">
+      <div class="cart-form-grid">
+        <div class="cart-ig">
+          <label>Tipo</label>
+          <select id="cartTipo" onchange="carteiraToggleTipo()">
+            <option value="acao">📈 Ação / FII (B3)</option>
+            <option value="tesouro">🏛 Tesouro Direto</option>
+          </select>
+        </div>
+        <!-- Campos para Ação/FII -->
+        <div id="cartCamposAcao" class="cart-form-grid" style="display:contents">
+          <div class="cart-ig">
+            <label>Ticker (ex: PETR4)</label>
+            <input type="text" id="cartTicker" placeholder="PETR4" maxlength="10" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')carteiraAdd()">
+          </div>
+          <div class="cart-ig">
+            <label>Quantidade</label>
+            <input type="number" id="cartQtd" placeholder="100" min="0" onkeydown="if(event.key==='Enter')carteiraAdd()">
+          </div>
+          <div class="cart-ig">
+            <label>Preço médio (R$) <span style="color:var(--t3);font-weight:400;font-size:10px">opcional</span></label>
+            <input type="number" id="cartPmedio" placeholder="38,50" min="0" step="0.01">
+          </div>
+        </div>
+        <!-- Campos para Tesouro Direto -->
+        <div id="cartCamposTesouro" style="display:none;grid-column:1/-1">
+          <div class="cart-form-grid">
+            <div class="cart-ig">
+              <label>Título</label>
+              <select id="cartTesouoTipo">
+                <option value="Tesouro Selic">Tesouro SELIC</option>
+                <option value="Tesouro IPCA+">Tesouro IPCA+</option>
+                <option value="Tesouro Prefixado">Tesouro Prefixado</option>
+              </select>
+            </div>
+            <div class="cart-ig">
+              <label>Valor investido (R$)</label>
+              <input type="number" id="cartTesouoValor" placeholder="5.000" min="0" step="0.01">
+            </div>
+            <div class="cart-ig">
+              <label>Vencimento <span style="color:var(--t3);font-weight:400;font-size:10px">opcional</span></label>
+              <input type="text" id="cartTesouoVenc" placeholder="2029, 2035...">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Token BRAPI -->
+      <div id="cartBrapiArea" class="cart-brapi-key">
+        <span>🔑</span>
+        <input type="password" id="cartBrapiToken" placeholder="Token BRAPI (opcional — para tickers fora dos gratuitos)" oninput="carteiraSaveToken()">
+        <a href="https://brapi.dev/dashboard" target="_blank" style="color:var(--ac);font-size:10px;white-space:nowrap;text-decoration:none">brapi.dev grátis →</a>
+      </div>
+      <div id="cartAddStatus"></div>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="track-btn primary" onclick="carteiraAdd()">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Importar CSV/XLSX -->
+  <div class="cart-form">
+    <div class="ph2"><span style="font-size:15px">📂</span><span class="pt">Importar da Corretora (CSV/XLSX)</span></div>
+    <div class="cart-form-body">
+      <div class="cart-import-zone" id="cartImportZone" onclick="document.getElementById('cartImportFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');carteiraImportFile(event.dataTransfer.files[0])">
+        <div class="cart-import-icon">📊</div>
+        <div class="cart-import-title">Arraste ou clique para selecionar</div>
+        <div class="cart-import-sub">CSV ou XLSX · Inter: App → Investimentos → Carteira → ⋯ → Exportar</div>
+      </div>
+      <input type="file" id="cartImportFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
+      <div id="cartImportStatus"></div>
+    </div>
+  </div>
+
+  <!-- Lista de ativos -->
+  <div class="panel">
+    <div class="ph2">
+      <span style="font-size:15px">📋</span>
+      <span class="pt">Meus Ativos</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:auto" id="cartCount"></span>
+    </div>
+    <div class="pb"><div id="cartListArea">
+      <div class="track-empty">
+        <div class="track-empty-icon">💼</div>
+        <div class="track-empty-title">Nenhum ativo cadastrado</div>
+        <div class="track-empty-sub">Adicione ações, FIIs ou títulos do Tesouro Direto acima.</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ═══ SEPARADOR ═══ -->
+  <div style="display:flex;align-items:center;gap:10px;padding:8px 0 2px">
+    <div style="font-size:18px">📈</div>
+    <div style="font-size:14px;font-weight:700;color:var(--t1)">Acompanhamento Mensal</div>
+    <div style="height:1px;background:var(--bd);flex:1"></div>
+  </div>
 
   <!-- REGISTRO DO MÊS -->
   <div class="track-form">
@@ -988,11 +1172,10 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
           <input type="number" id="trackAporte" min="0" placeholder="Ex: 3.200" oninput="updateTrackCalc()">
         </div>
         <div class="track-ig">
-          <label>🏦 Saldo atual da carteira (R$)</label>
+          <label>🏦 Saldo total da carteira (R$)</label>
           <input type="number" id="trackPatrimonio" min="0" placeholder="Ex: 51.180" oninput="updateTrackCalc()">
         </div>
       </div>
-      <!-- Retirada (opcional) -->
       <div style="display:flex;gap:8px;align-items:center">
         <div style="height:1px;background:var(--bd);flex:1"></div>
         <span style="font-size:10px;color:var(--t3);white-space:nowrap">retirada (opcional)</span>
@@ -1005,7 +1188,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         </div>
         <div class="track-ig" style="grid-column:span 2">
           <label>📝 Motivo da retirada</label>
-          <input type="text" id="trackRetiradaMotivo" placeholder="Ex: Compra do carro, Viagem, Emergência..." maxlength="80">
+          <input type="text" id="trackRetiradaMotivo" placeholder="Ex: Compra do carro..." maxlength="80">
         </div>
       </div>
       <div class="track-calc-info" id="trackCalcInfo">
@@ -1019,119 +1202,33 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
   <!-- INSIGHTS -->
   <div class="panel" id="trackInsightsPanel" style="display:none">
-    <div class="ph2"><span style="font-size:16px">💡</span><span class="pt">Insights — Como você está em relação ao planejado</span></div>
+    <div class="ph2"><span style="font-size:15px">💡</span><span class="pt">Insights — Como você está em relação ao planejado</span></div>
     <div class="pb"><div class="insights-grid" id="trackInsights"></div></div>
   </div>
 
   <!-- GRÁFICO COMPARATIVO -->
   <div class="panel" id="trackChartPanel" style="display:none">
-    <div class="ph2"><span style="font-size:16px">📈</span><span class="pt">Realizado vs. Simulado</span></div>
-    <div class="pb">
-      <div class="compare-chart-wrap"><canvas id="compareChart"></canvas></div>
-    </div>
+    <div class="ph2"><span style="font-size:15px">📊</span><span class="pt">Realizado vs. Simulado</span></div>
+    <div class="pb"><div class="compare-chart-wrap"><canvas id="compareChart"></canvas></div></div>
   </div>
 
   <!-- HISTÓRICO -->
   <div class="panel">
     <div class="ph2">
-      <span style="font-size:16px">📋</span>
+      <span style="font-size:15px">📋</span>
       <span class="pt">Histórico de Registros</span>
       <span style="margin-left:auto;font-size:11px;color:var(--t3)" id="trackHistCount"></span>
     </div>
-    <div class="pb">
-      <div id="trackHistArea">
-        <div class="track-empty">
-          <div class="track-empty-icon">📭</div>
-          <div class="track-empty-title">Nenhum registro ainda</div>
-          <div class="track-empty-sub">Registre o primeiro mês acima. Você só precisa informar o aporte que fez e o saldo atual da carteira — o rendimento é calculado automaticamente.</div>
-        </div>
+    <div class="pb"><div id="trackHistArea">
+      <div class="track-empty">
+        <div class="track-empty-icon">📭</div>
+        <div class="track-empty-title">Nenhum registro ainda</div>
+        <div class="track-empty-sub">Registre o primeiro mês acima.</div>
       </div>
-    </div>
+    </div></div>
   </div>
 
-</div><!-- end screenAcompanhamento -->
-
-<!-- METAS SCREEN -->
-<div id="screenMetas" class="screen-full" style="display:none">
-
-  <!-- Form adicionar meta -->
-  <div class="goal-form">
-    <div class="ph2"><span style="font-size:16px">🎯</span><span class="pt">Nova Meta</span></div>
-    <div class="goal-form-body">
-      <div class="goal-form-grid">
-        <div class="goal-ig">
-          <label>Categoria</label>
-          <select id="goalCat" onchange="goalCatChanged()">
-            <option value="carro" data-icon="🚗">🚗 Carro</option>
-            <option value="imovel" data-icon="🏠">🏠 Casa / Imóvel</option>
-            <option value="viagem" data-icon="✈️">✈️ Viagem Internacional</option>
-            <option value="casamento" data-icon="💍">💍 Casamento</option>
-            <option value="outro" data-icon="⭐">⭐ Outro</option>
-          </select>
-        </div>
-        <div class="goal-ig">
-          <label>Nome da meta</label>
-          <input type="text" id="goalName" placeholder="Ex: Comprar um carro novo" maxlength="50">
-        </div>
-        <div class="goal-ig">
-          <label>💰 Valor necessário (R$)</label>
-          <input type="number" id="goalValor" min="0" placeholder="Ex: 80000" oninput="goalCalcAuto('valor')">
-        </div>
-        <div class="goal-ig">
-          <label>📅 Prazo (meses a partir de hoje)</label>
-          <input type="number" id="goalMeses" min="1" max="480" placeholder="Ex: 36" oninput="goalCalcAuto('meses')">
-        </div>
-        <div class="goal-ig">
-          <label>🗓 Ou informe a data alvo</label>
-          <input type="month" id="goalData" oninput="goalCalcAuto('data')">
-        </div>
-      </div>
-      <div class="goal-hint" id="goalHint">
-        <span>💡</span>
-        <span>Preencha o valor e o prazo — os campos se completam automaticamente.</span>
-      </div>
-      <div style="display:flex;justify-content:flex-end">
-        <button class="track-btn primary" onclick="addGoal()">＋ Adicionar Meta</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Resumo -->
-  <div id="goalsSummaryArea" style="display:none">
-    <div class="goals-summary" id="goalsSummary"></div>
-  </div>
-
-  <!-- Gráfico projeção ajustada -->
-  <div class="panel" id="goalsChartPanel" style="display:none">
-    <div class="ph2">
-      <span style="font-size:16px">📈</span>
-      <span class="pt">Projeção Patrimonial com Metas</span>
-      <span style="font-size:11px;color:var(--t3);margin-left:auto">linha verde = sem metas · linha laranja = com metas</span>
-    </div>
-    <div class="pb">
-      <div class="goals-chart-wrap"><canvas id="goalsChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Lista de metas -->
-  <div class="panel">
-    <div class="ph2">
-      <span style="font-size:16px">🏆</span>
-      <span class="pt">Suas Metas</span>
-      <span style="font-size:11px;color:var(--t3);margin-left:auto" id="goalsCount"></span>
-    </div>
-    <div class="pb">
-      <div id="goalsListArea">
-        <div class="goals-empty">
-          <div class="goals-empty-icon">🎯</div>
-          <div class="goals-empty-title">Nenhuma meta cadastrada</div>
-          <div class="goals-empty-sub">Adicione sua primeira meta acima. O simulador vai calcular quando você atingirá o valor e como isso afeta sua trajetória patrimonial.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- end screenMetas -->
+</div><!-- end screenFinancas -->
 
 <!-- LEMBRETES SCREEN -->
 <div id="screenReminder" class="screen-full" style="display:none">
@@ -1383,16 +1480,16 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 <div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
   <div class="gh-setup-box">
     <div class="smh">
-      <span class="smt" id="ghPinTitle">🔐 Modo Desenvolvedor</span>
+      <span class="smt" id="ghPinTitle">🔐 Digite seu PIN</span>
       <button class="mcl" onclick="ghClosePinModal()">✕</button>
     </div>
     <div class="smb">
       <!-- PIN dots display -->
       <div style="display:flex;justify-content:center;gap:12px;margin:4px 0 8px">
-        <div id="ghDot0" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
-        <div id="ghDot1" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
-        <div id="ghDot2" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
-        <div id="ghDot3" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
+        <div id="ghDot0" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot1" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot2" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot3" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
       </div>
       <!-- PIN numpad -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto">
@@ -1538,7 +1635,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">✅</span><span id="toastMsg">OK</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔓</span><span id="toastMsg">Desbloqueado! Publicar disponível por 30 min.</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
@@ -2590,6 +2687,7 @@ function getInputs() {
                 'p2fat','p2retirada','p2prolabore','p2reserva',
                 'pctMoradia','pctAlimentacao','pctTransporte','pctContas','pctLazer','pctInvest',
                 'taxaAnual','anos','reajuste','patrimonioInicial','taxaInflacao',
+        'patInvestimentos','patFGTS','patReserva',
                 'p1regime','p2regime'];
   const out = { _regime1: regime[1], _regime2: regime[2] };
   ids.forEach(id => {
@@ -3025,6 +3123,7 @@ function driveGetPayload() {
     simulacoes:     JSON.parse(localStorage.getItem('simfin_saves')  || '[]'),
     acompanhamento: JSON.parse(localStorage.getItem('simfin_track')  || '[]'),
     metas:          JSON.parse(localStorage.getItem('simfin_goals')   || '[]'),
+    carteira:       JSON.parse(localStorage.getItem('simfin_carteira') || '[]'),
     reminder:       JSON.parse(localStorage.getItem('simfin_reminder_config') || '{}'),
     inputs: (() => { try { return getInputs(); } catch(e) { return null; } })(),
   };
@@ -4073,12 +4172,605 @@ function calcInflacaoSnaps(snaps) {
   }));
 }
 
+
+// ════════════════════════════════════════════════════════════════
+// ABA CARTEIRA — Ativos + Cotações BRAPI + Importação CSV/XLSX
+// ════════════════════════════════════════════════════════════════
+
+const CART_KEY       = 'simfin_carteira';
+const CART_TOKEN_KEY = 'simfin_brapi_token';
+const BRAPI_BASE     = 'https://brapi.dev/api/quote/';
+
+function carteiraLoad()    { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
+function carteiraSave(d)   { localStorage.setItem(CART_KEY, JSON.stringify(d)); driveAutoPush(); }
+function carteiraSaveToken(){ localStorage.setItem(CART_TOKEN_KEY, document.getElementById('cartBrapiToken')?.value?.trim() || ''); }
+function carteiraGetToken() { return localStorage.getItem(CART_TOKEN_KEY) || ''; }
+
+// ── Atualiza UI da tela ──
+function carteiraUpdateUI() {
+  const token = carteiraGetToken();
+  const el = document.getElementById('cartBrapiToken');
+  if (el && token) el.value = token;
+  carteiraRenderList();
+}
+
+// ── Adicionar ativo ──
+async function carteiraAdd() {
+  const ticker = document.getElementById('cartTicker')?.value?.trim().toUpperCase();
+  const qtd    = parseFloat(document.getElementById('cartQtd')?.value) || 0;
+  const pmedio = parseFloat(document.getElementById('cartPmedio')?.value) || null;
+  const statusEl = document.getElementById('cartAddStatus');
+
+  if (!ticker) { carteiraSetStatus(statusEl, 'Informe o ticker', 'err'); return; }
+  if (!qtd)    { carteiraSetStatus(statusEl, 'Informe a quantidade', 'err'); return; }
+
+  // Verifica duplicata
+  const ativos = carteiraLoad();
+  const existing = ativos.findIndex(a => a.ticker === ticker);
+
+  carteiraSetStatus(statusEl, `Buscando cotação de ${ticker}...`, 'load');
+
+  // Busca cotação
+  const quote = await carteiraBuscarCotacao([ticker]);
+  if (!quote || !quote[ticker]) {
+    carteiraSetStatus(statusEl, `Ticker ${ticker} não encontrado. Verifique o código.`, 'err');
+    return;
+  }
+
+  const q = quote[ticker];
+  const ativo = {
+    ticker, qtd, pmedio,
+    nome:         q.shortName || q.longName || ticker,
+    preco:        q.regularMarketPrice,
+    variacao:     q.regularMarketChangePercent,
+    updatedAt:    new Date().toISOString(),
+  };
+
+  if (existing >= 0) {
+    ativos[existing] = { ...ativos[existing], ...ativo };
+  } else {
+    ativos.push(ativo);
+  }
+
+  carteiraSave(ativos);
+  carteiraSetStatus(statusEl, `${ticker} adicionado! ${fmt(q.regularMarketPrice)}/ação`, 'ok');
+
+  document.getElementById('cartTicker').value  = '';
+  document.getElementById('cartQtd').value     = '';
+  document.getElementById('cartPmedio').value  = '';
+  carteiraRenderList();
+}
+
+// ── Remover ativo ──
+function carteiraRemove(ticker) {
+  carteiraSave(carteiraLoad().filter(a => a.ticker !== ticker));
+  carteiraRenderList();
+  showToast(`${ticker} removido`, '🗑', 2000);
+}
+
+// ── Atualizar cotações de todos os ativos ──
+async function carteiraRefresh() {
+  const ativos = carteiraLoad();
+  if (!ativos.length) return;
+  const btn = document.getElementById('cartRefreshBtn');
+  if (btn) { btn.textContent = '⏳ Atualizando...'; btn.disabled = true; }
+
+  const tickers = ativos.map(a => a.ticker);
+  const quotes  = await carteiraBuscarCotacao(tickers);
+
+  if (!quotes) {
+    showToast('Erro ao buscar cotações', '❌', 3000);
+    if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
+    return;
+  }
+
+  const agora = new Date().toISOString();
+  const updated = ativos.map(a => {
+    const q = quotes[a.ticker];
+    if (!q) return a;
+    return {
+      ...a,
+      preco:     q.regularMarketPrice,
+      variacao:  q.regularMarketChangePercent,
+      nome:      q.shortName || q.longName || a.nome,
+      updatedAt: agora,
+    };
+  });
+
+  carteiraSave(updated);
+  carteiraRenderList();
+  if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
+  showToast('Cotações atualizadas!', '✅', 3000);
+}
+
+// ── Buscar cotações via BRAPI ──
+async function carteiraBuscarCotacao(tickers) {
+  const token = carteiraGetToken();
+  const url   = BRAPI_BASE + tickers.join(',') + (token ? `?token=${token}` : '');
+  try {
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.results) return null;
+    // Mapeia por ticker
+    const map = {};
+    data.results.forEach(r => { map[r.symbol] = r; });
+    return map;
+  } catch(e) {
+    console.error('[BRAPI]', e);
+    return null;
+  }
+}
+
+// ── Usar total da carteira como patrimônio no acompanhamento ──
+function carteiraUsarTotal() {
+  const total = carteiraLoad().reduce((s,a) => s + (a.preco||0) * (a.qtd||0), 0);
+  if (!total) { showToast('Atualize as cotações primeiro', '⚠️'); return; }
+  // Preenche o campo de patrimônio na tela de acompanhamento
+  const el = document.getElementById('trackPatrimonio');
+  if (el) el.value = total.toFixed(2);
+  switchScreen('acompanhamento');
+  showToast(`Patrimônio preenchido: ${fmt(total)}`, '📥');
+  updateTrackCalc();
+}
+
+// ── Renderizar lista de ativos ──
+function carteiraRenderList() {
+  const ativos  = carteiraLoad();
+  const area    = document.getElementById('cartListArea');
+  const countEl = document.getElementById('cartCount');
+  const totalEl = document.getElementById('cartTotalVal');
+  const subEl   = document.getElementById('cartTotalSub');
+  const totalArea = document.getElementById('cartTotalArea');
+  const lastEl  = document.getElementById('cartLastUpdate');
+
+  if (!ativos.length) {
+    area.innerHTML = `<div class="track-empty">
+      <div class="track-empty-icon">💼</div>
+      <div class="track-empty-title">Nenhum ativo cadastrado</div>
+      <div class="track-empty-sub">Adicione seus ativos acima ou importe um arquivo CSV/XLSX da sua corretora.</div>
+    </div>`;
+    if (totalArea) totalArea.style.display = 'none';
+    if (countEl)   countEl.textContent = '';
+    return;
+  }
+
+  const total      = ativos.reduce((s,a) => s + (a.preco||0)*(a.qtd||0), 0);
+  const totalCusto = ativos.reduce((s,a) => s + (a.pmedio||0)*(a.qtd||0), 0);
+  const lucroTotal = totalCusto > 0 ? total - totalCusto : null;
+
+  if (totalArea) totalArea.style.display = 'flex';
+  if (totalEl)   totalEl.textContent = fmt(total);
+  if (subEl) {
+    subEl.innerHTML = lucroTotal !== null
+      ? `${ativos.length} ativo${ativos.length!==1?'s':''} · L/P: <span style="color:${lucroTotal>=0?'var(--ac)':'var(--re)'}">${lucroTotal>=0?'+':''}${fmt(lucroTotal)} (${((lucroTotal/totalCusto)*100).toFixed(1)}%)</span>`
+      : `${ativos.length} ativo${ativos.length!==1?'s':''}`;
+  }
+  if (countEl) countEl.textContent = `${ativos.length} ativo${ativos.length!==1?'s':''}`;
+
+  const lastUpdate = ativos.map(a=>a.updatedAt).filter(Boolean).sort().pop();
+  if (lastEl && lastUpdate) {
+    lastEl.textContent = 'Atualizado: ' + new Date(lastUpdate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  area.innerHTML = `<div class="cart-grid">${ativos.map(a => {
+    const valor   = (a.preco||0) * (a.qtd||0);
+    const lucro   = a.pmedio ? ((a.preco||0) - a.pmedio) * a.qtd : null;
+    const lucroPct= a.pmedio && a.pmedio>0 ? ((a.preco||0)/a.pmedio-1)*100 : null;
+    const pct     = total > 0 ? (valor/total*100).toFixed(1) : '0';
+    const varCls  = !a.variacao ? 'neu' : a.variacao >= 0 ? 'pos' : 'neg';
+    const varStr  = a.variacao != null ? (a.variacao>=0?'+':'')+a.variacao.toFixed(2)+'%' : '—';
+
+    return `<div class="cart-asset">
+      <div class="cart-asset-header">
+        <div style="flex:1;min-width:0">
+          <div class="cart-asset-ticker">${a.ticker}</div>
+          <div class="cart-asset-name">${escHtml(a.nome||'')}</div>
+        </div>
+        <button class="cart-asset-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button>
+      </div>
+      <div class="cart-asset-price">${a.preco ? fmt(a.preco) : '—'}</div>
+      <div class="cart-asset-change ${varCls}">${varStr} hoje</div>
+      <div class="cart-asset-body">
+        <div class="cart-asset-row">
+          <span class="cart-asset-label">Quantidade</span>
+          <span class="cart-asset-val">${a.qtd.toLocaleString('pt-BR')} ações</span>
+        </div>
+        <div class="cart-asset-row">
+          <span class="cart-asset-label">Valor total</span>
+          <span class="cart-asset-val" style="color:var(--ac)">${fmt(valor)}</span>
+        </div>
+        <div class="cart-asset-row">
+          <span class="cart-asset-label">% da carteira</span>
+          <span class="cart-asset-val">${pct}%</span>
+        </div>
+        ${a.pmedio ? `
+        <div class="cart-asset-row">
+          <span class="cart-asset-label">Preço médio</span>
+          <span class="cart-asset-val">${fmt(a.pmedio)}</span>
+        </div>
+        <div class="cart-asset-row">
+          <span class="cart-asset-label">L/P</span>
+          <span class="cart-asset-val" style="color:${lucro>=0?'var(--ac)':'var(--re)'}">
+            ${lucro>=0?'+':''}${fmt(lucro)} (${lucroPct>=0?'+':''}${lucroPct?.toFixed(1)}%)
+          </span>
+        </div>` : ''}
+        <div style="height:4px;background:var(--bg5);border-radius:2px;margin-top:4px;overflow:hidden">
+          <div style="width:${Math.min(100,parseFloat(pct))}%;height:4px;background:var(--ac);border-radius:2px"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── Importar CSV/XLSX ──
+async function carteiraImportFile(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('cartImportStatus');
+  carteiraSetStatus(statusEl, 'Lendo arquivo...', 'load');
+
+  const ext = file.name.split('.').pop().toLowerCase();
+
+  try {
+    let rows = [];
+    if (ext === 'csv') {
+      rows = await carteiraParseCSV(file);
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      rows = await carteiraParseXLSX(file);
+    } else {
+      carteiraSetStatus(statusEl, 'Formato não suportado. Use CSV ou XLSX.', 'err');
+      return;
+    }
+
+    if (!rows.length) {
+      carteiraSetStatus(statusEl, 'Arquivo vazio ou sem dados reconhecidos', 'err');
+      return;
+    }
+
+    // Detecta colunas de ticker e quantidade automaticamente
+    const headers = Object.keys(rows[0]).map(h => h.toLowerCase().trim());
+    const tickerCol = Object.keys(rows[0]).find(h =>
+      /ticker|ativo|papel|codigo|código|symbol/i.test(h)
+    );
+    const qtdCol = Object.keys(rows[0]).find(h =>
+      /qtd|quantidade|qtde|quant|shares|cotas/i.test(h)
+    );
+    const pmedioCol = Object.keys(rows[0]).find(h =>
+      /preço médio|preco medio|pm|custo|p\.m\.|p med/i.test(h)
+    );
+
+    if (!tickerCol || !qtdCol) {
+      carteiraSetStatus(statusEl,
+        `Não encontrei colunas de Ticker e Quantidade. Colunas encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
+      return;
+    }
+
+    // Extrai ativos do arquivo
+    const novos = rows
+      .map(r => ({
+        ticker: (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
+        qtd:    parseFloat((r[qtdCol]||'').toString().replace(',','.')),
+        pmedio: pmedioCol ? parseFloat((r[pmedioCol]||'').toString().replace(',','.')) || null : null,
+      }))
+      .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
+
+    if (!novos.length) {
+      carteiraSetStatus(statusEl, 'Nenhum ativo válido encontrado no arquivo', 'err');
+      return;
+    }
+
+    carteiraSetStatus(statusEl, `Encontrei ${novos.length} ativos. Buscando cotações...`, 'load');
+
+    // Busca cotações em lote
+    const tickers = [...new Set(novos.map(a => a.ticker))];
+    const quotes  = await carteiraBuscarCotacao(tickers);
+
+    const existentes = carteiraLoad();
+    let adicionados = 0;
+
+    novos.forEach(n => {
+      const q   = quotes?.[n.ticker];
+      const idx = existentes.findIndex(e => e.ticker === n.ticker);
+      const ativo = {
+        ticker:    n.ticker,
+        qtd:       n.qtd,
+        pmedio:    n.pmedio,
+        nome:      q?.shortName || q?.longName || n.ticker,
+        preco:     q?.regularMarketPrice || null,
+        variacao:  q?.regularMarketChangePercent || null,
+        updatedAt: new Date().toISOString(),
+      };
+      if (idx >= 0) {
+        existentes[idx] = { ...existentes[idx], ...ativo };
+      } else {
+        existentes.push(ativo);
+        adicionados++;
+      }
+    });
+
+    carteiraSave(existentes);
+    carteiraRenderList();
+    carteiraSetStatus(statusEl,
+      `✅ ${novos.length} ativos importados (${adicionados} novos, ${novos.length-adicionados} atualizados)`, 'ok');
+
+  } catch(e) {
+    console.error('[Carteira import]', e);
+    carteiraSetStatus(statusEl, 'Erro ao processar arquivo: ' + e.message, 'err');
+  }
+}
+
+// ── Parse CSV ──
+async function carteiraParseCSV(file) {
+  const text = await file.text();
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  // Detecta separador
+  const sep = lines[0].includes(';') ? ';' : ',';
+  const headers = lines[0].split(sep).map(h => h.replace(/["']/g,'').trim());
+  return lines.slice(1)
+    .filter(l => l.trim())
+    .map(line => {
+      const vals = line.split(sep).map(v => v.replace(/["']/g,'').trim());
+      const obj = {};
+      headers.forEach((h,i) => { obj[h] = vals[i] || ''; });
+      return obj;
+    });
+}
+
+// ── Parse XLSX ──
+async function carteiraParseXLSX(file) {
+  // Carrega SheetJS dinamicamente
+  if (!window.XLSX) {
+    await new Promise((res,rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb   = XLSX.read(e.target.result, { type: 'binary' });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        res(data);
+      } catch(err) { rej(err); }
+    };
+    reader.onerror = rej;
+    reader.readAsBinaryString(file);
+  });
+}
+
+// ── Helper status ──
+function carteiraSetStatus(el, msg, type) {
+  if (!el) return;
+  el.className = 'cart-status ' + type;
+  el.innerHTML = (type==='load'?'⏳ ':type==='ok'?'✅ ':'❌ ') + msg;
+  el.style.display = 'flex';
+}
+
+// ── Incluir carteira no Drive payload ──
+// (adicionado via driveGetPayload que já inclui tudo via localStorage)
+
+
+// ════════════════════════════════════════════════════════════════
+// PATRIMÔNIO SEPARADO — soma os 3 buckets para a projeção
+// ════════════════════════════════════════════════════════════════
+function calcPatrimonio() {
+  const inv   = parseFloat(document.getElementById('patInvestimentos')?.value) || 0;
+  const fgts  = parseFloat(document.getElementById('patFGTS')?.value)          || 0;
+  const res   = parseFloat(document.getElementById('patReserva')?.value)       || 0;
+  const total = inv + fgts + res;
+  // Atualiza o campo hidden que alimenta a projeção
+  const el = document.getElementById('patrimonioInicial');
+  if (el) el.value = total;
+  // Atualiza o display
+  const disp = document.getElementById('patTotal');
+  if (disp) disp.textContent = fmt(total);
+  calc();
+}
+
+// ════════════════════════════════════════════════════════════════
+// TESOURO DIRETO — API pública do Tesouro Nacional
+// https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json
+// ════════════════════════════════════════════════════════════════
+const TESOURO_API = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
+
+async function tesouroFetchPrices() {
+  try {
+    // Tesouro bloqueia CORS direto — usa proxy CORS gratuito
+    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(TESOURO_API);
+    const res   = await fetch(proxy);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data  = await res.json();
+    // Estrutura: { response: { TrsrBdTradgList: [ { TrsrBd: { nm, untrRedVal, ... } } ] } }
+    const list  = data?.response?.TrsrBdTradgList || [];
+    return list.map(item => ({
+      nome:    item.TrsrBd.nm,           // "Tesouro Selic 2029"
+      preco:   item.TrsrBd.untrRedVal,   // preço unitário atual
+      venc:    item.TrsrBd.mtrtyDt,      // data de vencimento
+    }));
+  } catch(e) {
+    console.warn('[Tesouro]', e);
+    return null;
+  }
+}
+
+// ── Toggle tipo de ativo no formulário ──
+function carteiraToggleTipo() {
+  const tipo = document.getElementById('cartTipo')?.value;
+  const acaoFields    = document.getElementById('cartCamposAcao');
+  const tesouoFields  = document.getElementById('cartCamposTesouro');
+  const brapiArea     = document.getElementById('cartBrapiArea');
+  if (tipo === 'tesouro') {
+    if (acaoFields)   acaoFields.style.display   = 'none';
+    if (tesouoFields) tesouoFields.style.display = 'block';
+    if (brapiArea)    brapiArea.style.display    = 'none';
+  } else {
+    if (acaoFields)   acaoFields.style.display   = 'contents';
+    if (tesouoFields) tesouoFields.style.display = 'none';
+    if (brapiArea)    brapiArea.style.display    = 'flex';
+  }
+}
+
+// ── Adicionar ativo — suporte a Tesouro Direto ──
+// (override da função existente para suportar os dois tipos)
+const _carteiraAddOrig = carteiraAdd;
+async function carteiraAdd() {
+  const tipo = document.getElementById('cartTipo')?.value || 'acao';
+  if (tipo === 'tesouro') {
+    await carteiraAddTesouro();
+    return;
+  }
+  await _carteiraAddOrig();
+}
+
+async function carteiraAddTesouro() {
+  const tipoTitulo = document.getElementById('cartTesouoTipo')?.value || 'Tesouro Selic';
+  const valor      = parseFloat(document.getElementById('cartTesouoValor')?.value) || 0;
+  const venc       = document.getElementById('cartTesouoVenc')?.value?.trim() || '';
+  const statusEl   = document.getElementById('cartAddStatus');
+
+  if (!valor) { carteiraSetStatus(statusEl, 'Informe o valor investido', 'err'); return; }
+
+  carteiraSetStatus(statusEl, `Buscando preço do ${tipoTitulo}...`, 'load');
+
+  const prices = await tesouroFetchPrices();
+  let precoAtual = null;
+  let nomeCompleto = tipoTitulo + (venc ? ' ' + venc : '');
+
+  if (prices) {
+    // Busca o título mais próximo pelo nome
+    const match = prices.find(p =>
+      p.nome.toLowerCase().includes(tipoTitulo.toLowerCase().replace('tesouro ','')) &&
+      (!venc || p.nome.includes(venc))
+    ) || prices.find(p => p.nome.toLowerCase().includes(tipoTitulo.toLowerCase().replace('tesouro ','')));
+
+    if (match) {
+      precoAtual   = match.preco;
+      nomeCompleto = match.nome;
+    }
+  }
+
+  // Ticker sintético para identificar Tesouro no sistema
+  const ticker = ('TD_' + tipoTitulo.replace(/[^A-Z]/gi,'').toUpperCase() + (venc||'').replace(/\D/g,'').slice(-4)).slice(0,12);
+
+  const ativos = carteiraLoad();
+  const idx    = ativos.findIndex(a => a.ticker === ticker);
+
+  const ativo = {
+    ticker,
+    nome:      nomeCompleto,
+    qtd:       1,            // Tesouro: 1 unidade = valor total
+    pmedio:    valor,        // valor investido = preço médio
+    preco:     precoAtual || valor,  // preço atual (se disponível)
+    variacao:  precoAtual ? ((precoAtual - valor) / valor * 100) : null,
+    tipo:      'tesouro',
+    valorInvestido: valor,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (idx >= 0) ativos[idx] = { ...ativos[idx], ...ativo };
+  else           ativos.push(ativo);
+
+  carteiraSave(ativos);
+  carteiraSetStatus(statusEl,
+    precoAtual
+      ? `${nomeCompleto} adicionado! Valor atual: ${fmt(precoAtual)}`
+      : `${nomeCompleto} adicionado (preço atual indisponível — usando valor investido)`,
+    'ok');
+
+  document.getElementById('cartTesouoValor').value = '';
+  document.getElementById('cartTesouoVenc').value  = '';
+  carteiraRenderList();
+}
+
+// ── Atualizar cotações — inclui Tesouro Direto ──
+const _carteiraRefreshOrig = carteiraRefresh;
+async function carteiraRefresh() {
+  const ativos = carteiraLoad();
+  const acoes   = ativos.filter(a => a.tipo !== 'tesouro');
+  const tesouro = ativos.filter(a => a.tipo === 'tesouro');
+
+  const btn = document.getElementById('cartRefreshBtn');
+  if (btn) { btn.textContent = '⏳ Atualizando...'; btn.disabled = true; }
+
+  // Atualiza ações via BRAPI
+  let quotesAcoes = {};
+  if (acoes.length) {
+    const q = await carteiraBuscarCotacao(acoes.map(a => a.ticker));
+    if (q) quotesAcoes = q;
+  }
+
+  // Atualiza Tesouro via API
+  let pricesTesouro = [];
+  if (tesouro.length) {
+    pricesTesouro = await tesouroFetchPrices() || [];
+  }
+
+  const agora   = new Date().toISOString();
+  const updated = ativos.map(a => {
+    if (a.tipo === 'tesouro') {
+      const match = pricesTesouro.find(p =>
+        p.nome.toLowerCase().includes(
+          a.nome.toLowerCase().replace('tesouro ','').split(' ')[0]
+        ) && a.nome.includes(p.nome.split(' ').slice(-1)[0])
+      ) || pricesTesouro.find(p => p.nome === a.nome);
+      if (!match) return { ...a, updatedAt: agora };
+      return {
+        ...a,
+        preco:     match.preco,
+        variacao:  ((match.preco - a.pmedio) / a.pmedio * 100),
+        updatedAt: agora,
+      };
+    } else {
+      const q = quotesAcoes[a.ticker];
+      if (!q) return a;
+      return { ...a, preco: q.regularMarketPrice, variacao: q.regularMarketChangePercent, nome: q.shortName||q.longName||a.nome, updatedAt: agora };
+    }
+  });
+
+  carteiraSave(updated);
+  carteiraRenderList();
+  if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
+  showToast('Cotações atualizadas!', '✅', 3000);
+}
+
+// ── Usar total da carteira para preencher saldo no acompanhamento ──
+function carteiraUsarTotal() {
+  const total = carteiraLoad().reduce((s,a) => {
+    // Para Tesouro: usa preço atual
+    return s + (a.preco||a.valorInvestido||0) * (a.tipo==='tesouro'?1:(a.qtd||0));
+  }, 0);
+  if (!total) { showToast('Atualize as cotações primeiro', '⚠️'); return; }
+  const el = document.getElementById('trackPatrimonio');
+  if (el) el.value = total.toFixed(2);
+  // Scroll para o formulário de registro
+  document.getElementById('trackMes')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  showToast(`Saldo preenchido: ${fmt(total)}`, '📥');
+  updateTrackCalc();
+}
+
+// ── Atualiza patInvestimentos quando carteira muda ──
+function carteiraSyncPatrimonio() {
+  const total = carteiraLoad().reduce((s,a) => {
+    return s + (a.preco||a.valorInvestido||0) * (a.tipo==='tesouro'?1:(a.qtd||0));
+  }, 0);
+  const el = document.getElementById('patInvestimentos');
+  if (el && !el.value) { // só preenche se estiver vazio
+    el.value = total.toFixed(2);
+    calcPatrimonio();
+  }
+}
+
 // ── Init ──
 renderSavedList();
 // Restaura últimos inputs usados (se houver)
 if (autoRestoreInputs()) {
   updAno();
-  calc();
+  calcPatrimonio(); // recalcula o total dos buckets
 } else {
   updAno();
   calc();
@@ -4094,25 +4786,25 @@ let compareChart = null;
 // ── Screen switcher ──
 function switchScreen(screen) {
   const screens = {
-    simulador:       { el:'screenSimulador',      display:'contents' },
-    acompanhamento:  { el:'screenAcompanhamento', display:'flex'     },
-    metas:           { el:'screenMetas',          display:'flex'     },
-    reminder:        { el:'screenReminder',       display:'flex'     },
+    simulador:  { el:'screenSimulador',  display:'contents' },
+    financas:   { el:'screenFinancas',   display:'flex'     },
+    metas:      { el:'screenMetas',      display:'flex'     },
+    reminder:   { el:'screenReminder',   display:'flex'     },
   };
   Object.entries(screens).forEach(([key, cfg]) => {
     const el = document.getElementById(cfg.el);
     if (el) el.style.display = key === screen ? cfg.display : 'none';
   });
-  ['tabSimulador','tabAcomp','tabMetas','tabReminder'].forEach(id => {
+  ['tabSimulador','tabFinancas','tabMetas','tabReminder'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
-  const tabMap = { simulador:'tabSimulador', acompanhamento:'tabAcomp', metas:'tabMetas', reminder:'tabReminder' };
+  const tabMap = { simulador:'tabSimulador', financas:'tabFinancas', metas:'tabMetas', reminder:'tabReminder' };
   document.getElementById(tabMap[screen])?.classList.add('active');
 
-  if (screen === 'acompanhamento') { initTrackMes(); renderTrack(); }
-  if (screen === 'metas')          { renderGoals(); }
-  if (screen === 'reminder')       { reminderUpdateUI(); }
+  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); }
+  if (screen === 'metas')     { renderGoals(); }
+  if (screen === 'reminder')  { reminderUpdateUI(); }
 }
 
 // ── Storage helpers ──
