@@ -526,6 +526,21 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 .goals-empty-title{font-size:14px;font-weight:600;color:var(--t2)}
 .goals-empty-sub{font-size:12px;max-width:300px;line-height:1.6}
 
+/* ── Lembretes ── */
+.reminder-panel{background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.reminder-form{padding:20px;display:flex;flex-direction:column;gap:14px}
+.reminder-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.reminder-ig{display:flex;flex-direction:column;gap:5px}
+.reminder-ig label{font-size:11px;color:var(--t2);font-weight:500}
+.reminder-ig input,.reminder-ig select{background:var(--bg6);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-family:var(--fm);font-size:13px;padding:9px 13px;width:100%;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.reminder-ig input:focus,.reminder-ig select:focus{outline:none;border-color:var(--acd);box-shadow:0 0 0 3px var(--acg)}
+.reminder-status{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg6);border-radius:10px;font-size:12px}
+.reminder-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.reminder-dot.on{background:var(--ac);box-shadow:0 0 6px var(--ac)}
+.reminder-dot.off{background:var(--t3)}
+.reminder-url-input{font-size:11px;color:var(--t3);background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-family:var(--fm);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.reminder-url-input:hover{border-color:var(--bda);color:var(--t2)}
+
 /* PRINT */
 @media print{
   body{background:#fff!important;color:#111!important}
@@ -584,6 +599,9 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       </button>
       <button class="nav-tab" id="tabMetas" onclick="switchScreen('metas')">
         <span class="nav-tab-icon">🎯</span> Metas
+      </button>
+      <button class="nav-tab" id="tabReminder" onclick="switchScreen('reminder')">
+        <span class="nav-tab-icon">🔔</span> Lembretes
       </button>
     </div>
   </div>
@@ -1053,6 +1071,110 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   </div>
 
 </div><!-- end screenMetas -->
+
+<!-- LEMBRETES SCREEN -->
+<div id="screenReminder" class="screen-full" style="display:none">
+
+  <!-- Status atual -->
+  <div class="reminder-panel" id="reminderStatusPanel">
+    <div class="ph2"><span style="font-size:16px">🔔</span><span class="pt">Status do Lembrete</span></div>
+    <div style="padding:0 20px 20px">
+      <div class="reminder-status" id="reminderStatusBar">
+        <div class="reminder-dot off" id="reminderDot"></div>
+        <span id="reminderStatusText" style="color:var(--t2)">Nenhum lembrete configurado</span>
+        <button id="reminderCancelBtn" onclick="reminderCancel()" style="display:none;margin-left:auto;background:var(--reg);border:1px solid var(--re);color:var(--re);font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--fb)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuração -->
+  <div class="reminder-panel">
+    <div class="ph2"><span style="font-size:16px">⚙️</span><span class="pt">Configurar Lembrete Mensal</span></div>
+    <div class="reminder-form">
+
+      <!-- URL do Apps Script -->
+      <div class="reminder-ig" style="grid-column:1/-1">
+        <label>🔗 URL do Google Apps Script <span style="color:var(--t3);font-weight:400">(cole após o deploy)</span></label>
+        <input type="url" id="reminderScriptUrl" placeholder="https://script.google.com/macros/s/...exec" oninput="reminderSaveConfig()">
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">
+          Siga as instruções abaixo para obter esta URL
+        </div>
+      </div>
+
+      <div class="reminder-grid">
+        <div class="reminder-ig">
+          <label>📧 Seu e-mail</label>
+          <input type="email" id="reminderEmail" placeholder="seuemail@gmail.com" oninput="reminderSaveConfig()">
+        </div>
+        <div class="reminder-ig">
+          <label>📅 Dia do mês para receber</label>
+          <select id="reminderDia" onchange="reminderSaveConfig()">
+            ${Array.from({length:28},(_,i)=&gt;`<option value="${i+1}" ${i+1="==5?'" selected':''}="">${i+1}º dia do mês</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="track-btn" onclick="reminderTest()" style="background:var(--bg6);border:1px solid var(--bd);color:var(--t2);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb)">
+          📧 Enviar e-mail de teste
+        </button>
+        <button class="track-btn primary" onclick="reminderSchedule()">
+          🔔 Ativar Lembrete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instruções -->
+  <div class="reminder-panel">
+    <div class="ph2"><span style="font-size:16px">📋</span><span class="pt">Como configurar o Google Apps Script</span></div>
+    <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:12px">
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">1</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">
+          Acesse <a href="https://script.google.com" target="_blank" style="color:var(--ac)">script.google.com</a> e clique em <strong style="color:var(--t1)">Novo projeto</strong>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">2</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">
+          Apague o código existente e cole o código do arquivo <strong style="color:var(--t1)">Code.gs</strong> que você baixou junto com o SimFin
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">3</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">
+          Clique em <strong style="color:var(--t1)">Implantar → Nova implantação</strong><br>
+          Tipo: <strong style="color:var(--t1)">Aplicativo da Web</strong><br>
+          Executar como: <strong style="color:var(--t1)">Eu</strong><br>
+          Quem tem acesso: <strong style="color:var(--t1)">Qualquer pessoa</strong>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">4</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">
+          Copie a <strong style="color:var(--t1)">URL do aplicativo da web</strong> gerada e cole no campo acima
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">5</div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">
+          Preencha seu e-mail, escolha o dia e clique em <strong style="color:var(--t1)">Ativar Lembrete</strong>
+        </div>
+      </div>
+
+      <div style="background:var(--bg6);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--t3);line-height:1.6;margin-top:4px">
+        💡 <strong style="color:var(--t2)">100% gratuito.</strong> O Apps Script roda na sua conta Google. Os e-mails são enviados pelo Gmail sem custo até 100/dia (mais que suficiente).
+      </div>
+    </div>
+  </div>
+
+</div><!-- end screenReminder -->
 
 <!-- ═══════ MODAL ═══════ -->
 <div class="mo" id="moOv" onclick="handleOvClick(event)">
@@ -2670,7 +2792,8 @@ function driveGetPayload() {
     },
     simulacoes:     JSON.parse(localStorage.getItem('simfin_saves')  || '[]'),
     acompanhamento: JSON.parse(localStorage.getItem('simfin_track')  || '[]'),
-    metas:          JSON.parse(localStorage.getItem('simfin_goals')  || '[]'),
+    metas:          JSON.parse(localStorage.getItem('simfin_goals')   || '[]'),
+    reminder:       JSON.parse(localStorage.getItem('simfin_reminder_config') || '{}'),
     inputs: (() => { try { return getInputs(); } catch(e) { return null; } })(),
   };
 }
@@ -3437,6 +3560,154 @@ setInterval(() => { if (!ghIsUnlocked()) ghUpdateUI(); }, 60000);
 // Inicializa UI ao carregar
 window.addEventListener('load', () => setTimeout(ghUpdateUI, 200));
 
+
+// ════════════════════════════════════════════════════════════════
+// LEMBRETES — Google Apps Script integration
+// ════════════════════════════════════════════════════════════════
+
+const REMINDER_KEY = 'simfin_reminder_config';
+
+function reminderLoadConfig() {
+  try { return JSON.parse(localStorage.getItem(REMINDER_KEY)) || {}; } catch { return {}; }
+}
+function reminderSaveConfig() {
+  const cfg = reminderLoadConfig();
+  cfg.scriptUrl = document.getElementById('reminderScriptUrl')?.value?.trim() || cfg.scriptUrl;
+  cfg.email     = document.getElementById('reminderEmail')?.value?.trim()     || cfg.email;
+  cfg.dia       = parseInt(document.getElementById('reminderDia')?.value)     || cfg.dia;
+  localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
+}
+
+function reminderUpdateUI() {
+  const cfg = reminderLoadConfig();
+
+  // Preenche campos com config salva
+  const urlEl = document.getElementById('reminderScriptUrl');
+  const emEl  = document.getElementById('reminderEmail');
+  const diaEl = document.getElementById('reminderDia');
+  if (urlEl && cfg.scriptUrl) urlEl.value = cfg.scriptUrl;
+  if (emEl  && cfg.email)     emEl.value  = cfg.email;
+  if (diaEl && cfg.dia)       diaEl.value = cfg.dia;
+
+  // Status
+  const dot     = document.getElementById('reminderDot');
+  const txt     = document.getElementById('reminderStatusText');
+  const cancelB = document.getElementById('reminderCancelBtn');
+
+  if (cfg.ativo && cfg.email && cfg.dia) {
+    dot.className = 'reminder-dot on';
+    txt.innerHTML = `Ativo · e-mail para <strong style="color:var(--t1)">${cfg.email}</strong> todo dia <strong style="color:var(--ac)">${cfg.dia}</strong> do mês`;
+    txt.style.color = 'var(--ac)';
+    if (cancelB) cancelB.style.display = 'block';
+  } else {
+    dot.className = 'reminder-dot off';
+    txt.textContent = 'Nenhum lembrete ativo';
+    txt.style.color = 'var(--t2)';
+    if (cancelB) cancelB.style.display = 'none';
+  }
+}
+
+async function reminderSchedule() {
+  const cfg = reminderLoadConfig();
+  const url = document.getElementById('reminderScriptUrl')?.value?.trim();
+  const email = document.getElementById('reminderEmail')?.value?.trim();
+  const dia   = parseInt(document.getElementById('reminderDia')?.value);
+
+  if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
+  if (!email) { showToast('Informe seu e-mail', '⚠️'); return; }
+  if (!url.includes('script.google.com')) {
+    showToast('URL inválida — deve ser do script.google.com', '❌'); return;
+  }
+
+  showToast('Configurando lembrete...', '⏳', 60000);
+
+  try {
+    const token = cfg.token || ('tk_' + Date.now().toString(36));
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action:  'schedule',
+        email,
+        dia,
+        appUrl:  'https://paulovcr18.github.io/SimFin/',
+        nome:    'SimFin',
+        token,
+      })
+    });
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
+
+    // Salva config com token
+    const newCfg = { scriptUrl: url, email, dia, token: data.token || token, ativo: true };
+    localStorage.setItem(REMINDER_KEY, JSON.stringify(newCfg));
+    reminderUpdateUI();
+    showToast(`Lembrete ativo! Você receberá e-mails todo dia ${dia}.`, '🔔', 5000);
+
+  } catch(e) {
+    console.error('[Reminder]', e);
+    showToast('Erro: ' + e.message + ' · Verifique a URL do script', '❌', 6000);
+  }
+}
+
+async function reminderTest() {
+  const url   = document.getElementById('reminderScriptUrl')?.value?.trim();
+  const email = document.getElementById('reminderEmail')?.value?.trim();
+
+  if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
+  if (!email) { showToast('Informe seu e-mail para o teste', '⚠️'); return; }
+
+  showToast('Enviando e-mail de teste...', '📧', 10000);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'test',
+        email,
+        appUrl: 'https://paulovcr18.github.io/SimFin/',
+        nome:   'SimFin',
+      })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    showToast('E-mail de teste enviado! Verifique sua caixa de entrada.', '✅', 5000);
+  } catch(e) {
+    showToast('Erro ao enviar teste: ' + e.message, '❌', 5000);
+  }
+}
+
+async function reminderCancel() {
+  const cfg = reminderLoadConfig();
+  if (!cfg.scriptUrl || !cfg.token) {
+    // Cancela só localmente
+    cfg.ativo = false;
+    localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
+    reminderUpdateUI();
+    showToast('Lembrete cancelado localmente', '🔕', 3000);
+    return;
+  }
+
+  try {
+    const res = await fetch(cfg.scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cancel', token: cfg.token })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+  } catch(e) {
+    console.warn('[Reminder cancel]', e);
+  }
+
+  cfg.ativo = false;
+  localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
+  reminderUpdateUI();
+  showToast('Lembrete cancelado com sucesso', '🔕', 3000);
+}
+
 // ── Init ──
 renderSavedList();
 // Restaura últimos inputs usados (se houver)
@@ -3461,20 +3732,22 @@ function switchScreen(screen) {
     simulador:       { el:'screenSimulador',      display:'contents' },
     acompanhamento:  { el:'screenAcompanhamento', display:'flex'     },
     metas:           { el:'screenMetas',          display:'flex'     },
+    reminder:        { el:'screenReminder',       display:'flex'     },
   };
   Object.entries(screens).forEach(([key, cfg]) => {
     const el = document.getElementById(cfg.el);
     if (el) el.style.display = key === screen ? cfg.display : 'none';
   });
-  ['tabSimulador','tabAcomp','tabMetas'].forEach(id => {
+  ['tabSimulador','tabAcomp','tabMetas','tabReminder'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
-  const tabMap = { simulador:'tabSimulador', acompanhamento:'tabAcomp', metas:'tabMetas' };
+  const tabMap = { simulador:'tabSimulador', acompanhamento:'tabAcomp', metas:'tabMetas', reminder:'tabReminder' };
   document.getElementById(tabMap[screen])?.classList.add('active');
 
   if (screen === 'acompanhamento') { initTrackMes(); renderTrack(); }
   if (screen === 'metas')          { renderGoals(); }
+  if (screen === 'reminder')       { reminderUpdateUI(); }
 }
 
 // ── Storage helpers ──
