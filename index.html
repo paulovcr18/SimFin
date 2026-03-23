@@ -1101,6 +1101,15 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         </div>
       </div>
 
+      <!-- Chave secreta -->
+      <div class="reminder-ig" style="grid-column:1/-1">
+        <label>🔑 Chave secreta <span style="color:var(--t3);font-weight:400">(deve ser igual à definida no Code.gs)</span></label>
+        <input type="password" id="reminderSecretKey" placeholder="Ex: minha-chave-super-secreta-2026" oninput="reminderSaveConfig()">
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">
+          No Code.gs, substitua <code style="background:var(--bg5);padding:1px 5px;border-radius:4px;font-size:10px">DEFINA_SUA_CHAVE_AQUI</code> pela mesma chave que você digitar aqui
+        </div>
+      </div>
+
       <div class="reminder-grid">
         <div class="reminder-ig">
           <label>📧 Seu e-mail</label>
@@ -3599,9 +3608,10 @@ function reminderLoadConfig() {
 }
 function reminderSaveConfig() {
   const cfg = reminderLoadConfig();
-  cfg.scriptUrl = document.getElementById('reminderScriptUrl')?.value?.trim() || cfg.scriptUrl;
-  cfg.email     = document.getElementById('reminderEmail')?.value?.trim()     || cfg.email;
-  cfg.dia       = parseInt(document.getElementById('reminderDia')?.value)     || cfg.dia;
+  cfg.scriptUrl  = document.getElementById('reminderScriptUrl')?.value?.trim()  || cfg.scriptUrl;
+  cfg.secretKey  = document.getElementById('reminderSecretKey')?.value?.trim()  || cfg.secretKey;
+  cfg.email      = document.getElementById('reminderEmail')?.value?.trim()      || cfg.email;
+  cfg.dia        = parseInt(document.getElementById('reminderDia')?.value)      || cfg.dia;
   localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
 }
 
@@ -3610,9 +3620,11 @@ function reminderUpdateUI() {
 
   // Preenche campos com config salva
   const urlEl = document.getElementById('reminderScriptUrl');
+  const keyEl = document.getElementById('reminderSecretKey');
   const emEl  = document.getElementById('reminderEmail');
   const diaEl = document.getElementById('reminderDia');
   if (urlEl && cfg.scriptUrl) urlEl.value = cfg.scriptUrl;
+  if (keyEl && cfg.secretKey) keyEl.value = cfg.secretKey;
   if (emEl  && cfg.email)     emEl.value  = cfg.email;
   if (diaEl && cfg.dia)       diaEl.value = cfg.dia;
 
@@ -3653,8 +3665,10 @@ async function reminderSchedule() {
   const email = document.getElementById('reminderEmail')?.value?.trim();
   const dia   = parseInt(document.getElementById('reminderDia')?.value);
 
-  if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
-  if (!email) { showToast('Informe seu e-mail', '⚠️'); return; }
+  const secretKey = document.getElementById('reminderSecretKey')?.value?.trim();
+  if (!url)       { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
+  if (!email)     { showToast('Informe seu e-mail', '⚠️'); return; }
+  if (!secretKey) { showToast('Informe a chave secreta', '⚠️'); return; }
   if (!url.includes('script.google.com')) { showToast('URL inválida', '❌'); return; }
 
   showToast('Configurando lembrete...', '⏳', 30000);
@@ -3662,7 +3676,7 @@ async function reminderSchedule() {
   try {
     const token = cfg.token || ('tk_' + Date.now().toString(36));
     const fullUrl = reminderBuildUrl(url, {
-      action: 'schedule', email, dia,
+      action: 'schedule', email, dia, key: secretKey,
       appUrl: 'https://paulovcr18.github.io/SimFin/',
       nome: 'SimFin', token,
     });
@@ -3670,7 +3684,8 @@ async function reminderSchedule() {
     if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
 
     localStorage.setItem(REMINDER_KEY, JSON.stringify({
-      scriptUrl: url, email, dia, token: data.token || token, ativo: true
+      scriptUrl: url, email, dia, token: data.token || token,
+      secretKey: secretKey, ativo: true
     }));
     reminderUpdateUI();
     showToast(`🔔 Lembrete ativo! E-mail todo dia ${dia} do mês.`, '🔔', 5000);
@@ -3684,14 +3699,16 @@ async function reminderTest() {
   const url   = document.getElementById('reminderScriptUrl')?.value?.trim();
   const email = document.getElementById('reminderEmail')?.value?.trim();
 
-  if (!url)   { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
-  if (!email) { showToast('Informe seu e-mail', '⚠️'); return; }
+  const secretKeyT = document.getElementById('reminderSecretKey')?.value?.trim();
+  if (!url)        { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
+  if (!email)      { showToast('Informe seu e-mail', '⚠️'); return; }
+  if (!secretKeyT) { showToast('Informe a chave secreta', '⚠️'); return; }
 
   showToast('Enviando e-mail de teste...', '📧', 15000);
 
   try {
     const fullUrl = reminderBuildUrl(url, {
-      action: 'test', email,
+      action: 'test', email, key: secretKeyT,
       appUrl: 'https://paulovcr18.github.io/SimFin/',
       nome: 'SimFin',
     });
@@ -3707,7 +3724,7 @@ async function reminderCancel() {
   const cfg = reminderLoadConfig();
   if (cfg.scriptUrl && cfg.token) {
     try {
-      const fullUrl = reminderBuildUrl(cfg.scriptUrl, { action: 'cancel', token: cfg.token });
+      const fullUrl = reminderBuildUrl(cfg.scriptUrl, { action: 'cancel', token: cfg.token, key: cfg.secretKey || '' });
       await reminderFetch(fullUrl);
     } catch(e) { console.warn('[Reminder cancel]', e); }
   }
