@@ -1109,7 +1109,34 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         <div class="reminder-ig">
           <label>📅 Dia do mês para receber</label>
           <select id="reminderDia" onchange="reminderSaveConfig()">
-            ${Array.from({length:28},(_,i)=&gt;`<option value="${i+1}" ${i+1="==5?'" selected':''}="">${i+1}º dia do mês</option>`).join('')}
+            <option value="1">1º dia do mês</option>
+            <option value="2">2º dia do mês</option>
+            <option value="3">3º dia do mês</option>
+            <option value="4">4º dia do mês</option>
+            <option value="5" selected="">5º dia do mês</option>
+            <option value="6">6º dia do mês</option>
+            <option value="7">7º dia do mês</option>
+            <option value="8">8º dia do mês</option>
+            <option value="9">9º dia do mês</option>
+            <option value="10">10º dia do mês</option>
+            <option value="11">11º dia do mês</option>
+            <option value="12">12º dia do mês</option>
+            <option value="13">13º dia do mês</option>
+            <option value="14">14º dia do mês</option>
+            <option value="15">15º dia do mês</option>
+            <option value="16">16º dia do mês</option>
+            <option value="17">17º dia do mês</option>
+            <option value="18">18º dia do mês</option>
+            <option value="19">19º dia do mês</option>
+            <option value="20">20º dia do mês</option>
+            <option value="21">21º dia do mês</option>
+            <option value="22">22º dia do mês</option>
+            <option value="23">23º dia do mês</option>
+            <option value="24">24º dia do mês</option>
+            <option value="25">25º dia do mês</option>
+            <option value="26">26º dia do mês</option>
+            <option value="27">27º dia do mês</option>
+            <option value="28">28º dia do mês</option>
           </select>
         </div>
       </div>
@@ -1286,16 +1313,16 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 <div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
   <div class="gh-setup-box">
     <div class="smh">
-      <span class="smt" id="ghPinTitle">🔐 Digite seu PIN</span>
+      <span class="smt" id="ghPinTitle">🔐 Modo Desenvolvedor</span>
       <button class="mcl" onclick="ghClosePinModal()">✕</button>
     </div>
     <div class="smb">
       <!-- PIN dots display -->
       <div style="display:flex;justify-content:center;gap:12px;margin:4px 0 8px">
-        <div id="ghDot0" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot1" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot2" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot3" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
+        <div id="ghDot0" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
+        <div id="ghDot1" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
+        <div id="ghDot2" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
+        <div id="ghDot3" style="width:16px;height:16px;border-radius:50%;background:var(--bg5);border:2px solid var(--bd);transition:all .15s"></div>
       </div>
       <!-- PIN numpad -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto">
@@ -1344,7 +1371,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔓</span><span id="toastMsg">Desbloqueado! Publicar disponível por 30 min.</span></div>
+<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">✅</span><span id="toastMsg">OK</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
