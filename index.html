@@ -553,6 +553,37 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 .reminder-url-input{font-size:11px;color:var(--t3);background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-family:var(--fm);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
 .reminder-url-input:hover{border-color:var(--bda);color:var(--t2)}
 
+/* ── Edit modals ── */
+.edit-modal{position:fixed;inset:0;background:rgba(5,8,14,.88);backdrop-filter:blur(10px);z-index:9600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.edit-modal.open{opacity:1;pointer-events:all}
+.edit-box{background:var(--bg8);border:1px solid var(--bda);border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.8);transform:scale(.96);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+.edit-modal.open .edit-box{transform:scale(1)}
+.edit-header{padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.edit-body{padding:20px;display:flex;flex-direction:column;gap:14px;max-height:70vh;overflow-y:auto}
+.edit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.edit-ig{display:flex;flex-direction:column;gap:5px}
+.edit-ig label{font-size:11px;color:var(--t2);font-weight:500}
+.edit-ig input,.edit-ig select,.edit-ig textarea{background:var(--bg6);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-family:var(--fm);font-size:13px;padding:9px 13px;width:100%;transition:border-color .2s,box-shadow .2s;resize:vertical}
+.edit-ig input:focus,.edit-ig select:focus,.edit-ig textarea:focus{outline:none;border-color:var(--acd);box-shadow:0 0 0 3px var(--acg)}
+.edit-actions{display:flex;gap:8px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--bd)}
+
+/* ── Retirada badge na tabela ── */
+.retirada-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:rgba(224,108,108,.15);color:var(--re);margin-left:5px}
+
+/* ── Versões modal ── */
+.ver-list{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.ver-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg6);border-radius:8px;border:1px solid var(--bd);cursor:pointer;transition:border-color .15s}
+.ver-item:hover{border-color:var(--bda)}
+.ver-item.current{border-color:var(--bda);background:var(--acg)}
+.ver-meta{flex:1;min-width:0}
+.ver-name{font-size:12px;font-weight:600;color:var(--t1)}
+.ver-date{font-size:10px;color:var(--t3);margin-top:2px}
+.ver-summary{font-size:10px;color:var(--t2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ver-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--acg);color:var(--ac);flex-shrink:0}
+
+/* ── Inflação ── */
+.inf-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;background:rgba(167,139,250,.12);color:var(--pu)}
+
 /* PRINT */
 @media print{
   body{background:#fff!important;color:#111!important}
@@ -638,12 +669,13 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
             <span class="saves-drop-count" id="savesDropCount">1 / 10</span>
           </div>
           <div class="saves-drop-list" id="savesDropList">
-    <div class="sdrop-item" onclick="loadSave(0);closeSavesDrop()" title="Carregar simulação">
+    <div class="sdrop-item" onclick="loadSave(0);closeSavesDrop()" title="Carregar simulação" style="position:relative">
       <div style="font-size:16px;flex-shrink:0">📋</div>
       <div class="sdrop-item-info">
         <div class="sdrop-item-name">Cenário Possivel 10 anos</div>
         <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 01:20</div>
       </div>
+      <button class="sdrop-del" onclick="event.stopPropagation();openVersions(0)" title="Histórico de versões" style="color:var(--t3);font-size:11px;background:none;border:none;cursor:pointer;padding:2px 4px">🕐</button>
       <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(0)" title="Excluir">🗑</button>
     </div></div>
           <div class="saves-drop-footer">
@@ -808,6 +840,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   </div>
   <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" oninput="calc()"></div>
   <div class="ig"><label>Patrimônio Inicial (R$)</label><input type="number" id="patrimonioInicial" value="" min="0" oninput="calc()"></div>
+  <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" oninput="calc()" title="Usada para mostrar o valor real (poder de compra) no gráfico e snapshots"></div>
 </aside>
 
 <!-- MAIN -->
@@ -957,6 +990,22 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         <div class="track-ig">
           <label>🏦 Saldo atual da carteira (R$)</label>
           <input type="number" id="trackPatrimonio" min="0" placeholder="Ex: 51.180" oninput="updateTrackCalc()">
+        </div>
+      </div>
+      <!-- Retirada (opcional) -->
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="height:1px;background:var(--bd);flex:1"></div>
+        <span style="font-size:10px;color:var(--t3);white-space:nowrap">retirada (opcional)</span>
+        <div style="height:1px;background:var(--bd);flex:1"></div>
+      </div>
+      <div class="track-row">
+        <div class="track-ig">
+          <label>💰 Valor retirado (R$)</label>
+          <input type="number" id="trackRetirada" min="0" placeholder="Ex: 5.000" oninput="updateTrackCalc()">
+        </div>
+        <div class="track-ig" style="grid-column:span 2">
+          <label>📝 Motivo da retirada</label>
+          <input type="text" id="trackRetiradaMotivo" placeholder="Ex: Compra do carro, Viagem, Emergência..." maxlength="80">
         </div>
       </div>
       <div class="track-calc-info" id="trackCalcInfo">
@@ -1387,6 +1436,103 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         <button class="sm-btn cancel" onclick="document.getElementById('ghSetupModal').classList.remove('open')">Cancelar</button>
         <button class="sm-btn confirm" onclick="ghSaveToken()">Salvar ✓</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT GOAL MODAL -->
+<div class="edit-modal" id="editGoalModal" onclick="if(event.target===this)closeEditGoal()">
+  <div class="edit-box">
+    <div class="edit-header">
+      <span style="font-size:13px;font-weight:600;color:var(--t1)">✏️ Editar Meta</span>
+      <button class="mcl" onclick="closeEditGoal()">✕</button>
+    </div>
+    <div class="edit-body">
+      <input type="hidden" id="editGoalId">
+      <div class="edit-grid">
+        <div class="edit-ig">
+          <label>Categoria</label>
+          <select id="editGoalCat">
+            <option value="carro">🚗 Carro</option>
+            <option value="imovel">🏠 Casa / Imóvel</option>
+            <option value="viagem">✈️ Viagem Internacional</option>
+            <option value="casamento">💍 Casamento</option>
+            <option value="outro">⭐ Outro</option>
+          </select>
+        </div>
+        <div class="edit-ig">
+          <label>Nome</label>
+          <input type="text" id="editGoalName" maxlength="50">
+        </div>
+        <div class="edit-ig">
+          <label>Valor necessário (R$)</label>
+          <input type="number" id="editGoalValor" min="0">
+        </div>
+        <div class="edit-ig">
+          <label>Prazo (meses)</label>
+          <input type="number" id="editGoalMeses" min="1" max="480">
+        </div>
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="sm-btn cancel" onclick="closeEditGoal()">Cancelar</button>
+      <button class="sm-btn confirm" onclick="saveEditGoal()">Salvar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TRACK MODAL -->
+<div class="edit-modal" id="editTrackModal" onclick="if(event.target===this)closeEditTrack()">
+  <div class="edit-box">
+    <div class="edit-header">
+      <span style="font-size:13px;font-weight:600;color:var(--t1)">✏️ Editar Registro</span>
+      <button class="mcl" onclick="closeEditTrack()">✕</button>
+    </div>
+    <div class="edit-body">
+      <input type="hidden" id="editTrackMes">
+      <div class="edit-grid">
+        <div class="edit-ig">
+          <label>Mês de referência</label>
+          <input type="month" id="editTrackMesInput" readonly="" style="opacity:.6">
+        </div>
+        <div class="edit-ig">
+          <label>💸 Aporte realizado (R$)</label>
+          <input type="number" id="editTrackAporte" min="0">
+        </div>
+        <div class="edit-ig">
+          <label>🏦 Saldo da carteira (R$)</label>
+          <input type="number" id="editTrackPatrimonio" min="0">
+        </div>
+        <div class="edit-ig">
+          <label>💰 Retirada (R$)</label>
+          <input type="number" id="editTrackRetirada" min="0" placeholder="0">
+        </div>
+        <div class="edit-ig" style="grid-column:1/-1">
+          <label>📝 Motivo da retirada</label>
+          <input type="text" id="editTrackMotivo" maxlength="80" placeholder="Ex: Compra do carro...">
+        </div>
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="sm-btn cancel" onclick="closeEditTrack()">Cancelar</button>
+      <button class="sm-btn confirm" onclick="saveEditTrack()">Salvar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- VERSIONS MODAL -->
+<div class="edit-modal" id="versionsModal" onclick="if(event.target===this)closeVersions()">
+  <div class="edit-box" style="max-width:480px">
+    <div class="edit-header">
+      <span style="font-size:13px;font-weight:600;color:var(--t1)">🕐 Histórico de Versões</span>
+      <button class="mcl" onclick="closeVersions()">✕</button>
+    </div>
+    <div class="edit-body">
+      <div style="font-size:12px;color:var(--t2);margin-bottom:8px" id="versionsSimName"></div>
+      <div class="ver-list" id="versionsList"></div>
+    </div>
+    <div class="edit-actions">
+      <button class="sm-btn cancel" onclick="closeVersions()">Fechar</button>
     </div>
   </div>
 </div>
@@ -1835,16 +1981,19 @@ let myChart=null,donutChart=null;
 function renderChart(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
   snaps=buildSnaps(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
   renderMilestones(snaps);
+  const inflAnual = parseFloat(document.getElementById('taxaInflacao')?.value)||4.5;
   const labels=snaps.map(d=>d.ano===0?'Hoje':`Ano ${d.ano}`);
-  const vals=snaps.map(d=>d.pat);
-  const aps=snaps.map(d=>d.totAp);
+  const vals =snaps.map(d=>d.pat);
+  const aps  =snaps.map(d=>d.totAp);
+  const reais=snaps.map(d=>d.pat/Math.pow(1+inflAnual/100,d.ano)); // poder de compra
   const ctx=document.getElementById('chartP').getContext('2d');
   if(myChart)myChart.destroy();
   myChart=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[
       {label:'Patrimônio com Juros',data:vals,borderColor:'#5dd4a0',backgroundColor:'rgba(93,212,160,0.08)',borderWidth:2.5,fill:true,tension:.4,pointRadius:4,pointHoverRadius:9,pointBackgroundColor:'#5dd4a0',pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'#5dd4a0',pointHoverBorderWidth:2.5},
-      {label:'Aportes sem Juros',data:aps,borderColor:'#6aace6',backgroundColor:'rgba(106,172,230,0.05)',borderWidth:1.5,fill:true,tension:.4,borderDash:[6,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#6aace6'}
+      {label:'Aportes sem Juros',data:aps,borderColor:'#6aace6',backgroundColor:'rgba(106,172,230,0.05)',borderWidth:1.5,fill:true,tension:.4,borderDash:[6,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#6aace6'},
+      {label:`Valor Real (−${inflAnual}% inflação/ano)`,data:reais,borderColor:'rgba(167,139,250,.8)',backgroundColor:'transparent',borderWidth:1.5,fill:false,tension:.4,borderDash:[3,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'rgba(167,139,250,.8)'},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -1860,11 +2009,13 @@ function renderChart(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
             afterBody(items){
               const s=snaps[items[0].dataIndex];
               if(!s)return[];
+              const patReal=s.pat/Math.pow(1+inflAnual/100,s.ano);
               return[
                 `  ─────────────────`,
                 `  💰 Renda Real: ${fmtK(s.renda)}/mês`,
                 `  📈 Aporte: ${fmtK(s.apN)}/mês`,
                 ...(s.ano>0?[`  ✨ Rendimento: ${fmtK(s.rendAnual)}/ano`]:[]),
+                ...(s.ano>0?[`  💜 Poder de compra: ${fmtK(patReal)}`]:[]),
                 ``,
                 `  ↩ Clique para snapshot completo`
               ];
@@ -1937,7 +2088,9 @@ function popM(idx){
     </div>
     <div class="mkpi kgo"><div class="mkl">Aporte / Mês</div><div class="mkv go">${fmtK(ap)}</div><div class="mks">${pcts.pctInvest}% da renda operacional</div></div>
     <div class="mkpi kbl"><div class="mkl">Rendimento / Mês</div><div class="mkv bl">${fmtK(rendMes)}</div><div class="mks">juros do patrimônio</div></div>
-    <div class="mkpi kpu"><div class="mkl">Patrimônio Total</div><div class="mkv pu">${fmtK(s.pat)}</div><div class="mks">acumulado até aqui</div></div>
+    <div class="mkpi kpu"><div class="mkl">Patrimônio Total</div><div class="mkv pu">${fmtK(s.pat)}</div>
+      <div class="mks">acumulado · <span class="inf-badge">💜 ${fmtK(s.pat/Math.pow(1+(parseFloat(document.getElementById('taxaInflacao')?.value)||4.5)/100,s.ano))} hoje</span></div>
+    </div>
     <div class="mkpi kre"><div class="mkl">Gastos Fixos/mês</div><div class="mkv re">${fmtK(gastMes)}</div><div class="mks">${100-pcts.pctInvest}% do operacional</div></div>
     <div class="mkpi kgo"><div class="mkl">Aporte Extra Potencial</div><div class="mkv go">${fmtK(extrasAnuais*pcts.pctInvest/100)}</div><div class="mks">${pcts.pctInvest}% de ${fmtK(extrasAnuais)} de extras anuais</div></div>
     <div class="mkpi kgo"><div class="mkl">FGTS Anual</div><div class="mkv go">${(s.f1.fgts+s.f2.fgts)>0?fmtK((s.f1.fgts+s.f2.fgts)*12):'N/A (PJ)'}</div><div class="mks">${s.f1.tipo==='PJ'&&s.f2.tipo==='PJ'?'PJ não tem FGTS':'patrimônio trabalhista'}</div></div>`;
@@ -2436,7 +2589,7 @@ function getInputs() {
                 'p1fat','p1retirada','p1prolabore','p1reserva',
                 'p2fat','p2retirada','p2prolabore','p2reserva',
                 'pctMoradia','pctAlimentacao','pctTransporte','pctContas','pctLazer','pctInvest',
-                'taxaAnual','anos','reajuste','patrimonioInicial',
+                'taxaAnual','anos','reajuste','patrimonioInicial','taxaInflacao',
                 'p1regime','p2regime'];
   const out = { _regime1: regime[1], _regime2: regime[2] };
   ids.forEach(id => {
@@ -2483,12 +2636,13 @@ function renderSavedList() {
     return;
   }
   listEl.innerHTML = saves.map((s, i) => `
-    <div class="sdrop-item" onclick="loadSave(${i});closeSavesDrop()" title="Carregar simulação">
+    <div class="sdrop-item" onclick="loadSave(${i});closeSavesDrop()" title="Carregar simulação" style="position:relative">
       <div style="font-size:16px;flex-shrink:0">📋</div>
       <div class="sdrop-item-info">
         <div class="sdrop-item-name">${escHtml(s.name)}</div>
         <div class="sdrop-item-meta">${escHtml(s.summary)} · ${escHtml(s.date)}</div>
       </div>
+      <button class="sdrop-del" onclick="event.stopPropagation();openVersions(${i})" title="Histórico de versões" style="color:var(--t3);font-size:11px;background:none;border:none;cursor:pointer;padding:2px 4px">🕐</button>
       <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(${i})" title="Excluir">🗑</button>
     </div>`).join('');
 }
@@ -2520,8 +2674,7 @@ function openSaveModal() {
 
 // ── Confirm save ──
 function confirmSave() {
-  const saves = loadSaves();
-  if (saves.length >= MAX_SAVES) { showToast(`Limite de ${MAX_SAVES} slots atingido`, '⚠️'); return; }
+  const saves   = loadSaves();
   const name    = document.getElementById('saveName').value.trim() || `Simulação ${new Date().toLocaleDateString('pt-BR')}`;
   const inputs  = getInputs();
   const g       = id => parseFloat(document.getElementById(id).value) || 0;
@@ -2533,7 +2686,38 @@ function confirmSave() {
   const summary = `Renda ${fmtK(renda)}/mês · ${anos} anos · ${taxa}% a.a.`;
   const now     = new Date();
   const date    = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  saves.push({ name, inputs, summary, date });
+
+  // Verifica se já existe simulação com o mesmo nome
+  const existsIdx = saves.findIndex(s => s.name === name);
+  if (existsIdx >= 0) {
+    // Pergunta: sobrescrever ou criar nova versão?
+    const choice = confirm(
+      `"${name}" já existe.
+
+OK → Criar nova versão (mantém histórico)
+Cancelar → Sobrescrever`
+    );
+    const existing = saves[existsIdx];
+    if (choice) {
+      // Nova versão — guarda o estado atual no histórico
+      const versions = existing.versions || [];
+      versions.push({ inputs: existing.inputs, summary: existing.summary, savedAt: existing.date });
+      saves[existsIdx] = { ...existing, inputs, summary, date, versions };
+    } else {
+      // Sobrescreve sem histórico adicional
+      saves[existsIdx] = { ...existing, inputs, summary, date };
+    }
+    persistSaves(saves);
+    document.getElementById('smo').classList.remove('open');
+    renderSavedList();
+    showToast(choice ? `"${name}" — nova versão salva!` : `"${name}" sobrescrita!`, '💾');
+    driveAutoPush();
+    return;
+  }
+
+  // Nome novo — salva normalmente
+  if (saves.length >= MAX_SAVES) { showToast(`Limite de ${MAX_SAVES} slots atingido`, '⚠️'); return; }
+  saves.push({ name, inputs, summary, date, versions: [] });
   persistSaves(saves);
   document.getElementById('smo').classList.remove('open');
   renderSavedList();
@@ -3285,6 +3469,7 @@ function renderGoalsList(goals){
           <div class="goal-card-name">${escHtml(g.name)}</div>
           <div class="goal-card-cat">${cat.label} · ${mesLabel(g.data)}</div>
         </div>
+        <button class="goal-card-del" onclick="openEditGoal(${g.id})" title="Editar" style="color:var(--t3);font-size:12px">✏️</button>
         <button class="goal-card-del" onclick="deleteGoal(${g.id})" title="Excluir">🗑</button>
       </div>
       <div class="goal-card-body">
@@ -3746,6 +3931,148 @@ async function reminderCancel() {
   showToast('Lembrete cancelado', '🔕', 3000);
 }
 
+
+// ════════════════════════════════════════════════════════════════
+// EDITAR META
+// ════════════════════════════════════════════════════════════════
+function openEditGoal(id) {
+  const g = loadGoals().find(g => g.id === id);
+  if (!g) return;
+  document.getElementById('editGoalId').value    = id;
+  document.getElementById('editGoalCat').value   = g.cat;
+  document.getElementById('editGoalName').value  = g.name;
+  document.getElementById('editGoalValor').value = g.valor;
+  document.getElementById('editGoalMeses').value = g.meses;
+  document.getElementById('editGoalModal').classList.add('open');
+}
+function closeEditGoal() {
+  document.getElementById('editGoalModal').classList.remove('open');
+}
+function saveEditGoal() {
+  const id    = parseInt(document.getElementById('editGoalId').value);
+  const goals = loadGoals();
+  const idx   = goals.findIndex(g => g.id === id);
+  if (idx < 0) return;
+  const meses = parseInt(document.getElementById('editGoalMeses').value) || goals[idx].meses;
+  goals[idx] = {
+    ...goals[idx],
+    cat:   document.getElementById('editGoalCat').value,
+    name:  document.getElementById('editGoalName').value.trim() || goals[idx].name,
+    valor: parseFloat(document.getElementById('editGoalValor').value) || goals[idx].valor,
+    meses,
+    data:  mesesParaData(meses),
+  };
+  saveGoals(goals);
+  closeEditGoal();
+  renderGoals();
+  showToast('Meta atualizada!', '✅');
+}
+
+// ════════════════════════════════════════════════════════════════
+// EDITAR REGISTRO DE ACOMPANHAMENTO
+// ════════════════════════════════════════════════════════════════
+function openEditTrack(mes) {
+  const entries = loadTrack();
+  const e = entries.find(e => e.mes === mes);
+  if (!e) return;
+  document.getElementById('editTrackMes').value         = mes;
+  document.getElementById('editTrackMesInput').value    = mes;
+  document.getElementById('editTrackAporte').value      = e.aporte || '';
+  document.getElementById('editTrackPatrimonio').value  = e.patrimonio || '';
+  document.getElementById('editTrackRetirada').value    = e.retirada || '';
+  document.getElementById('editTrackMotivo').value      = e.retiradaMotivo || '';
+  document.getElementById('editTrackModal').classList.add('open');
+}
+function closeEditTrack() {
+  document.getElementById('editTrackModal').classList.remove('open');
+}
+function saveEditTrack() {
+  const mes      = document.getElementById('editTrackMes').value;
+  const aporte   = parseFloat(document.getElementById('editTrackAporte').value)     || 0;
+  const patrim   = parseFloat(document.getElementById('editTrackPatrimonio').value) || 0;
+  const retirada = parseFloat(document.getElementById('editTrackRetirada').value)   || 0;
+  const motivo   = document.getElementById('editTrackMotivo').value.trim();
+
+  if (!patrim) { showToast('Informe o saldo da carteira', '⚠️'); return; }
+
+  const entries = loadTrack();
+  const idx     = entries.findIndex(e => e.mes === mes);
+  if (idx < 0) return;
+
+  const { rendimento, taxaMensal, taxaAnual } = calcTrackEntry(mes, aporte, patrim, retirada);
+
+  entries[idx] = {
+    ...entries[idx],
+    aporte, patrimonio: patrim,
+    retirada: retirada || null,
+    retiradaMotivo: motivo || null,
+    rendimento, taxaMensal, taxaAnual,
+    editadoEm: new Date().toISOString(),
+  };
+
+  entries.sort((a,b) => a.mes.localeCompare(b.mes));
+  saveTrack(entries);
+  closeEditTrack();
+  renderTrack();
+  driveAutoPush();
+  showToast('Registro atualizado!', '✅');
+}
+
+// ════════════════════════════════════════════════════════════════
+// HISTÓRICO DE VERSÕES
+// ════════════════════════════════════════════════════════════════
+function openVersions(i) {
+  const saves = loadSaves();
+  const s     = saves[i];
+  if (!s) return;
+  document.getElementById('versionsSimName').textContent = `Simulação: "${s.name}"`;
+
+  const versions = s.versions || [];
+  const list     = document.getElementById('versionsList');
+
+  if (!versions.length) {
+    list.innerHTML = `<div style="font-size:12px;color:var(--t3);text-align:center;padding:20px">Nenhuma versão anterior. As próximas edições criarão um histórico aqui.</div>`;
+  } else {
+    list.innerHTML = [...versions].reverse().map((v, vi) => `
+      <div class="ver-item" onclick="loadVersion(${i}, ${versions.length-1-vi})">
+        <div class="ver-meta">
+          <div class="ver-name">Versão ${versions.length - vi}</div>
+          <div class="ver-date">${v.savedAt || '—'}</div>
+          <div class="ver-summary">${v.summary || ''}</div>
+        </div>
+        <span class="ver-badge">Restaurar</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('versionsModal').classList.add('open');
+  document._versionsIdx = i;
+}
+
+function loadVersion(saveIdx, versionIdx) {
+  const saves = loadSaves();
+  const s     = saves[saveIdx];
+  if (!s?.versions?.[versionIdx]) return;
+  if (!confirm('Restaurar esta versão? Os dados atuais da simulação serão substituídos.')) return;
+  applyInputs(s.versions[versionIdx].inputs);
+  closeVersions();
+  showToast('Versão restaurada!', '🕐');
+}
+
+function closeVersions() {
+  document.getElementById('versionsModal').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════════════════
+// INFLAÇÃO — cálculo do valor real (poder de compra)
+// ════════════════════════════════════════════════════════════════
+function calcInflacaoSnaps(snaps) {
+  const inflAnual = parseFloat(document.getElementById('taxaInflacao')?.value) || 4.5;
+  return snaps.map(s => ({
+    ...s,
+    patReal: s.pat / Math.pow(1 + inflAnual/100, s.ano), // descontado
+  }));
+}
+
 // ── Init ──
 renderSavedList();
 // Restaura últimos inputs usados (se houver)
@@ -3863,45 +4190,61 @@ function updateTrackCalc() {
 }
 
 // ── Save entry ──
-function saveTrackEntry() {
-  const mes        = document.getElementById('trackMes').value;
-  const aporte     = parseFloat(document.getElementById('trackAporte').value) || 0;
-  const patrimonio = parseFloat(document.getElementById('trackPatrimonio').value) || 0;
+function calcTrackEntry(mes, aporte, patrimonio, retirada) {
+  // Rendimento = variação do patrimônio descontando aporte E retirada
+  // Sem retirada: rendimento = pat - patAnt - aporte
+  // Com retirada: rendimento = pat - patAnt - aporte + retirada
+  // (retirada reduz o patrimônio mas não é rendimento negativo)
+  const patAnterior = getPatrimonioAnterior(mes);
+  const rendimento  = patAnterior !== null
+    ? patrimonio - patAnterior - aporte + (retirada || 0)
+    : null;
+  const base       = patAnterior !== null ? patAnterior + aporte : null;
+  const taxaMensal = base && base > 0 ? rendimento / base * 100 : null;
+  const taxaAnual  = taxaMensal !== null ? (Math.pow(1 + taxaMensal/100, 12) - 1) * 100 : null;
+  return { rendimento, taxaMensal, taxaAnual };
+}
 
-  if (!mes)       { showToast('Selecione o mês de referência', '⚠️'); return; }
-  if (!patrimonio) { showToast('Informe o saldo atual da carteira', '⚠️'); return; }
+function saveTrackEntry() {
+  const mes      = document.getElementById('trackMes').value;
+  const aporte   = parseFloat(document.getElementById('trackAporte').value)   || 0;
+  const patrim   = parseFloat(document.getElementById('trackPatrimonio').value)|| 0;
+  const retirada = parseFloat(document.getElementById('trackRetirada').value)  || 0;
+  const motivo   = document.getElementById('trackRetiradaMotivo').value.trim();
+
+  if (!mes)   { showToast('Selecione o mês de referência', '⚠️'); return; }
+  if (!patrim){ showToast('Informe o saldo atual da carteira', '⚠️'); return; }
 
   const entries = loadTrack();
   const exists  = entries.findIndex(e => e.mes === mes);
+  const { rendimento, taxaMensal, taxaAnual } = calcTrackEntry(mes, aporte, patrim, retirada);
 
-  const patAnterior = getPatrimonioAnterior(mes);
-  const rendimento  = patAnterior !== null ? patrimonio - patAnterior - aporte : null;
-  const base        = patAnterior !== null ? patAnterior + aporte : null;
-  const taxaMensal  = base && base > 0 ? rendimento / base * 100 : null;
-  const taxaAnual   = taxaMensal !== null ? (Math.pow(1 + taxaMensal/100, 12) - 1) * 100 : null;
-
-  const entry = { mes, aporte, patrimonio, rendimento, taxaMensal, taxaAnual, registradoEm: new Date().toISOString() };
+  const entry = {
+    mes, aporte, patrimonio: patrim, retirada: retirada || null,
+    retiradaMotivo: motivo || null,
+    rendimento, taxaMensal, taxaAnual,
+    registradoEm: new Date().toISOString()
+  };
 
   if (exists >= 0) {
-    if (!confirm(`Já existe um registro para este mês. Deseja substituir?`)) return;
+    if (!confirm('Já existe um registro para este mês. Deseja substituir?')) return;
     entries[exists] = entry;
   } else {
     entries.push(entry);
   }
-
   entries.sort((a,b) => a.mes.localeCompare(b.mes));
   saveTrack(entries);
 
-  const mesLabel = new Date(mes + '-02').toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-  showToast(`${mesLabel} registrado!`, '✅');
+  const mesLbl = new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  showToast(`${mesLbl} registrado!`, '✅');
   driveAutoPush();
 
-  // Advance month
   const [y,m] = mes.split('-').map(Number);
-  const next = m === 12 ? `${y+1}-01` : `${y}-${String(m+1).padStart(2,'0')}`;
-  document.getElementById('trackMes').value = next;
-  document.getElementById('trackAporte').value = '';
-  document.getElementById('trackPatrimonio').value = '';
+  document.getElementById('trackMes').value = m===12?`${y+1}-01`:`${y}-${String(m+1).padStart(2,'0')}`;
+  document.getElementById('trackAporte').value         = '';
+  document.getElementById('trackPatrimonio').value     = '';
+  document.getElementById('trackRetirada').value       = '';
+  document.getElementById('trackRetiradaMotivo').value = '';
   updateTrackCalc();
   renderTrack();
 }
@@ -3946,9 +4289,9 @@ function renderTrackHistory(entries) {
 
   let totalAportes = 0, totalRendimentos = 0;
   const rows = entries.map((e, i) => {
-    const mesLabel = new Date(e.mes + '-02').toLocaleDateString('pt-BR', {month:'short', year:'2-digit'});
+    const mesLabel  = new Date(e.mes + '-02').toLocaleDateString('pt-BR', {month:'short', year:'2-digit'});
     const rendValid = e.rendimento !== null;
-    totalAportes += e.aporte || 0;
+    totalAportes   += e.aporte || 0;
     if (rendValid) totalRendimentos += e.rendimento;
 
     const rendClass = !rendValid ? 'neu' : e.rendimento >= 0 ? 'pos' : 'neg';
@@ -3956,23 +4299,29 @@ function renderTrackHistory(entries) {
     const taxaStr   = e.taxaAnual !== null ? `${e.taxaAnual.toFixed(1)}%` : '—';
     const taxaClass = e.taxaAnual === null ? 'neu' : e.taxaAnual >= taxaSim * 0.8 ? 'pos' : e.taxaAnual >= 0 ? 'neu' : 'neg';
 
-    // Desvio vs simulado
+    // Retirada
+    const retStr = e.retirada ? `<span class="retirada-badge">-${fmt(e.retirada)}${e.retiradaMotivo?' · '+e.retiradaMotivo:''}</span>` : '';
+
+    // Semáforo
     let semaforo = '';
     if (e.taxaMensal !== null) {
       const diff = e.taxaMensal - taxaSimMes;
-      if (diff >= -0.1)      semaforo = `<span class="semaforo sem-green">▲ acima do plano</span>`;
-      else if (diff >= -0.5) semaforo = `<span class="semaforo sem-gold">≈ próximo do plano</span>`;
-      else                   semaforo = `<span class="semaforo sem-red">▼ abaixo do plano</span>`;
+      if (diff >= -0.1)      semaforo = `<span class="semaforo sem-green">▲</span>`;
+      else if (diff >= -0.5) semaforo = `<span class="semaforo sem-gold">≈</span>`;
+      else                   semaforo = `<span class="semaforo sem-red">▼</span>`;
     }
 
     return `<tr>
-      <td>${mesLabel} ${semaforo}</td>
+      <td>${mesLabel} ${semaforo}${retStr}</td>
       <td class="pos">${fmt(e.aporte || 0)}</td>
       <td class="${rendClass}">${rendStr}</td>
       <td class="${rendClass}">${e.taxaMensal !== null ? e.taxaMensal.toFixed(2) + '%' : '—'}</td>
       <td class="${taxaClass}">${taxaStr} a.a.</td>
       <td class="pos">${fmt(e.patrimonio)}</td>
-      <td><button class="del-btn" onclick="deleteTrackEntry('${e.mes}')" title="Excluir">🗑</button></td>
+      <td style="display:flex;gap:4px">
+        <button class="del-btn" onclick="openEditTrack('${e.mes}')" title="Editar">✏️</button>
+        <button class="del-btn" onclick="deleteTrackEntry('${e.mes}')" title="Excluir">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 
@@ -4288,9 +4637,12 @@ function renderCompareChart(entries) {
       pointRadius: 5,
       pointHoverRadius: 8,
       pointBackgroundColor: realPats.map((v,i) => {
+        if (entries[i]?.retirada) return '#e06c6c';     // vermelho = retirada
         if (!simPats || simPats[i] === null) return '#5dd4a0';
         return v >= simPats[i] ? '#5dd4a0' : '#e06c6c';
       }),
+      pointRadius: realPats.map((_,i) => entries[i]?.retirada ? 8 : 5),
+      pointStyle:  realPats.map((_,i) => entries[i]?.retirada ? 'triangle' : 'circle'),
       pointHoverBackgroundColor: '#fff',
     }
   ];
@@ -4336,6 +4688,9 @@ function renderCompareChart(entries) {
                 lines.push(`  💸 Aporte: ${fmt(e.aporte||0)}`);
                 lines.push(`  📈 Rendimento: ${sign}${fmt(e.rendimento)}`);
                 if (e.taxaAnual !== null) lines.push(`  📊 Taxa: ${e.taxaAnual.toFixed(1)}% a.a.`);
+              }
+              if (entries[i]?.retirada) {
+                lines.push(`  💰 Retirada: −${fmt(entries[i].retirada)}${entries[i].retiradaMotivo ? ' ('+entries[i].retiradaMotivo+')' : ''}`);
               }
               if (simPats && simPats[i] !== null) {
                 const desvio = entries[i].patrimonio - simPats[i];
