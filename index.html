@@ -627,6 +627,41 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 .cart-import-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px}
 .cart-import-sub{font-size:11px;color:var(--t3)}
 
+/* ── Categoria badge nos cards ── */
+.cart-cat-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.cart-cat-badge.acao{background:rgba(16,185,129,.15);color:#10b981}
+.cart-cat-badge.fii{background:rgba(99,102,241,.15);color:#818cf8}
+.cart-cat-badge.etf{background:rgba(245,158,11,.15);color:#f59e0b}
+.cart-cat-badge.bdr{background:rgba(139,92,246,.15);color:#a78bfa}
+.cart-cat-badge.renda-fixa{background:rgba(59,130,246,.15);color:#60a5fa}
+.cart-cat-badge.tesouro{background:rgba(20,184,166,.15);color:#2dd4bf}
+.cart-cat-badge.outro{background:rgba(148,163,184,.12);color:var(--t3)}
+
+/* ── Alocação por categoria ── */
+.aloc-wrap{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:start}
+.aloc-chart-wrap{position:relative;width:180px;height:180px}
+.aloc-legend{display:flex;flex-direction:column;gap:8px;padding-top:4px}
+.aloc-row{display:grid;grid-template-columns:10px 1fr 1fr auto auto;align-items:center;gap:8px;font-size:12px}
+.aloc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.aloc-label{color:var(--t2);font-weight:500}
+.aloc-bar-wrap{background:var(--bg5);border-radius:3px;height:5px;overflow:hidden}
+.aloc-bar{height:5px;border-radius:3px;transition:width .4s}
+.aloc-pct{font-family:var(--fm);font-size:11px;color:var(--t1);text-align:right;min-width:36px}
+.aloc-val{font-family:var(--fm);font-size:11px;color:var(--t3);text-align:right;min-width:70px}
+@media(max-width:600px){.aloc-wrap{grid-template-columns:1fr}.aloc-chart-wrap{margin:0 auto}}
+
+/* ── Recomendações ── */
+.recom-card{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-bottom:8px;border:1px solid}
+.recom-card:last-child{margin-bottom:0}
+.recom-card.ok{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2)}
+.recom-card.warn{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.2)}
+.recom-card.err{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2)}
+.recom-card.info{background:rgba(99,102,241,.07);border-color:rgba(99,102,241,.2)}
+.recom-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.recom-body{flex:1;min-width:0}
+.recom-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.recom-desc{font-size:11px;color:var(--t3);line-height:1.5}
+
 /* PRINT */
 @media print{
   body{background:#fff!important;color:#111!important}
@@ -1109,14 +1144,21 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
     </div>
   </div>
 
-  <!-- Importar CSV/XLSX -->
+  <!-- Importar B3 / Corretora -->
   <div class="cart-form">
-    <div class="ph2"><span style="font-size:15px">📂</span><span class="pt">Importar da Corretora (CSV/XLSX)</span></div>
+    <div class="ph2"><span style="font-size:15px">📂</span><span class="pt">Importar da B3 / Corretora</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3)">Detecta formato B3 automaticamente</span>
+    </div>
     <div class="cart-form-body">
       <div class="cart-import-zone" id="cartImportZone" onclick="document.getElementById('cartImportFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');carteiraImportFile(event.dataTransfer.files[0])">
-        <div class="cart-import-icon">📊</div>
+        <div class="cart-import-icon">🏦</div>
         <div class="cart-import-title">Arraste ou clique para selecionar</div>
-        <div class="cart-import-sub">CSV ou XLSX · Inter: App → Investimentos → Carteira → ⋯ → Exportar</div>
+        <div class="cart-import-sub">
+          <strong>B3:</strong> investidor.b3.com.br → Extrato → Posição · <strong>Corretoras:</strong> CSV ou XLSX genérico
+        </div>
+        <div class="cart-import-sub" style="margin-top:4px;font-size:10px;opacity:.7">
+          O arquivo da B3 traz ticker, quantidade e preço médio automaticamente
+        </div>
       </div>
       <input type="file" id="cartImportFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
       <div id="cartImportStatus"></div>
@@ -1134,9 +1176,30 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <div class="track-empty">
         <div class="track-empty-icon">💼</div>
         <div class="track-empty-title">Nenhum ativo cadastrado</div>
-        <div class="track-empty-sub">Adicione ações, FIIs ou títulos do Tesouro Direto acima.</div>
+        <div class="track-empty-sub">Importe o arquivo da B3 ou adicione ativos manualmente acima.</div>
       </div>
     </div></div>
+  </div>
+
+  <!-- Alocação por Categoria -->
+  <div class="panel" id="cartAlocacaoPanel" style="display:none">
+    <div class="ph2"><span style="font-size:15px">🥧</span><span class="pt">Alocação por Categoria</span></div>
+    <div class="pb">
+      <div class="aloc-wrap">
+        <div class="aloc-chart-wrap">
+          <canvas id="cartAlocacaoChart"></canvas>
+        </div>
+        <div class="aloc-legend" id="cartAlocacaoLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recomendações ativas -->
+  <div class="panel" id="cartRecomPanel" style="display:none">
+    <div class="ph2"><span style="font-size:15px">💡</span><span class="pt">Recomendações</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3)">baseadas na sua carteira atual</span>
+    </div>
+    <div class="pb"><div id="cartRecomArea"></div></div>
   </div>
 
   <!-- ═══ SEPARADOR ═══ -->
@@ -4291,8 +4354,15 @@ async function carteiraAdd() {
   }
 
   const q = quote[ticker];
+  // Tenta inferir categoria pelo shortName da BRAPI
+  const nomeApi = (q.shortName || q.longName || '').toLowerCase();
+  const catManual = /fii|fundo.*imob/i.test(nomeApi) ? 'fii'
+                  : /etf|fundo.*indice/i.test(nomeApi) ? 'etf'
+                  : /bdr/i.test(nomeApi) ? 'bdr'
+                  : 'acao';
   const ativo = {
     ticker, qtd, pmedio,
+    categoria:    catManual,
     nome:         q.shortName || q.longName || ticker,
     preco:        q.regularMarketPrice,
     variacao:     q.regularMarketChangePercent,
@@ -4356,23 +4426,36 @@ async function carteiraRefresh() {
   showToast('Cotações atualizadas!', '✅', 3000);
 }
 
-// ── Buscar cotações via BRAPI ──
+// ── Buscar cotações via BRAPI (com batching e cache-busting) ──
 async function carteiraBuscarCotacao(tickers) {
-  const token = carteiraGetToken();
-  const url   = BRAPI_BASE + tickers.join(',') + (token ? `?token=${token}` : '');
-  try {
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data.results) return null;
-    // Mapeia por ticker
-    const map = {};
-    data.results.forEach(r => { map[r.symbol] = r; });
-    return map;
-  } catch(e) {
-    console.error('[BRAPI]', e);
-    return null;
+  const token     = carteiraGetToken();
+  const BATCH     = 30;          // BRAPI aceita até ~50 tickers por request
+  const map       = {};
+  const timestamp = Date.now();  // cache-busting
+
+  for (let i = 0; i < tickers.length; i += BATCH) {
+    const batch = tickers.slice(i, i + BATCH);
+    const params = new URLSearchParams({ range: '1d', interval: '1d', _t: timestamp });
+    if (token) params.set('token', token);
+    const url = BRAPI_BASE + batch.join(',') + '?' + params.toString();
+    try {
+      const res  = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {
+        console.warn('[BRAPI] batch', i, 'HTTP', res.status);
+        continue;
+      }
+      const data = await res.json();
+      if (data.results) {
+        data.results.forEach(r => {
+          if (r.regularMarketPrice) map[r.symbol] = r;
+        });
+      }
+    } catch(e) {
+      console.error('[BRAPI] batch', i, e);
+    }
   }
+
+  return Object.keys(map).length ? map : null;
 }
 
 // ── Usar total da carteira como patrimônio no acompanhamento ──
@@ -4386,6 +4469,11 @@ function carteiraUsarTotal() {
   showToast(`Patrimônio preenchido: ${fmt(total)}`, '📥');
   updateTrackCalc();
 }
+
+// ── Labels e cores das categorias ──
+const CAT_LABELS = { acao:'Ações', fii:'FIIs', etf:'ETFs', bdr:'BDRs', 'renda-fixa':'Renda Fixa', tesouro:'Tesouro Direto', outro:'Outros' };
+const CAT_COLORS = { acao:'#10b981', fii:'#818cf8', etf:'#f59e0b', bdr:'#a78bfa', 'renda-fixa':'#60a5fa', tesouro:'#2dd4bf', outro:'#94a3b8' };
+const CAT_ICONS  = { acao:'📈', fii:'🏢', etf:'🌐', bdr:'🌎', 'renda-fixa':'🏛', tesouro:'🏛', outro:'📦' };
 
 // ── Renderizar lista de ativos ──
 function carteiraRenderList() {
@@ -4401,10 +4489,14 @@ function carteiraRenderList() {
     area.innerHTML = `<div class="track-empty">
       <div class="track-empty-icon">💼</div>
       <div class="track-empty-title">Nenhum ativo cadastrado</div>
-      <div class="track-empty-sub">Adicione seus ativos acima ou importe um arquivo CSV/XLSX da sua corretora.</div>
+      <div class="track-empty-sub">Importe o arquivo da B3 ou adicione ativos manualmente acima.</div>
     </div>`;
     if (totalArea) totalArea.style.display = 'none';
     if (countEl)   countEl.textContent = '';
+    const ap = document.getElementById('cartAlocacaoPanel');
+    const rp = document.getElementById('cartRecomPanel');
+    if (ap) ap.style.display = 'none';
+    if (rp) rp.style.display = 'none';
     return;
   }
 
@@ -4427,17 +4519,23 @@ function carteiraRenderList() {
   }
 
   area.innerHTML = `<div class="cart-grid">${ativos.map(a => {
-    const valor   = (a.preco||0) * (a.qtd||0);
-    const lucro   = a.pmedio ? ((a.preco||0) - a.pmedio) * a.qtd : null;
-    const lucroPct= a.pmedio && a.pmedio>0 ? ((a.preco||0)/a.pmedio-1)*100 : null;
-    const pct     = total > 0 ? (valor/total*100).toFixed(1) : '0';
-    const varCls  = !a.variacao ? 'neu' : a.variacao >= 0 ? 'pos' : 'neg';
-    const varStr  = a.variacao != null ? (a.variacao>=0?'+':'')+a.variacao.toFixed(2)+'%' : '—';
+    const valor    = (a.preco||0) * (a.qtd||0);
+    const lucro    = a.pmedio ? ((a.preco||0) - a.pmedio) * a.qtd : null;
+    const lucroPct = a.pmedio && a.pmedio>0 ? ((a.preco||0)/a.pmedio-1)*100 : null;
+    const pct      = total > 0 ? (valor/total*100).toFixed(1) : '0';
+    const varCls   = !a.variacao ? 'neu' : a.variacao >= 0 ? 'pos' : 'neg';
+    const varStr   = a.variacao != null ? (a.variacao>=0?'+':'')+a.variacao.toFixed(2)+'%' : '—';
+    const cat      = a.categoria || 'outro';
+    const catLabel = CAT_LABELS[cat] || cat;
+    const unidade  = (cat === 'fii') ? 'cotas' : (cat === 'tesouro') ? 'títulos' : 'ações';
 
     return `<div class="cart-asset">
       <div class="cart-asset-header">
         <div style="flex:1;min-width:0">
-          <div class="cart-asset-ticker">${a.ticker}</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="cart-asset-ticker">${a.ticker}</div>
+            <span class="cart-cat-badge ${cat}">${CAT_ICONS[cat]||'📦'} ${catLabel}</span>
+          </div>
           <div class="cart-asset-name">${escHtml(a.nome||'')}</div>
         </div>
         <button class="cart-asset-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button>
@@ -4447,7 +4545,7 @@ function carteiraRenderList() {
       <div class="cart-asset-body">
         <div class="cart-asset-row">
           <span class="cart-asset-label">Quantidade</span>
-          <span class="cart-asset-val">${a.qtd.toLocaleString('pt-BR')} ações</span>
+          <span class="cart-asset-val">${a.qtd.toLocaleString('pt-BR')} ${unidade}</span>
         </div>
         <div class="cart-asset-row">
           <span class="cart-asset-label">Valor total</span>
@@ -4469,14 +4567,225 @@ function carteiraRenderList() {
           </span>
         </div>` : ''}
         <div style="height:4px;background:var(--bg5);border-radius:2px;margin-top:4px;overflow:hidden">
-          <div style="width:${Math.min(100,parseFloat(pct))}%;height:4px;background:var(--ac);border-radius:2px"></div>
+          <div style="width:${Math.min(100,parseFloat(pct))}%;height:4px;background:${CAT_COLORS[cat]||'var(--ac)'};border-radius:2px"></div>
         </div>
       </div>
     </div>`;
   }).join('')}</div>`;
+
+  // Renderiza painéis extras
+  carteiraRenderAlocacao();
+  carteiraRenderRecomendacoes();
 }
 
-// ── Importar CSV/XLSX ──
+// ── Renderizar gráfico de alocação por categoria ──
+function carteiraRenderAlocacao() {
+  const ativos = carteiraLoad();
+  const panel  = document.getElementById('cartAlocacaoPanel');
+  if (!panel) return;
+
+  if (!ativos.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  // Agrupa por categoria
+  const cats = {};
+  ativos.forEach(a => {
+    const cat   = a.categoria || 'outro';
+    const valor = (a.preco||0) * (a.qtd||0);
+    if (valor > 0) cats[cat] = (cats[cat]||0) + valor;
+  });
+
+  const entries = Object.entries(cats).sort(([,a],[,b]) => b - a);
+  const total   = entries.reduce((s,[,v]) => s+v, 0);
+  if (!total) { panel.style.display = 'none'; return; }
+
+  // Gráfico doughnut
+  const canvas = document.getElementById('cartAlocacaoChart');
+  if (canvas) {
+    if (window._cartAlocChart) { try { window._cartAlocChart.destroy(); } catch(e){} }
+    window._cartAlocChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: entries.map(([k]) => CAT_LABELS[k]||k),
+        datasets: [{
+          data: entries.map(([,v]) => v),
+          backgroundColor: entries.map(([k]) => CAT_COLORS[k]||'#94a3b8'),
+          borderWidth: 2,
+          borderColor: 'var(--bg8, #10141c)',
+          hoverOffset: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const pct = (ctx.parsed / total * 100).toFixed(1);
+                return ` ${fmt(ctx.parsed)} · ${pct}%`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Legenda
+  const legendEl = document.getElementById('cartAlocacaoLegend');
+  if (legendEl) {
+    legendEl.innerHTML = entries.map(([k, v]) => {
+      const pct   = (v / total * 100).toFixed(1);
+      const color = CAT_COLORS[k] || '#94a3b8';
+      return `<div class="aloc-row">
+        <span class="aloc-dot" style="background:${color}"></span>
+        <span class="aloc-label">${CAT_LABELS[k]||k}</span>
+        <div class="aloc-bar-wrap"><div class="aloc-bar" style="width:${pct}%;background:${color}"></div></div>
+        <span class="aloc-pct">${pct}%</span>
+        <span class="aloc-val">${fmt(v)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Renderizar recomendações ativas ──
+function carteiraRenderRecomendacoes() {
+  const ativos = carteiraLoad();
+  const panel  = document.getElementById('cartRecomPanel');
+  const area   = document.getElementById('cartRecomArea');
+  if (!panel || !area) return;
+
+  if (!ativos.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  const total = ativos.reduce((s,a) => s + (a.preco||0)*(a.qtd||0), 0);
+  const recs  = [];
+
+  // 1. Concentração excessiva por ativo
+  ativos.forEach(a => {
+    const valor = (a.preco||0)*(a.qtd||0);
+    const pct   = total > 0 ? valor/total*100 : 0;
+    if (pct > 20) {
+      recs.push({ type:'warn', icon:'⚠️',
+        title:`${a.ticker} representa ${pct.toFixed(1)}% da carteira`,
+        desc:`Concentração acima de 20% em um único ativo aumenta o risco. Considere diversificar gradualmente.`
+      });
+    }
+  });
+
+  // 2. Top ganhador e maior perdedor (vs preço médio)
+  const comPM = ativos.filter(a => a.pmedio && a.preco && a.pmedio > 0);
+  if (comPM.length) {
+    const sorted    = [...comPM].sort((a,b) => (b.preco/b.pmedio) - (a.preco/a.pmedio));
+    const best      = sorted[0];
+    const worst     = sorted[sorted.length-1];
+    const bestPct   = (best.preco/best.pmedio-1)*100;
+    const worstPct  = (worst.preco/worst.pmedio-1)*100;
+
+    if (bestPct > 0) {
+      recs.push({ type:'ok', icon:'🏆',
+        title:`Melhor ativo: ${best.ticker} (+${bestPct.toFixed(1)}% vs PM)`,
+        desc:`Preço atual ${fmt(best.preco)} vs PM ${fmt(best.pmedio)} · L/P acumulado: ${fmt((best.preco-best.pmedio)*best.qtd)}`
+      });
+    }
+    if (worstPct < -5 && worst.ticker !== best.ticker) {
+      recs.push({ type:'err', icon:'📉',
+        title:`Atenção: ${worst.ticker} (${worstPct.toFixed(1)}% vs PM)`,
+        desc:`Preço atual ${fmt(worst.preco)} vs PM ${fmt(worst.pmedio)} · Prejuízo: ${fmt((worst.preco-worst.pmedio)*worst.qtd)}`
+      });
+    }
+  }
+
+  // 3. Sem renda passiva (FII / Renda Fixa)
+  const cats = {};
+  ativos.forEach(a => { const c = a.categoria||'outro'; cats[c] = (cats[c]||0)+1; });
+  if (!cats.fii && !cats['renda-fixa'] && !cats.tesouro && ativos.length >= 3) {
+    recs.push({ type:'info', icon:'💡',
+      title:'Carteira sem renda fixa ou FIIs',
+      desc:'Adicionar FIIs ou Renda Fixa pode reduzir a volatilidade e gerar renda passiva recorrente.'
+    });
+  }
+
+  // 4. Sem ações nacionais
+  if (!cats.acao && !cats.etf && ativos.length >= 2) {
+    recs.push({ type:'info', icon:'📊',
+      title:'Nenhuma ação ou ETF na carteira',
+      desc:'Ações e ETFs têm maior potencial de crescimento no longo prazo. Considere adicionar exposição variável.'
+    });
+  }
+
+  // 5. Cotações desatualizadas
+  const desatual = ativos.filter(a => {
+    if (!a.updatedAt) return true;
+    return (Date.now() - new Date(a.updatedAt)) > 24 * 60 * 60 * 1000;
+  });
+  if (desatual.length) {
+    recs.push({ type:'warn', icon:'🕐',
+      title:`${desatual.length} ativo${desatual.length>1?'s':''} sem cotação atualizada (>24h)`,
+      desc:`Clique em "Atualizar cotações" para buscar os preços mais recentes do mercado.`
+    });
+  }
+
+  if (!recs.length) {
+    area.innerHTML = `<div style="text-align:center;padding:16px 0;font-size:12px;color:var(--t3)">✅ Nenhuma recomendação crítica no momento. Continue acompanhando!</div>`;
+    return;
+  }
+
+  area.innerHTML = recs.map(r => `
+    <div class="recom-card ${r.type}">
+      <div class="recom-icon">${r.icon}</div>
+      <div class="recom-body">
+        <div class="recom-title">${r.title}</div>
+        <div class="recom-desc">${r.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Detectar se é formato B3 ──
+function carteiraIsFormatoB3(rows) {
+  if (!rows.length) return false;
+  const headers = Object.keys(rows[0]);
+  return headers.some(h => /código de negociação|codigo de negociacao/i.test(h));
+}
+
+// ── Extrair categoria a partir do campo "Tipo" da B3 ──
+function carteiraExtrairCategoria(tipo) {
+  if (!tipo) return 'outro';
+  const t = tipo.toLowerCase();
+  if (/fundo.*imob|fii/i.test(t))            return 'fii';
+  if (/etf|fundo.*índice|fundo de índice/i.test(t)) return 'etf';
+  if (/bdr/i.test(t))                        return 'bdr';
+  if (/ação|ações|acoes|acao/i.test(t))      return 'acao';
+  if (/renda.*fixa|cri|cra|debênture|debenture/i.test(t)) return 'renda-fixa';
+  if (/tesouro/i.test(t))                    return 'tesouro';
+  return 'outro';
+}
+
+// ── Extrair ativos do formato B3 ──
+function carteiraExtrairB3(rows) {
+  const tickerCol  = Object.keys(rows[0]).find(h => /código de negociação|codigo de negociacao/i.test(h));
+  const qtdCol     = Object.keys(rows[0]).find(h => /quantidade(?!\s*disponível|\s*indisponível)/i.test(h));
+  const pmedioCol  = Object.keys(rows[0]).find(h => /preço médio|preco medio/i.test(h));
+  const tipoCol    = Object.keys(rows[0]).find(h => /^tipo$/i.test(h));
+  const produtoCol = Object.keys(rows[0]).find(h => /^produto$/i.test(h));
+
+  const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+
+  return rows
+    .map(r => {
+      const ticker = (r[tickerCol]||'').toString().trim().toUpperCase().replace(/\s+/g,'');
+      const qtd    = parseBR(r[qtdCol]);
+      const pmedio = pmedioCol ? parseBR(r[pmedioCol]) : null;
+      const tipo   = tipoCol   ? (r[tipoCol]  ||'').toString().trim() : '';
+      const nome   = produtoCol? (r[produtoCol]||'').toString().trim() : ticker;
+      return { ticker, qtd, pmedio, categoria: carteiraExtrairCategoria(tipo), nomeB3: nome };
+    })
+    .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
+}
+
+// ── Importar B3 / CSV / XLSX ──
 async function carteiraImportFile(file) {
   if (!file) return;
   const statusEl = document.getElementById('cartImportStatus');
@@ -4491,7 +4800,7 @@ async function carteiraImportFile(file) {
     } else if (ext === 'xlsx' || ext === 'xls') {
       rows = await carteiraParseXLSX(file);
     } else {
-      carteiraSetStatus(statusEl, 'Formato não suportado. Use CSV ou XLSX.', 'err');
+      carteiraSetStatus(statusEl, 'Formato não suportado. Use CSV ou XLSX da B3 / corretora.', 'err');
       return;
     }
 
@@ -4500,46 +4809,55 @@ async function carteiraImportFile(file) {
       return;
     }
 
-    // Detecta colunas de ticker e quantidade automaticamente
-    const headers = Object.keys(rows[0]).map(h => h.toLowerCase().trim());
-    const tickerCol = Object.keys(rows[0]).find(h =>
-      /ticker|ativo|papel|codigo|código|symbol/i.test(h)
-    );
-    const qtdCol = Object.keys(rows[0]).find(h =>
-      /qtd|quantidade|qtde|quant|shares|cotas/i.test(h)
-    );
-    const pmedioCol = Object.keys(rows[0]).find(h =>
-      /preço médio|preco medio|pm|custo|p\.m\.|p med/i.test(h)
-    );
+    // ── Detecta se é formato B3 ──
+    const isB3 = carteiraIsFormatoB3(rows);
+    let novos = [];
 
-    if (!tickerCol || !qtdCol) {
-      carteiraSetStatus(statusEl,
-        `Não encontrei colunas de Ticker e Quantidade. Colunas encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
-      return;
+    if (isB3) {
+      carteiraSetStatus(statusEl, '🏦 Formato B3 detectado! Extraindo posição...', 'load');
+      novos = carteiraExtrairB3(rows);
+    } else {
+      // Formato genérico: detecta colunas por padrão
+      const tickerCol = Object.keys(rows[0]).find(h =>
+        /ticker|ativo|papel|codigo|código|symbol/i.test(h)
+      );
+      const qtdCol = Object.keys(rows[0]).find(h =>
+        /qtd|quantidade|qtde|quant|shares|cotas/i.test(h)
+      );
+      const pmedioCol = Object.keys(rows[0]).find(h =>
+        /preço médio|preco medio|pm|custo|p\.m\.|p med/i.test(h)
+      );
+
+      if (!tickerCol || !qtdCol) {
+        carteiraSetStatus(statusEl,
+          `Colunas não reconhecidas. Encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
+        return;
+      }
+
+      const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+      novos = rows
+        .map(r => ({
+          ticker:    (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
+          qtd:       parseBR(r[qtdCol]),
+          pmedio:    pmedioCol ? parseBR(r[pmedioCol]) : null,
+          categoria: 'outro',
+          nomeB3:    '',
+        }))
+        .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
     }
-
-    // Extrai ativos do arquivo
-    const novos = rows
-      .map(r => ({
-        ticker: (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
-        qtd:    parseFloat((r[qtdCol]||'').toString().replace(',','.')),
-        pmedio: pmedioCol ? parseFloat((r[pmedioCol]||'').toString().replace(',','.')) || null : null,
-      }))
-      .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
 
     if (!novos.length) {
       carteiraSetStatus(statusEl, 'Nenhum ativo válido encontrado no arquivo', 'err');
       return;
     }
 
-    carteiraSetStatus(statusEl, `Encontrei ${novos.length} ativos. Buscando cotações...`, 'load');
+    carteiraSetStatus(statusEl, `Encontrei ${novos.length} ativos. Buscando cotações atuais...`, 'load');
 
-    // Busca cotações em lote
     const tickers = [...new Set(novos.map(a => a.ticker))];
     const quotes  = await carteiraBuscarCotacao(tickers);
 
     const existentes = carteiraLoad();
-    let adicionados = 0;
+    let adicionados  = 0;
 
     novos.forEach(n => {
       const q   = quotes?.[n.ticker];
@@ -4548,12 +4866,15 @@ async function carteiraImportFile(file) {
         ticker:    n.ticker,
         qtd:       n.qtd,
         pmedio:    n.pmedio,
-        nome:      q?.shortName || q?.longName || n.ticker,
-        preco:     q?.regularMarketPrice || null,
+        categoria: n.categoria,
+        nome:      q?.shortName || q?.longName || n.nomeB3 || n.ticker,
+        preco:     q?.regularMarketPrice  || null,
         variacao:  q?.regularMarketChangePercent || null,
         updatedAt: new Date().toISOString(),
       };
       if (idx >= 0) {
+        // Mantém categoria existente se não vier do B3
+        if (!isB3 && existentes[idx].categoria) ativo.categoria = existentes[idx].categoria;
         existentes[idx] = { ...existentes[idx], ...ativo };
       } else {
         existentes.push(ativo);
@@ -4563,8 +4884,9 @@ async function carteiraImportFile(file) {
 
     carteiraSave(existentes);
     carteiraRenderList();
+    const srcTag = isB3 ? '🏦 B3' : '📂 Corretora';
     carteiraSetStatus(statusEl,
-      `✅ ${novos.length} ativos importados (${adicionados} novos, ${novos.length-adicionados} atualizados)`, 'ok');
+      `✅ [${srcTag}] ${novos.length} ativos (${adicionados} novos, ${novos.length-adicionados} atualizados)`, 'ok');
 
   } catch(e) {
     console.error('[Carteira import]', e);
@@ -4736,11 +5058,12 @@ async function carteiraAddTesouro() {
   const ativo = {
     ticker,
     nome:      nomeCompleto,
-    qtd:       1,            // Tesouro: 1 unidade = valor total
-    pmedio:    valor,        // valor investido = preço médio
-    preco:     precoAtual || valor,  // preço atual (se disponível)
+    qtd:       1,
+    pmedio:    valor,
+    preco:     precoAtual || valor,
     variacao:  precoAtual ? ((precoAtual - valor) / valor * 100) : null,
     tipo:      'tesouro',
+    categoria: 'tesouro',
     valorInvestido: valor,
     updatedAt: new Date().toISOString(),
   };
