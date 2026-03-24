@@ -9,7 +9,7 @@ if (!window.supabase) {
   console.error('[SimFin] Supabase SDK não carregou. Verifique a conexão.');
 }
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
     persistSession:     true,
     autoRefreshToken:   true,
@@ -29,7 +29,7 @@ let appInitialized = false;    // garante que initApp() roda só uma vez
 // Usa onAuthStateChange como única fonte de verdade.
 // INITIAL_SESSION dispara uma vez no load (com ou sem sessão).
 // Assim evitamos double-init (getSession + onAuthStateChange).
-supabase.auth.onAuthStateChange((event, session) => {
+sb.auth.onAuthStateChange((event, session) => {
   switch (event) {
     case 'INITIAL_SESSION':
       if (session) {
@@ -105,7 +105,7 @@ async function authUpdatePassword() {
 
   btn.disabled = true;
   btn.textContent = 'Salvando...';
-  const { error } = await supabase.auth.updateUser({ password: newPass });
+  const { error } = await sb.auth.updateUser({ password: newPass });
   btn.disabled = false;
   btn.textContent = 'Salvar nova senha';
 
@@ -130,7 +130,7 @@ async function authSubmit(e) {
     if (authMode === 'signup') {
       if (password !== confirm) { authSetError('As senhas não coincidem.'); return; }
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email, password,
         options: { emailRedirectTo: AUTH_REDIRECT },
       });
@@ -145,7 +145,7 @@ async function authSubmit(e) {
         document.getElementById('authPassword').value = '';
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
       // onAuthStateChange SIGNED_IN vai cuidar do resto
     }
@@ -162,7 +162,7 @@ async function authForgotPassword() {
   const email = document.getElementById('authEmail').value.trim();
   if (!email) { authSetError('Informe seu e-mail primeiro.'); return; }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
     redirectTo: AUTH_REDIRECT,  // redireciona de volta para o SimFin
   });
   if (error) { authSetError(authTranslateError(error.message)); return; }
@@ -171,7 +171,7 @@ async function authForgotPassword() {
 
 // ─── Logout ──────────────────────────────────────────────────────────────────
 async function authLogout() {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   // onAuthStateChange SIGNED_OUT cuida do resto
 }
 
