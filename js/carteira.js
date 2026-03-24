@@ -113,6 +113,9 @@ function carteiraLimparHistorico() {
   localStorage.removeItem(CART_KEY);
   localStorage.removeItem(NEGOC_KEY);
   localStorage.removeItem(MOVIM_KEY);
+  // Limpa também no Supabase para evitar que o pull no próximo login restaure os dados
+  dbPushCarteira([]).catch(() => {});
+  dbPushHistorico([], []).catch(() => {});
   carteiraRenderList();
   showToast('Histórico apagado. Reimporte os arquivos da B3.', '🗑', 4000);
 }
@@ -227,20 +230,27 @@ async function carteiraRefresh() {
 
 // ── Buscar cotações via BRAPI (com batching e cache-busting) ──
 async function carteiraBuscarCotacao(tickers) {
-  const token     = carteiraGetToken();
-  const BATCH     = 30;          // BRAPI aceita até ~50 tickers por request
-  const map       = {};
-  const timestamp = Date.now();  // cache-busting
+  const token = carteiraGetToken();
+  const BATCH = 30;
+  const map   = {};
 
   for (let i = 0; i < tickers.length; i += BATCH) {
-    const batch = tickers.slice(i, i + BATCH);
-    const params = new URLSearchParams({ range: '1d', interval: '1d', _t: timestamp });
+    const batch  = tickers.slice(i, i + BATCH);
+    const params = new URLSearchParams();
     if (token) params.set('token', token);
-    const url = BRAPI_BASE + batch.join(',') + '?' + params.toString();
+    // range/interval são parâmetros do plano pago da BRAPI — omitir para compatibilidade
+    const qs  = token ? '?' + params.toString() : '';
+    const url = BRAPI_BASE + batch.join(',') + qs;
     try {
       const res  = await fetch(url, { cache: 'no-store' });
       if (!res.ok) {
-        console.warn('[BRAPI] batch', i, 'HTTP', res.status);
+        // 401 = sem token ou token inválido; 429 = rate limit
+        if (res.status === 401) {
+          showToast('BRAPI: token inválido ou não configurado. Acesse brapi.dev e insira seu token.', '🔑', 6000);
+        } else if (res.status === 429) {
+          showToast('BRAPI: limite de requisições atingido. Configure um token em brapi.dev.', '⏱', 5000);
+        }
+        console.warn('[BRAPI] HTTP', res.status, url);
         continue;
       }
       const data = await res.json();
@@ -250,7 +260,7 @@ async function carteiraBuscarCotacao(tickers) {
         });
       }
     } catch(e) {
-      console.error('[BRAPI] batch', i, e);
+      console.error('[BRAPI]', e);
     }
   }
 
@@ -264,7 +274,7 @@ function carteiraUsarTotal() {
   // Preenche o campo de patrimônio na tela de acompanhamento
   const el = document.getElementById('trackPatrimonio');
   if (el) el.value = total.toFixed(2);
-  switchScreen('acompanhamento');
+  switchScreen('financas');
   showToast(`Patrimônio preenchido: ${fmt(total)}`, '📥');
   updateTrackCalc();
 }
@@ -666,7 +676,11 @@ function carteiraExtrairNegociacoes(rows) {
   const precoCol  = h.find(k => /^pre[çc]o$/i.test(k));
   const valorCol  = h.find(k => /^valor$/i.test(k));
 
-  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  // SheetJS lê XLSX como JS numbers (ex: 163.57). String(163.57)="163.57".
+  // replace(/\./g,'') removeria o ponto decimal → 16357. Por isso,
+  // se o valor já é number, retorna direto sem processar como string BR.
+  const parseBR  = v => typeof v === 'number' ? v :
+    parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
   const parseData = d => {
     const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
     return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
@@ -699,7 +713,8 @@ function carteiraExtrairMovimentacoes(rows) {
   const precoCol   = h.find(k => /pre[çc]o.*unit[aá]rio/i.test(k));
   const valorCol   = h.find(k => /valor.*opera[çc][aã]o/i.test(k));
 
-  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  const parseBR  = v => typeof v === 'number' ? v :
+    parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
   const parseData = d => {
     const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
     return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
@@ -879,7 +894,8 @@ async function carteiraImportFile(file) {
             `Colunas não reconhecidas. Encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
           return;
         }
-        const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+        const parseBR = v => typeof v === 'number' ? v :
+          parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
         novos = rows
           .map(r => ({
             ticker:    (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
