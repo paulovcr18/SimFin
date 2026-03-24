@@ -18,17 +18,55 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Mono:wght@400;500&amp;family=Sora:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async="" defer=""></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="styles.css">
 <style id="googleidentityservice_button_styles">.qJTHM{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;color:#202124;direction:ltr;-webkit-touch-callout:none;font-family:"Roboto-Regular",arial,sans-serif;-webkit-font-smoothing:antialiased;font-weight:400;margin:0;overflow:hidden;-webkit-text-size-adjust:100%}.ynRLnc{left:-9999px;position:absolute;top:-9999px}.L6cTce{display:none}.bltWBb{overflow-wrap:break-word;word-break:break-word}.hSRGPd{color:#1a73e8;cursor:pointer;font-weight:500;text-decoration:none}.Bz112c-W3lGp{height:16px;width:16px}.Bz112c-E3DyYd{height:20px;width:20px}.Bz112c-r9oPif{height:24px;width:24px}.Bz112c-u2z5K{height:36px;width:36px}.Bz112c-uaxL4e{border-radius:10px}.LgbsSe-Bz112c{display:block}.S9gUrf-YoZ4jf{border:none;margin:0;padding:0}.S9gUrf-YoZ4jf *{border:none;margin:0;padding:0}.fFW7wc-ibnC6b>.aZ2wEe>div{border-color:#4285f4}.P1ekSe-ZMv3u{-webkit-transition:height linear .2s;transition:height linear .2s}.P1ekSe-ZMv3u>div:nth-child(1){background-color:#1a73e8!important;-webkit-transition:width linear .3s;transition:width linear .3s}.P1ekSe-ZMv3u>div:nth-child(2){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.P1ekSe-ZMv3u>div:nth-child(3){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.haAclf{display:inline-block}.nsm7Bb-HzV7m-LgbsSe{border-radius:4px;box-sizing:border-box;-webkit-transition:background-color .218s,border-color .218s;transition:background-color .218s,border-color .218s;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;-webkit-appearance:none;background-color:#fff;background-image:none;border:1px solid #dadce0;color:#3c4043;cursor:pointer;font-family:"Google Sans",arial,sans-serif;font-size:14px;height:40px;letter-spacing:.25px;outline:none;overflow:hidden;padding:0 12px;position:relative;text-align:center;vertical-align:middle;white-space:nowrap;width:auto}@media screen and (-ms-high-contrast:active){.nsm7Bb-HzV7m-LgbsSe{border:2px solid windowText;color:windowText}}@media screen and (preferes-contrast:more){.nsm7Bb-HzV7m-LgbsSe{color:#000}}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe{font-size:14px;height:32px;letter-spacing:.25px;padding:0 10px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe{font-size:11px;height:20px;letter-spacing:.3px;padding:0 8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe{padding:0;width:40px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe{width:32px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe{width:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK{border-radius:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.pSzOP-SxQuSe{border-radius:16px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.purZT-SxQuSe{border-radius:10px}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc{border:none;color:#fff}.nsm7Bb-HzV7m-LgbsSe.MFS4be-v3pZbf-Ia7Qfc{background-color:#1a73e8}.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{background-color:#202124;color:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{color:#fff}}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:18px;margin-right:8px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:14px;min-width:14px;width:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:10px;min-width:10px;width:10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin-left:8px;margin-right:-4px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:10px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:4px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:3px;border-bottom-left-radius:3px;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;align-items:center;background-color:#fff;height:36px;margin-left:-10px;margin-right:12px;min-width:36px;width:36px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c,.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:28px;margin-left:-8px;margin-right:10px;min-width:28px;width:28px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:16px;margin-left:-6px;margin-right:8px;min-width:16px;width:16px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:3px;margin-left:2px;margin-right:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:8px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;-webkit-flex-direction:row;-webkit-box-orient:horizontal;-webkit-box-direction:normal;flex-direction:row;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;-webkit-flex-wrap:nowrap;flex-wrap:nowrap;height:100%;position:relative;width:100%}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX{-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:1;-webkit-box-flex:1;flex-grow:1;font-family:"Google Sans",arial,sans-serif;font-weight:500;overflow:hidden;text-overflow:ellipsis;vertical-align:top}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-weight:300}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:0;-webkit-box-flex:0;flex-grow:0}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-MJoBVe{-webkit-transition:background-color .218s;transition:background-color .218s;bottom:0;left:0;position:absolute;right:0;top:0}.nsm7Bb-HzV7m-LgbsSe:hover,.nsm7Bb-HzV7m-LgbsSe:focus{box-shadow:none;border-color:rgb(210,227,252);outline:none}.nsm7Bb-HzV7m-LgbsSe:focus-within{outline:2px solid #00639b;border-color:transparent}.nsm7Bb-HzV7m-LgbsSe:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.08)}.nsm7Bb-HzV7m-LgbsSe:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.1)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.24)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.32)}.nsm7Bb-HzV7m-LgbsSe .n1UuX-DkfjY{border-radius:50%;display:-webkit-box;display:-webkit-flex;display:flex;height:20px;margin-left:-4px;margin-right:8px;min-width:20px;width:20px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-family:"Roboto";font-size:12px;text-align:left}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .ssJRIf,.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .fmcmS{overflow:hidden;text-overflow:ellipsis}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;color:#5f6368;fill:#5f6368;font-size:11px;font-weight:400}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#e8eaed;fill:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff,.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#000;fill:#000}}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .Bz112c{height:18px;margin:-3px -3px -3px 2px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:0;border-bottom-left-radius:0;border-top-right-radius:3px;border-bottom-right-radius:3px;margin-left:12px;margin-right:-10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.L5Fo6c-sM5MNb{border:0;display:block;left:0;position:relative;top:0}.L5Fo6c-bF1uUb{border-radius:4px;bottom:0;cursor:pointer;left:0;position:absolute;right:0;top:0}.L5Fo6c-bF1uUb:focus{border:none;outline:none}sentinel{}</style></head>
 <body>
-<div class="app">
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH OVERLAY — exibido enquanto usuário não está logado
+     ═══════════════════════════════════════════════════════ -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">SimFin <span>· Financeiro Familiar</span></div>
+    <p class="auth-sub">Gerencie suas finanças com segurança</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin"  onclick="authShowTab('login')">Entrar</button>
+      <button class="auth-tab"        id="authTabSignup" onclick="authShowTab('signup')">Cadastrar</button>
+    </div>
+
+    <div id="authError" class="auth-error" style="display:none"></div>
+
+    <form id="authForm" onsubmit="authSubmit(event)">
+      <div class="auth-field">
+        <label>E-mail</label>
+        <input type="email" id="authEmail" required autocomplete="email" placeholder="seu@email.com">
+      </div>
+      <div class="auth-field">
+        <label>Senha</label>
+        <input type="password" id="authPassword" required autocomplete="current-password" placeholder="••••••••" minlength="6">
+      </div>
+      <div class="auth-field" id="authConfirmField" style="display:none">
+        <label>Confirmar senha</label>
+        <input type="password" id="authConfirm" autocomplete="new-password" placeholder="••••••••" minlength="6">
+      </div>
+      <button type="submit" class="auth-btn" id="authSubmitBtn">Entrar</button>
+    </form>
+
+    <button class="auth-forgot" id="authForgotBtn" onclick="authForgotPassword()">Esqueci minha senha</button>
+    <div id="authMsg" class="auth-msg" style="display:none"></div>
+  </div>
+</div>
+
+<div class="app" id="appRoot" style="display:none">
 
 <!-- TOPBAR -->
 <header class="topbar">
 
   <!-- ZONA ESQUERDA: Logo + Nav -->
   <div class="topbar-left">
-    <div class="logo" id="simfinLogo" onclick="ghLogoClick()" style="cursor:default;user-select:none">SimFin <span>· Financeiro Familiar</span></div>
+    <div class="logo" id="simfinLogo" style="cursor:default;user-select:none">SimFin <span>· Financeiro Familiar</span></div>
     <div class="nav-tabs-group">
       <button class="nav-tab active" id="tabSimulador" onclick="switchScreen('simulador')">
         <span class="nav-tab-icon">📊</span> Simulador
@@ -113,17 +151,7 @@
         </button>
       </div></div>
       </div>
-    </div>
-
-    <!-- GitHub Publish — 100% invisível. Acesso: clicar no logo 5x OU Shift+G -->
-    <div style="position: relative; display: block;" id="ghWrap">
-      <button class="gh-btn ready publishing" id="ghBtn" onclick="ghPublish()" title="Publicar no GitHub Pages">
-        <span id="ghBtnIcon">⏳</span>
-        <span id="ghBtnLabel">Publicando...</span>
-      </button>
-    </div>
-
-  </div><!-- end topbar-right -->
+    </div></div><!-- end topbar-right -->
 
 </header>
 
@@ -912,93 +940,6 @@
   </div>
 </div>
 
-<!-- GITHUB UNLOCK MODAL -->
-<div class="gh-setup-modal" id="ghUnlockModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="gh-setup-box">
-    <div class="smh">
-      <span class="smt">🔐 Modo Publicação</span>
-      <button class="mcl" onclick="document.getElementById('ghUnlockModal').classList.remove('open')">✕</button>
-    </div>
-    <div class="smb">
-      <div style="font-size:12px;color:var(--t2);line-height:1.6;background:var(--bg6);border-radius:8px;padding:12px">
-        Digite a senha para ativar o botão de publicação neste dispositivo.
-        <br><br>
-        <strong style="color:var(--t3)">Para acessar esta tela: segure <kbd style="background:var(--bg5);padding:1px 6px;border-radius:4px;font-family:var(--fm)">Shift</kbd> e pressione <kbd style="background:var(--bg5);padding:1px 6px;border-radius:4px;font-family:var(--fm)">P</kbd> três vezes.</strong>
-      </div>
-      <div class="track-ig">
-        <label style="font-size:11px;color:var(--t2);font-weight:500">Senha de publicação</label>
-        <input class="sm-input" id="ghUnlockInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')ghUnlock()">
-      </div>
-      <div class="sm-row">
-        <button class="sm-btn cancel" onclick="document.getElementById('ghUnlockModal').classList.remove('open')">Cancelar</button>
-        <button class="sm-btn confirm" onclick="ghUnlock()">Desbloquear ✓</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- GITHUB SETUP MODAL -->
-<!-- PIN MODAL — para desbloquear o botão Publicar -->
-<div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
-  <div class="gh-setup-box">
-    <div class="smh">
-      <span class="smt" id="ghPinTitle">🔐 Crie um PIN de 4 dígitos</span>
-      <button class="mcl" onclick="ghClosePinModal()">✕</button>
-    </div>
-    <div class="smb">
-      <!-- PIN dots display -->
-      <div style="display:flex;justify-content:center;gap:12px;margin:4px 0 8px">
-        <div id="ghDot0" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot1" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot2" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-        <div id="ghDot3" style="width: 16px; height: 16px; border-radius: 50%; background: var(--bg5); border-color: var(--bd); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; transition: 0.15s;"></div>
-      </div>
-      <!-- PIN numpad -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto">
-        <button onclick="ghPinPress('1')" class="gh-pin-key">1</button>
-        <button onclick="ghPinPress('2')" class="gh-pin-key">2</button>
-        <button onclick="ghPinPress('3')" class="gh-pin-key">3</button>
-        <button onclick="ghPinPress('4')" class="gh-pin-key">4</button>
-        <button onclick="ghPinPress('5')" class="gh-pin-key">5</button>
-        <button onclick="ghPinPress('6')" class="gh-pin-key">6</button>
-        <button onclick="ghPinPress('7')" class="gh-pin-key">7</button>
-        <button onclick="ghPinPress('8')" class="gh-pin-key">8</button>
-        <button onclick="ghPinPress('9')" class="gh-pin-key">9</button>
-        <div></div>
-        <button onclick="ghPinPress('0')" class="gh-pin-key">0</button>
-        <button onclick="ghPinPress('⌫')" class="gh-pin-key" style="font-size:16px">⌫</button>
-      </div>
-      <div id="ghPinError" style="font-size:11px;color:var(--re);text-align:center;min-height:16px;margin-top:4px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- TOKEN MODAL — aparece após PIN correto, para configurar token -->
-<div class="gh-setup-modal" id="ghSetupModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="gh-setup-box">
-    <div class="smh">
-      <span class="smt">🐙 Token do GitHub</span>
-      <button class="mcl" onclick="document.getElementById('ghSetupModal').classList.remove('open')">✕</button>
-    </div>
-    <div class="smb">
-      <div style="font-size:12px;color:var(--t2);line-height:1.6;background:var(--bg6);border-radius:8px;padding:12px">
-        Token salvo <strong>apenas neste dispositivo</strong>. Nunca vai para o código público.
-      </div>
-      <div class="track-ig">
-        <label style="font-size:11px;color:var(--t2);font-weight:500">Personal Access Token (ghp_...)</label>
-        <input class="sm-input" id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" onkeydown="if(event.key==='Enter')ghSaveToken()">
-      </div>
-      <div style="font-size:11px;color:var(--t3)">
-        github.com → Settings → Developer settings → Personal access tokens → permissão <strong>repo</strong>
-      </div>
-      <div class="sm-row">
-        <button class="sm-btn cancel" onclick="document.getElementById('ghSetupModal').classList.remove('open')">Cancelar</button>
-        <button class="sm-btn confirm" onclick="ghSaveToken()">Salvar ✓</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- EDIT GOAL MODAL -->
 <div class="edit-modal" id="editGoalModal" onclick="if(event.target===this)closeEditGoal()">
   <div class="edit-box">
@@ -1130,7 +1071,7 @@
 <script src="js/storage.js"></script>
 <script src="js/drive.js"></script>
 <script src="js/goals.js"></script>
-<script src="js/github.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/reminders.js"></script>
 <script src="js/modals.js"></script>
 <script src="js/carteira.js"></script>

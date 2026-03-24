@@ -715,3 +715,80 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   .mbox{border-radius:16px;max-height:96vh}
   .nav-tabs-group{gap:1px}
 }
+
+
+/* ════════════════════════════════════════════════════════════
+   AUTH OVERLAY
+   ════════════════════════════════════════════════════════════ */
+.auth-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg1);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.auth-card {
+  background: var(--bg3);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 36px 32px;
+  width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.auth-logo {
+  font-family: var(--fs);
+  font-size: 22px; font-weight: 700;
+  color: var(--t1); text-align: center;
+}
+.auth-logo span { color: var(--t3); font-size: 13px; font-weight: 400; }
+.auth-sub {
+  text-align: center; color: var(--t3);
+  font-size: 12px; margin: -8px 0 4px;
+}
+.auth-tabs {
+  display: flex; background: var(--bg5);
+  border-radius: 8px; padding: 3px; gap: 3px;
+}
+.auth-tab {
+  flex: 1; padding: 7px; border: none; border-radius: 6px;
+  background: transparent; color: var(--t3);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .15s;
+}
+.auth-tab.active {
+  background: var(--bg3); color: var(--t1);
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+.auth-field { display: flex; flex-direction: column; gap: 5px; }
+.auth-field label { font-size: 11px; color: var(--t3); font-weight: 500; }
+.auth-field input {
+  background: var(--bg5); border: 1px solid var(--bd);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 14px; color: var(--t1);
+  outline: none; transition: border-color .15s;
+}
+.auth-field input:focus { border-color: var(--ac); }
+.auth-btn {
+  width: 100%; padding: 11px;
+  background: var(--ac); color: var(--bg1);
+  border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity .15s; margin-top: 4px;
+}
+.auth-btn:hover   { opacity: .88; }
+.auth-btn:disabled { opacity: .5; cursor: not-allowed; }
+.auth-forgot {
+  background: none; border: none;
+  color: var(--t3); font-size: 11px;
+  cursor: pointer; text-align: center;
+  text-decoration: underline;
+}
+.auth-error {
+  background: rgba(224,108,108,.1); border: 1px solid rgba(224,108,108,.3);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 12px; color: var(--re); line-height: 1.5;
+}
+.auth-msg {
+  background: rgba(93,212,160,.1); border: 1px solid rgba(93,212,160,.3);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 12px; color: var(--ac); line-height: 1.5;
+}
