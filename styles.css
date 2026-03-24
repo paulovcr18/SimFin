@@ -793,6 +793,4 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   font-size: 12px; color: var(--ac); line-height: 1.5;
 }
 
-/* Auth overlay — estado inicial oculto (evita flash de login ao carregar) */
-/* O JS mostra o overlay apenas quando INITIAL_SESSION confirmar sem sessão  */
-#authOverlay { display: none; }
+/* Auth overlay visível por padrão — JS esconde quando sessão confirmada */
