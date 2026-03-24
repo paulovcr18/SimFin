@@ -704,23 +704,14 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <div class="saves-wrap" id="savesWrap">
         <button class="act-btn ac" onclick="toggleSavesDrop(event)" title="Simulações salvas">
           <span class="act-btn-icon">📁</span>
-          <span id="savesCountLbl">Salvas (1)</span>
+          <span id="savesCountLbl">Salvas</span>
         </button>
         <div class="saves-drop" id="savesDrop">
           <div class="saves-drop-header">
             <span class="saves-drop-title">📁 Simulações Salvas</span>
-            <span class="saves-drop-count" id="savesDropCount">1 / 10</span>
+            <span class="saves-drop-count" id="savesDropCount">0 / 10</span>
           </div>
-          <div class="saves-drop-list" id="savesDropList">
-    <div class="sdrop-item" onclick="loadSave(0);closeSavesDrop()" title="Carregar simulação" style="position:relative">
-      <div style="font-size:16px;flex-shrink:0">📋</div>
-      <div class="sdrop-item-info">
-        <div class="sdrop-item-name">Cenário Possivel 10 anos</div>
-        <div class="sdrop-item-meta">Renda R$ 15.2K/mês · 10 anos · 10% a.a. · 22/03/2026 01:20</div>
-      </div>
-      <button class="sdrop-del" onclick="event.stopPropagation();openVersions(0)" title="Histórico de versões" style="color:var(--t3);font-size:11px;background:none;border:none;cursor:pointer;padding:2px 4px">🕐</button>
-      <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(0)" title="Excluir">🗑</button>
-    </div></div>
+          <div class="saves-drop-list" id="savesDropList"><div class="saves-drop-empty">Nenhuma simulação salva ainda.</div></div>
           <div class="saves-drop-footer">
             <button class="saves-new-btn" onclick="closeSavesDrop();openSaveModal()">＋ Salvar simulação atual</button>
           </div>
@@ -1022,7 +1013,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <div class="panel">
     <div class="ph2"><span style="font-size:16px">📈</span><span class="pt">Evolução Patrimonial Projetada</span></div>
     <div class="pb">
-      <div class="cw"><canvas id="chartP" style="box-sizing: border-box; display: block; height: 300px; width: 1537px;" width="1922" height="375"></canvas></div>
+      <div class="cw"><canvas id="chartP" style="box-sizing: border-box; display: block; height: 300px; width: 2087px;" width="2087" height="300"></canvas></div>
       <div class="chint"><div class="hdot"></div>Clique em qualquer ponto do gráfico para abrir o snapshot financeiro detalhado daquele ano</div>
     </div>
   </div>
@@ -1229,6 +1220,88 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   </div>
 
 </div><!-- end screenFinancas -->
+
+<!-- METAS SCREEN -->
+<div id="screenMetas" class="screen-full" style="display:none">
+
+  <!-- Form adicionar meta -->
+  <div class="goal-form">
+    <div class="ph2"><span style="font-size:16px">🎯</span><span class="pt">Nova Meta</span></div>
+    <div class="goal-form-body">
+      <div class="goal-form-grid">
+        <div class="goal-ig">
+          <label>Categoria</label>
+          <select id="goalCat" onchange="goalCatChanged()">
+            <option value="carro">🚗 Carro</option>
+            <option value="imovel">🏠 Casa / Imóvel</option>
+            <option value="viagem">✈️ Viagem Internacional</option>
+            <option value="casamento">💍 Casamento</option>
+            <option value="outro">⭐ Outro</option>
+          </select>
+        </div>
+        <div class="goal-ig">
+          <label>Nome da meta</label>
+          <input type="text" id="goalName" placeholder="Ex: Comprar um carro novo" maxlength="50">
+        </div>
+        <div class="goal-ig">
+          <label>💰 Valor necessário (R$)</label>
+          <input type="number" id="goalValor" min="0" placeholder="Ex: 80000" oninput="goalCalcAuto('valor')">
+        </div>
+        <div class="goal-ig">
+          <label>📅 Prazo (meses a partir de hoje)</label>
+          <input type="number" id="goalMeses" min="1" max="480" placeholder="Ex: 36" oninput="goalCalcAuto('meses')">
+        </div>
+        <div class="goal-ig">
+          <label>🗓 Ou informe a data alvo</label>
+          <input type="month" id="goalData" oninput="goalCalcAuto('data')">
+        </div>
+      </div>
+      <div class="goal-hint" id="goalHint">
+        <span>💡</span>
+        <span>Preencha o valor e o prazo — os campos se completam automaticamente.</span>
+      </div>
+      <div style="display:flex;justify-content:flex-end">
+        <button class="track-btn primary" onclick="addGoal()">＋ Adicionar Meta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo -->
+  <div id="goalsSummaryArea" style="display:none">
+    <div class="goals-summary" id="goalsSummary"></div>
+  </div>
+
+  <!-- Gráfico projeção ajustada -->
+  <div class="panel" id="goalsChartPanel" style="display:none">
+    <div class="ph2">
+      <span style="font-size:16px">📈</span>
+      <span class="pt">Projeção Patrimonial com Metas</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:auto">linha verde = sem metas · linha laranja = com metas</span>
+    </div>
+    <div class="pb">
+      <div class="goals-chart-wrap"><canvas id="goalsChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Lista de metas -->
+  <div class="panel">
+    <div class="ph2">
+      <span style="font-size:16px">🏆</span>
+      <span class="pt">Suas Metas</span>
+      <span style="font-size:11px;color:var(--t3);margin-left:auto" id="goalsCount"></span>
+    </div>
+    <div class="pb">
+      <div id="goalsListArea">
+        <div class="goals-empty">
+          <div class="goals-empty-icon">🎯</div>
+          <div class="goals-empty-title">Nenhuma meta cadastrada</div>
+          <div class="goals-empty-sub">Adicione sua primeira meta acima.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end screenMetas -->
 
 <!-- LEMBRETES SCREEN -->
 <div id="screenReminder" class="screen-full" style="display:none">
@@ -1480,7 +1553,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 <div class="gh-setup-modal" id="ghPinModal" onclick="if(event.target===this)ghClosePinModal()">
   <div class="gh-setup-box">
     <div class="smh">
-      <span class="smt" id="ghPinTitle">🔐 Digite seu PIN</span>
+      <span class="smt" id="ghPinTitle">🔐 Crie um PIN de 4 dígitos</span>
       <button class="mcl" onclick="ghClosePinModal()">✕</button>
     </div>
     <div class="smb">
@@ -1635,7 +1708,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toastIcon">🔓</span><span id="toastMsg">Desbloqueado! Publicar disponível por 30 min.</span></div>
+<div class="toast show" id="toast"><span class="toast-icon" id="toastIcon">🐙</span><span id="toastMsg">Token salvo! Clique em 🚀 Publicar.</span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
