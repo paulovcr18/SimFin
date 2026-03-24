@@ -80,7 +80,6 @@ function saveEditTrack() {
   saveTrack(entries);
   closeEditTrack();
   renderTrack();
-  driveAutoPush();
   showToast('Registro atualizado!', '✅');
 }
 

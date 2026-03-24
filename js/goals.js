@@ -14,7 +14,7 @@ const GOAL_CATS = {
 };
 
 function loadGoals() { try { return JSON.parse(localStorage.getItem(GOALS_KEY))||[]; } catch { return []; } }
-function saveGoals(g) { localStorage.setItem(GOALS_KEY,JSON.stringify(g)); driveAutoPush(); }
+function saveGoals(g) { localStorage.setItem(GOALS_KEY,JSON.stringify(g)); }
 
 // ── Interpola o patrimônio para meses não inteiros de ano ──
 // snaps tem um ponto por ano (Ano 0, Ano 1, ..., Ano N)

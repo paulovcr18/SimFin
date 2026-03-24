@@ -151,7 +151,6 @@ function saveTrackEntry() {
 
   const mesLbl = new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   showToast(`${mesLbl} registrado!`, '✅');
-  driveAutoPush();
 
   const [y,m] = mes.split('-').map(Number);
   document.getElementById('trackMes').value = m===12?`${y+1}-01`:`${y}-${String(m+1).padStart(2,'0')}`;

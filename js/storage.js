@@ -145,7 +145,6 @@ Cancelar → Sobrescrever`
     document.getElementById('smo').classList.remove('open');
     renderSavedList();
     showToast(choice ? `"${name}" — nova versão salva!` : `"${name}" sobrescrita!`, '💾');
-    driveAutoPush();
     return;
   }
 
@@ -156,7 +155,6 @@ Cancelar → Sobrescrever`
   document.getElementById('smo').classList.remove('open');
   renderSavedList();
   showToast(`"${name}" salva com sucesso!`, '💾');
-  driveAutoPush();
 }
 
 // ── Load / Delete ──
@@ -173,8 +171,7 @@ function deleteSave(i) {
   saves.splice(i, 1);
   persistSaves(saves);
   renderSavedList();
-  showToast(`"${name}" excluída`, '🗑', 2500);
-  driveAutoPush(); // sincroniza exclusão com o Drive
+  showToast(`"${name}" excluída`, '🗑', 2500); // sincroniza exclusão com o Drive
 }
 
 // ── Export JSON — exporta tudo: inputs, simulações salvas e acompanhamento ──
@@ -283,7 +280,6 @@ function handleImport(event) {
       showToast(`Importado: ${msg}`, '📂');
 
       // Sincroniza com Drive se conectado
-      driveAutoPush();
 
     } catch(err) { showToast('Arquivo inválido ou corrompido', '❌', 4000); }
   };

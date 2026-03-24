@@ -9,13 +9,13 @@ const MOVIM_KEY      = 'simfin_movimentacoes';
 const BRAPI_BASE     = 'https://brapi.dev/api/quote/';
 
 function carteiraLoad()    { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
-function carteiraSave(d)   { localStorage.setItem(CART_KEY, JSON.stringify(d)); driveAutoPush(); }
+function carteiraSave(d)   { localStorage.setItem(CART_KEY, JSON.stringify(d)); }
 function carteiraSaveToken(){ localStorage.setItem(CART_TOKEN_KEY, document.getElementById('cartBrapiToken')?.value?.trim() || ''); }
 function carteiraGetToken() { return localStorage.getItem(CART_TOKEN_KEY) || ''; }
 function negocLoad()       { try { return JSON.parse(localStorage.getItem(NEGOC_KEY)) || []; } catch { return []; } }
-function negocSave(d)      { localStorage.setItem(NEGOC_KEY, JSON.stringify(d)); driveAutoPush(); }
+function negocSave(d)      { localStorage.setItem(NEGOC_KEY, JSON.stringify(d)); }
 function movimLoad()       { try { return JSON.parse(localStorage.getItem(MOVIM_KEY)) || []; } catch { return []; } }
-function movimSave(d)      { localStorage.setItem(MOVIM_KEY, JSON.stringify(d)); driveAutoPush(); }
+function movimSave(d)      { localStorage.setItem(MOVIM_KEY, JSON.stringify(d)); }
 
 // ── Atualiza UI da tela ──
 // ── Migração: normaliza tickers F e infere categorias nos dados existentes ──

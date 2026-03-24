@@ -117,7 +117,6 @@ function authOnLogin(user) {
   // Inicializa o app normalmente (já estava pronto, so estava escondido)
   try { autoRestoreInputs(); } catch(e) {}
   try { updAno(); calc(); }    catch(e) {}
-  try { driveInit(); }         catch(e) {}
   try { carteiraMigrar(); renderCarteira(); } catch(e) {}
   try { renderGoals(); }       catch(e) {}
   try { renderTrack(); }       catch(e) {}

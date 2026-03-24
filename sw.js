@@ -4,7 +4,7 @@
 //             Network First para fontes e Chart.js (CDN)
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'simfin-v3';
+const CACHE_NAME = 'simfin-v4';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [
@@ -20,7 +20,6 @@ const LOCAL_ASSETS = [
   './js/projection.js',
   './js/app.js',
   './js/storage.js',
-  './js/drive.js',
   './js/goals.js',
   './js/reminders.js',
   './js/modals.js',
