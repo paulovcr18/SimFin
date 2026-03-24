@@ -1154,10 +1154,10 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
         <div class="cart-import-icon">🏦</div>
         <div class="cart-import-title">Arraste ou clique para selecionar</div>
         <div class="cart-import-sub">
-          <strong>B3:</strong> investidor.b3.com.br → Extrato → Posição · <strong>Corretoras:</strong> CSV ou XLSX genérico
+          <strong>B3 Negociação</strong> (calcula posição + PM) · <strong>B3 Movimentação</strong> (proventos) · <strong>B3 Posição</strong> (snapshot) · CSV genérico
         </div>
         <div class="cart-import-sub" style="margin-top:4px;font-size:10px;opacity:.7">
-          O arquivo da B3 traz ticker, quantidade e preço médio automaticamente
+          investidor.b3.com.br → Extrato de Negociação ou Extrato de Movimentação
         </div>
       </div>
       <input type="file" id="cartImportFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
@@ -1200,6 +1200,26 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       <span style="margin-left:auto;font-size:10px;color:var(--t3)">baseadas na sua carteira atual</span>
     </div>
     <div class="pb"><div id="cartRecomArea"></div></div>
+  </div>
+
+  <!-- Proventos Recebidos -->
+  <div class="panel" id="cartProventosPanel" style="display:none">
+    <div class="ph2">
+      <span style="font-size:15px">💰</span>
+      <span class="pt">Proventos Recebidos</span>
+      <span style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ac)" id="cartProventosTotal"></span>
+    </div>
+    <div class="pb"><div id="cartProventosArea"></div></div>
+  </div>
+
+  <!-- Ganhos Realizados -->
+  <div class="panel" id="cartGanhosPanel" style="display:none">
+    <div class="ph2">
+      <span style="font-size:15px">📊</span>
+      <span class="pt">Ganhos/Perdas Realizados</span>
+      <span style="margin-left:auto;font-size:12px;font-weight:700" id="cartGanhosTotal"></span>
+    </div>
+    <div class="pb"><div id="cartGanhosArea"></div></div>
   </div>
 
   <!-- ═══ SEPARADOR ═══ -->
@@ -4315,12 +4335,18 @@ function calcInflacaoSnaps(snaps) {
 
 const CART_KEY       = 'simfin_carteira';
 const CART_TOKEN_KEY = 'simfin_brapi_token';
+const NEGOC_KEY      = 'simfin_negociacoes';
+const MOVIM_KEY      = 'simfin_movimentacoes';
 const BRAPI_BASE     = 'https://brapi.dev/api/quote/';
 
 function carteiraLoad()    { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
 function carteiraSave(d)   { localStorage.setItem(CART_KEY, JSON.stringify(d)); driveAutoPush(); }
 function carteiraSaveToken(){ localStorage.setItem(CART_TOKEN_KEY, document.getElementById('cartBrapiToken')?.value?.trim() || ''); }
 function carteiraGetToken() { return localStorage.getItem(CART_TOKEN_KEY) || ''; }
+function negocLoad()       { try { return JSON.parse(localStorage.getItem(NEGOC_KEY)) || []; } catch { return []; } }
+function negocSave(d)      { localStorage.setItem(NEGOC_KEY, JSON.stringify(d)); driveAutoPush(); }
+function movimLoad()       { try { return JSON.parse(localStorage.getItem(MOVIM_KEY)) || []; } catch { return []; } }
+function movimSave(d)      { localStorage.setItem(MOVIM_KEY, JSON.stringify(d)); driveAutoPush(); }
 
 // ── Atualiza UI da tela ──
 function carteiraUpdateUI() {
@@ -4495,8 +4521,12 @@ function carteiraRenderList() {
     if (countEl)   countEl.textContent = '';
     const ap = document.getElementById('cartAlocacaoPanel');
     const rp = document.getElementById('cartRecomPanel');
+    const pp = document.getElementById('cartProventosPanel');
+    const gp = document.getElementById('cartGanhosPanel');
     if (ap) ap.style.display = 'none';
     if (rp) rp.style.display = 'none';
+    if (pp) pp.style.display = 'none';
+    if (gp) gp.style.display = 'none';
     return;
   }
 
@@ -4576,6 +4606,8 @@ function carteiraRenderList() {
   // Renderiza painéis extras
   carteiraRenderAlocacao();
   carteiraRenderRecomendacoes();
+  carteiraRenderProventos();
+  carteiraRenderGanhos();
 }
 
 // ── Renderizar gráfico de alocação por categoria ──
@@ -4743,11 +4775,27 @@ function carteiraRenderRecomendacoes() {
     </div>`).join('');
 }
 
-// ── Detectar se é formato B3 ──
+// ── Detectar formato B3 Posição (snapshot) ──
 function carteiraIsFormatoB3(rows) {
   if (!rows.length) return false;
   const headers = Object.keys(rows[0]);
-  return headers.some(h => /código de negociação|codigo de negociacao/i.test(h));
+  // Tem "Código de Negociação" mas NÃO tem "Data do Negócio" (que é do Extrato de Negociação)
+  return headers.some(h => /c[oó]digo de negoci/i.test(h)) &&
+        !headers.some(h => /data.*neg[oó]cio/i.test(h));
+}
+
+// ── Detectar formato B3 Negociação (histórico de trades) ──
+function carteiraIsFormatoNegociacao(rows) {
+  if (!rows.length) return false;
+  const headers = Object.keys(rows[0]);
+  return headers.some(h => /data.*neg[oó]cio/i.test(h));
+}
+
+// ── Detectar formato B3 Movimentação (proventos, eventos) ──
+function carteiraIsFormatoMovimentacao(rows) {
+  if (!rows.length) return false;
+  const headers = Object.keys(rows[0]);
+  return headers.some(h => /entrada.*sa[íi]da/i.test(h));
 }
 
 // ── Extrair categoria a partir do campo "Tipo" da B3 ──
@@ -4785,6 +4833,91 @@ function carteiraExtrairB3(rows) {
     .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
 }
 
+// ── Extrair trades do formato B3 Negociação ──
+function carteiraExtrairNegociacoes(rows) {
+  const h = Object.keys(rows[0]);
+  const dataCol   = h.find(k => /data.*neg[oó]cio/i.test(k));
+  const tipoCol   = h.find(k => /tipo.*moviment/i.test(k));
+  const tickerCol = h.find(k => /c[oó]digo.*negoci/i.test(k));
+  const qtdCol    = h.find(k => /^quantidade$/i.test(k));
+  const precoCol  = h.find(k => /^pre[çc]o$/i.test(k));
+  const valorCol  = h.find(k => /^valor$/i.test(k));
+
+  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  const parseData = d => {
+    const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
+  };
+
+  return rows
+    .map(r => ({
+      data:   parseData(r[dataCol]),
+      tipo:   (r[tipoCol]||'').toLowerCase(),
+      ticker: (r[tickerCol]||'').toString().trim().toUpperCase().replace(/\s+/g,''),
+      qtd:    parseBR(r[qtdCol]),
+      preco:  parseBR(r[precoCol]),
+      valor:  parseBR(r[valorCol]),
+    }))
+    .filter(n => n.ticker.length >= 4 && n.qtd > 0 &&
+      (n.tipo.includes('compra') || n.tipo.includes('venda')));
+}
+
+// ── Extrair eventos do formato B3 Movimentação ──
+function carteiraExtrairMovimentacoes(rows) {
+  const h = Object.keys(rows[0]);
+  const esCol      = h.find(k => /entrada.*sa[íi]da/i.test(k));
+  const dataCol    = h.find(k => /^data$/i.test(k));
+  const movimCol   = h.find(k => /^movimenta[çc][aã]o$/i.test(k));
+  const produtoCol = h.find(k => /^produto$/i.test(k));
+  const qtdCol     = h.find(k => /^quantidade$/i.test(k));
+  const precoCol   = h.find(k => /pre[çc]o.*unit[aá]rio/i.test(k));
+  const valorCol   = h.find(k => /valor.*opera[çc][aã]o/i.test(k));
+
+  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  const parseData = d => {
+    const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
+  };
+  const extractTicker = p => (String(p||'').split(/[\s-]/)[0]||'').trim().toUpperCase();
+
+  return rows
+    .map(r => ({
+      data:         parseData(r[dataCol]),
+      tipo:         (r[movimCol]||'').toString().trim(),
+      produto:      (r[produtoCol]||'').toString().trim(),
+      ticker:       extractTicker(r[produtoCol]),
+      entradaSaida: (r[esCol]||'').toLowerCase(),
+      qtd:          parseBR(r[qtdCol]),
+      preco:        parseBR(r[precoCol]),
+      valor:        parseBR(r[valorCol]),
+    }))
+    .filter(m => m.ticker && m.ticker.length >= 4);
+}
+
+// ── Calcular posição atual a partir do histórico de Negociação (custo médio ponderado) ──
+function carteiraCalcularPosicaoDeNegociacoes(negocs) {
+  const map = {};
+  [...negocs].sort((a,b) => a.data.localeCompare(b.data)).forEach(n => {
+    if (!map[n.ticker]) map[n.ticker] = { qtd:0, totalCusto:0, ganhoRealizado:0 };
+    const m = map[n.ticker];
+    if (n.tipo.includes('compra')) {
+      m.totalCusto += n.qtd * n.preco;
+      m.qtd += n.qtd;
+    } else if (n.tipo.includes('venda')) {
+      const pm = m.qtd > 0 ? m.totalCusto / m.qtd : 0;
+      m.ganhoRealizado += (n.preco - pm) * n.qtd;
+      m.totalCusto = Math.max(0, m.totalCusto - pm * n.qtd);
+      m.qtd = Math.max(0, m.qtd - n.qtd);
+    }
+  });
+  return Object.entries(map).map(([ticker, m]) => ({
+    ticker,
+    qtd:             Math.round(m.qtd * 1000) / 1000,
+    pmedio:          m.qtd > 0 ? m.totalCusto / m.qtd : 0,
+    ganhoRealizado:  m.ganhoRealizado,
+  }));
+}
+
 // ── Importar B3 / CSV / XLSX ──
 async function carteiraImportFile(file) {
   if (!file) return;
@@ -4809,84 +4942,168 @@ async function carteiraImportFile(file) {
       return;
     }
 
-    // ── Detecta se é formato B3 ──
-    const isB3 = carteiraIsFormatoB3(rows);
-    let novos = [];
+    // ── Roteamento por formato detectado ──
+    if (carteiraIsFormatoNegociacao(rows)) {
+      // ── B3 Extrato de Negociação ──
+      carteiraSetStatus(statusEl, '📊 Extrato de Negociação B3 detectado! Processando trades...', 'load');
+      const negocs = carteiraExtrairNegociacoes(rows);
+      if (!negocs.length) {
+        carteiraSetStatus(statusEl, 'Nenhum trade de compra/venda encontrado no arquivo', 'err');
+        return;
+      }
+      // Mescla com histórico existente (evita duplicatas)
+      const existingNegocs = negocLoad();
+      const newNegocs = negocs.filter(n => !existingNegocs.some(e =>
+        e.data===n.data && e.ticker===n.ticker && e.tipo===n.tipo &&
+        e.qtd===n.qtd && Math.abs(e.preco-n.preco)<0.01
+      ));
+      const allNegocs = [...existingNegocs, ...newNegocs];
+      negocSave(allNegocs);
 
-    if (isB3) {
-      carteiraSetStatus(statusEl, '🏦 Formato B3 detectado! Extraindo posição...', 'load');
-      novos = carteiraExtrairB3(rows);
-    } else {
-      // Formato genérico: detecta colunas por padrão
-      const tickerCol = Object.keys(rows[0]).find(h =>
-        /ticker|ativo|papel|codigo|código|symbol/i.test(h)
-      );
-      const qtdCol = Object.keys(rows[0]).find(h =>
-        /qtd|quantidade|qtde|quant|shares|cotas/i.test(h)
-      );
-      const pmedioCol = Object.keys(rows[0]).find(h =>
-        /preço médio|preco medio|pm|custo|p\.m\.|p med/i.test(h)
-      );
-
-      if (!tickerCol || !qtdCol) {
+      // Calcula posição atual de todo o histórico
+      const posicoes = carteiraCalcularPosicaoDeNegociacoes(allNegocs).filter(p => p.qtd > 0.001);
+      if (!posicoes.length) {
         carteiraSetStatus(statusEl,
-          `Colunas não reconhecidas. Encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
+          `${negocs.length} trades importados (${newNegocs.length} novos). Posição zerada.`, 'ok');
+        carteiraRenderList();
         return;
       }
 
-      const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
-      novos = rows
-        .map(r => ({
-          ticker:    (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
-          qtd:       parseBR(r[qtdCol]),
-          pmedio:    pmedioCol ? parseBR(r[pmedioCol]) : null,
-          categoria: 'outro',
-          nomeB3:    '',
-        }))
-        .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
-    }
+      carteiraSetStatus(statusEl, `Calculando posição de ${posicoes.length} ativos... Buscando cotações...`, 'load');
+      const tickers = posicoes.map(p => p.ticker);
+      const quotes  = await carteiraBuscarCotacao(tickers);
+      const existentes = carteiraLoad();
+      let adicionados = 0;
 
-    if (!novos.length) {
-      carteiraSetStatus(statusEl, 'Nenhum ativo válido encontrado no arquivo', 'err');
-      return;
-    }
+      posicoes.forEach(p => {
+        const q   = quotes?.[p.ticker];
+        const idx = existentes.findIndex(e => e.ticker === p.ticker);
+        const ativo = {
+          ticker:          p.ticker,
+          qtd:             p.qtd,
+          pmedio:          p.pmedio > 0 ? Math.round(p.pmedio * 100) / 100 : null,
+          ganhoRealizado:  p.ganhoRealizado,
+          categoria:       existentes[idx]?.categoria || 'outro',
+          nome:            q?.shortName || q?.longName || p.ticker,
+          preco:           q?.regularMarketPrice || null,
+          variacao:        q?.regularMarketChangePercent || null,
+          updatedAt:       new Date().toISOString(),
+          fromNegociacao:  true,
+        };
+        if (idx >= 0) {
+          existentes[idx] = { ...existentes[idx], ...ativo };
+        } else {
+          existentes.push(ativo);
+          adicionados++;
+        }
+      });
 
-    carteiraSetStatus(statusEl, `Encontrei ${novos.length} ativos. Buscando cotações atuais...`, 'load');
+      // Remove ativos zerados que vieram do histórico de negociação
+      const atualTickers = new Set(posicoes.map(p => p.ticker));
+      const filtrados = existentes.filter(a => !a.fromNegociacao || atualTickers.has(a.ticker));
+      carteiraSave(filtrados);
+      carteiraRenderList();
 
-    const tickers = [...new Set(novos.map(a => a.ticker))];
-    const quotes  = await carteiraBuscarCotacao(tickers);
+      const ganhoTotal = posicoes.reduce((s,p) => s + (p.ganhoRealizado||0), 0);
+      const ganhoStr   = ganhoTotal !== 0 ? ` · Realizado: ${ganhoTotal>=0?'+':''}${fmt(ganhoTotal)}` : '';
+      carteiraSetStatus(statusEl,
+        `✅ [Negociação B3] ${negocs.length} trades (${newNegocs.length} novos) → ${posicoes.length} ativos (${adicionados} novos)${ganhoStr}`, 'ok');
 
-    const existentes = carteiraLoad();
-    let adicionados  = 0;
-
-    novos.forEach(n => {
-      const q   = quotes?.[n.ticker];
-      const idx = existentes.findIndex(e => e.ticker === n.ticker);
-      const ativo = {
-        ticker:    n.ticker,
-        qtd:       n.qtd,
-        pmedio:    n.pmedio,
-        categoria: n.categoria,
-        nome:      q?.shortName || q?.longName || n.nomeB3 || n.ticker,
-        preco:     q?.regularMarketPrice  || null,
-        variacao:  q?.regularMarketChangePercent || null,
-        updatedAt: new Date().toISOString(),
-      };
-      if (idx >= 0) {
-        // Mantém categoria existente se não vier do B3
-        if (!isB3 && existentes[idx].categoria) ativo.categoria = existentes[idx].categoria;
-        existentes[idx] = { ...existentes[idx], ...ativo };
-      } else {
-        existentes.push(ativo);
-        adicionados++;
+    } else if (carteiraIsFormatoMovimentacao(rows)) {
+      // ── B3 Extrato de Movimentação ──
+      carteiraSetStatus(statusEl, '💰 Extrato de Movimentação B3 detectado! Processando proventos...', 'load');
+      const movims = carteiraExtrairMovimentacoes(rows);
+      if (!movims.length) {
+        carteiraSetStatus(statusEl, 'Nenhuma movimentação encontrada no arquivo', 'err');
+        return;
       }
-    });
+      const existingMovims = movimLoad();
+      const newMovims = movims.filter(m => !existingMovims.some(e =>
+        e.data===m.data && e.ticker===m.ticker && e.tipo===m.tipo && Math.abs(e.valor-m.valor)<0.01
+      ));
+      movimSave([...existingMovims, ...newMovims]);
+      carteiraRenderList();
 
-    carteiraSave(existentes);
-    carteiraRenderList();
-    const srcTag = isB3 ? '🏦 B3' : '📂 Corretora';
-    carteiraSetStatus(statusEl,
-      `✅ [${srcTag}] ${novos.length} ativos (${adicionados} novos, ${novos.length-adicionados} atualizados)`, 'ok');
+      const proventos   = movims.filter(m => /dividendo|jcp|juros.*capital|provento|rendimento/i.test(m.tipo));
+      const totalProv   = proventos.reduce((s,m) => s + m.valor, 0);
+      const tiposUnicos = [...new Set(movims.map(m => m.tipo))].slice(0,4).join(', ');
+      carteiraSetStatus(statusEl,
+        `✅ [Movimentação B3] ${movims.length} eventos (${newMovims.length} novos) · ${proventos.length} proventos = ${fmt(totalProv)} · Tipos: ${tiposUnicos}`, 'ok');
+
+    } else {
+      // ── B3 Posição (snapshot) ou CSV genérico ──
+      const isB3 = carteiraIsFormatoB3(rows);
+      let novos = [];
+
+      if (isB3) {
+        carteiraSetStatus(statusEl, '🏦 Posição B3 detectada! Extraindo...', 'load');
+        novos = carteiraExtrairB3(rows);
+      } else {
+        const tickerCol = Object.keys(rows[0]).find(h =>
+          /ticker|ativo|papel|codigo|código|symbol/i.test(h)
+        );
+        const qtdCol = Object.keys(rows[0]).find(h =>
+          /qtd|quantidade|qtde|quant|shares|cotas/i.test(h)
+        );
+        const pmedioCol = Object.keys(rows[0]).find(h =>
+          /preço médio|preco medio|pm|custo|p\.m\.|p med/i.test(h)
+        );
+        if (!tickerCol || !qtdCol) {
+          carteiraSetStatus(statusEl,
+            `Colunas não reconhecidas. Encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
+          return;
+        }
+        const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+        novos = rows
+          .map(r => ({
+            ticker:    (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
+            qtd:       parseBR(r[qtdCol]),
+            pmedio:    pmedioCol ? parseBR(r[pmedioCol]) : null,
+            categoria: 'outro',
+            nomeB3:    '',
+          }))
+          .filter(a => a.ticker && a.ticker.length >= 4 && a.qtd > 0);
+      }
+
+      if (!novos.length) {
+        carteiraSetStatus(statusEl, 'Nenhum ativo válido encontrado no arquivo', 'err');
+        return;
+      }
+
+      carteiraSetStatus(statusEl, `Encontrei ${novos.length} ativos. Buscando cotações...`, 'load');
+      const tickers = [...new Set(novos.map(a => a.ticker))];
+      const quotes  = await carteiraBuscarCotacao(tickers);
+      const existentes = carteiraLoad();
+      let adicionados = 0;
+
+      novos.forEach(n => {
+        const q   = quotes?.[n.ticker];
+        const idx = existentes.findIndex(e => e.ticker === n.ticker);
+        const ativo = {
+          ticker:    n.ticker,
+          qtd:       n.qtd,
+          pmedio:    n.pmedio,
+          categoria: n.categoria,
+          nome:      q?.shortName || q?.longName || n.nomeB3 || n.ticker,
+          preco:     q?.regularMarketPrice  || null,
+          variacao:  q?.regularMarketChangePercent || null,
+          updatedAt: new Date().toISOString(),
+        };
+        if (idx >= 0) {
+          if (!isB3 && existentes[idx].categoria) ativo.categoria = existentes[idx].categoria;
+          existentes[idx] = { ...existentes[idx], ...ativo };
+        } else {
+          existentes.push(ativo);
+          adicionados++;
+        }
+      });
+
+      carteiraSave(existentes);
+      carteiraRenderList();
+      const srcTag = isB3 ? '🏦 B3 Posição' : '📂 Corretora';
+      carteiraSetStatus(statusEl,
+        `✅ [${srcTag}] ${novos.length} ativos (${adicionados} novos, ${novos.length-adicionados} atualizados)`, 'ok');
+    }
 
   } catch(e) {
     console.error('[Carteira import]', e);
@@ -4944,6 +5161,99 @@ function carteiraSetStatus(el, msg, type) {
   el.className = 'cart-status ' + type;
   el.innerHTML = (type==='load'?'⏳ ':type==='ok'?'✅ ':'❌ ') + msg;
   el.style.display = 'flex';
+}
+
+// ── Renderizar painel de Proventos Recebidos ──
+function carteiraRenderProventos() {
+  const movims  = movimLoad();
+  const panel   = document.getElementById('cartProventosPanel');
+  const area    = document.getElementById('cartProventosArea');
+  const totalEl = document.getElementById('cartProventosTotal');
+  if (!panel || !area) return;
+
+  const proventos = movims.filter(m => /dividendo|jcp|juros.*capital|provento|rendimento/i.test(m.tipo));
+  if (!proventos.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  // Agrupa por ticker
+  const byTicker = {};
+  proventos.forEach(p => {
+    if (!byTicker[p.ticker]) byTicker[p.ticker] = { total:0, count:0, tipos: new Set() };
+    byTicker[p.ticker].total += p.valor;
+    byTicker[p.ticker].count++;
+    byTicker[p.ticker].tipos.add(p.tipo);
+  });
+
+  const entries    = Object.entries(byTicker).sort(([,a],[,b]) => b.total - a.total);
+  const totalProv  = entries.reduce((s,[,v]) => s + v.total, 0);
+  const totalAnual = (() => {
+    const now = new Date();
+    const anoAtual = proventos.filter(p => p.data.startsWith(now.getFullYear().toString()));
+    return anoAtual.reduce((s,p) => s+p.valor, 0);
+  })();
+
+  if (totalEl) totalEl.textContent = `Total: ${fmt(totalProv)}`;
+
+  area.innerHTML = `
+    <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px;background:var(--bg3);border-radius:10px;padding:10px 14px">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:2px">Total acumulado</div>
+        <div style="font-size:18px;font-weight:700;color:var(--ac)">${fmt(totalProv)}</div>
+      </div>
+      ${totalAnual > 0 ? `<div style="flex:1;min-width:120px;background:var(--bg3);border-radius:10px;padding:10px 14px">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:2px">Ano atual</div>
+        <div style="font-size:18px;font-weight:700;color:var(--ac)">${fmt(totalAnual)}</div>
+      </div>` : ''}
+      <div style="flex:1;min-width:120px;background:var(--bg3);border-radius:10px;padding:10px 14px">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:2px">Pagamentos</div>
+        <div style="font-size:18px;font-weight:700;color:var(--t1)">${proventos.length}</div>
+      </div>
+    </div>
+    ${entries.map(([ticker, v]) => `
+    <div class="cart-asset-row" style="padding:8px 0;border-bottom:1px solid var(--bd)">
+      <div>
+        <span class="cart-asset-ticker" style="font-size:12px">${ticker}</span>
+        <span style="font-size:10px;color:var(--t3);margin-left:6px">${[...v.tipos].join(', ')} · ${v.count}x</span>
+      </div>
+      <span style="font-size:13px;font-weight:700;color:var(--ac)">${fmt(v.total)}</span>
+    </div>`).join('')}`;
+}
+
+// ── Renderizar painel de Ganhos/Perdas Realizados ──
+function carteiraRenderGanhos() {
+  const ativos  = carteiraLoad();
+  const panel   = document.getElementById('cartGanhosPanel');
+  const area    = document.getElementById('cartGanhosArea');
+  const totalEl = document.getElementById('cartGanhosTotal');
+  if (!panel || !area) return;
+
+  const comGanho = ativos.filter(a => a.ganhoRealizado !== undefined && a.ganhoRealizado !== 0);
+  if (!comGanho.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  const totalGanho = comGanho.reduce((s,a) => s + (a.ganhoRealizado||0), 0);
+  if (totalEl) {
+    totalEl.textContent = `${totalGanho>=0?'+':''}${fmt(totalGanho)}`;
+    totalEl.style.color = totalGanho >= 0 ? 'var(--ac)' : 'var(--re)';
+  }
+
+  const sorted = [...comGanho].sort((a,b) => (b.ganhoRealizado||0) - (a.ganhoRealizado||0));
+
+  area.innerHTML = `
+    <div style="background:var(--bg3);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--t3);margin-bottom:2px">Resultado total realizado</div>
+      <div style="font-size:20px;font-weight:700;color:${totalGanho>=0?'var(--ac)':'var(--re)'}">
+        ${totalGanho>=0?'+':''}${fmt(totalGanho)}
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">IR sobre ganho: ${totalGanho>0?fmt(totalGanho*0.15)+' (15% aprox.)':'—'}</div>
+    </div>
+    ${sorted.map(a => `
+    <div class="cart-asset-row" style="padding:8px 0;border-bottom:1px solid var(--bd)">
+      <span class="cart-asset-ticker" style="font-size:12px">${a.ticker}</span>
+      <span style="font-size:13px;font-weight:700;color:${(a.ganhoRealizado||0)>=0?'var(--ac)':'var(--re)'}">
+        ${(a.ganhoRealizado||0)>=0?'+':''}${fmt(a.ganhoRealizado||0)}
+      </span>
+    </div>`).join('')}`;
 }
 
 // ── Incluir carteira no Drive payload ──
