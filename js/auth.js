@@ -1,45 +1,57 @@
 // ════════════════════════════════════════════════════════════════
 // SUPABASE — Auth e cliente global
 // ════════════════════════════════════════════════════════════════
-//
-// SETUP (faça uma vez):
-//   1. Crie um projeto em https://supabase.com
-//   2. Vá em Project Settings > API
-//   3. Substitua os valores abaixo pelo seu Project URL e anon key
-//
 const SUPABASE_URL  = 'https://qaopienbsmssjosttucn.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhb3BpZW5ic21zc2pvc3R0dWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODUyOTIsImV4cCI6MjA4OTk2MTI5Mn0.jwFSbkYYOc-fwD_UitBEwfNfQvZdOypHlELx6reMvQs';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    persistSession:    true,   // sessao sobrevive ao refresh
-    autoRefreshToken:  true,   // renova o JWT automaticamente
-    detectSessionInUrl: true,  // necessario para magic link / OAuth
+    persistSession:     true,
+    autoRefreshToken:   true,
+    detectSessionInUrl: true,  // necessário para links de confirmação e reset
   }
 });
 
+// URL de retorno para e-mails do Supabase (confirmação, reset de senha)
+const AUTH_REDIRECT = window.location.origin + window.location.pathname;
+
 // ─── Estado ──────────────────────────────────────────────────────────────────
-let currentUser = null;
-let authMode    = 'login'; // 'login' | 'signup'
+let currentUser   = null;
+let authMode      = 'login';   // 'login' | 'signup'
+let appInitialized = false;    // garante que initApp() roda só uma vez
 
-// ─── Boot: verifica sessao ao carregar ───────────────────────────────────────
-(async function authBoot() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    authOnLogin(session.user);
-  } else {
-    authShowOverlay();
-  }
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+// Usa onAuthStateChange como única fonte de verdade.
+// INITIAL_SESSION dispara uma vez no load (com ou sem sessão).
+// Assim evitamos double-init (getSession + onAuthStateChange).
+supabase.auth.onAuthStateChange((event, session) => {
+  switch (event) {
+    case 'INITIAL_SESSION':
+      if (session) {
+        authOnLogin(session.user);
+      } else {
+        authShowOverlay();
+      }
+      break;
 
-  // Escuta mudancas de sessao (logout em outra aba, expiração, etc.)
-  supabase.auth.onAuthStateChange((_event, session) => {
-    if (session) {
-      authOnLogin(session.user);
-    } else {
+    case 'SIGNED_IN':
+      // Só re-inicializa se não estava logado antes (evita re-init no TOKEN_REFRESHED)
+      if (!currentUser) authOnLogin(session.user);
+      break;
+
+    case 'SIGNED_OUT':
       authOnLogout();
-    }
-  });
-})();
+      break;
+
+    case 'PASSWORD_RECOVERY':
+      // Usuário clicou no link de "esqueci minha senha" — mostra formulário de nova senha
+      authShowOverlay();
+      authShowPasswordReset();
+      break;
+
+    // TOKEN_REFRESHED, USER_UPDATED etc. — ignora, não reinicializa o app
+  }
+});
 
 // ─── Mostrar / esconder overlay ──────────────────────────────────────────────
 function authShowOverlay() {
@@ -52,20 +64,52 @@ function authHideOverlay() {
   document.getElementById('appRoot').style.display     = 'contents';
 }
 
-// ─── Tabs (Entrar / Cadastrar) ───────────────────────────────────────────────
+// ─── Tabs ────────────────────────────────────────────────────────────────────
 function authShowTab(mode) {
   authMode = mode;
   const isSignup = mode === 'signup';
+
   document.getElementById('authTabLogin').classList.toggle('active', !isSignup);
   document.getElementById('authTabSignup').classList.toggle('active', isSignup);
-  document.getElementById('authConfirmField').style.display = isSignup ? 'block' : 'none';
-  document.getElementById('authSubmitBtn').textContent      = isSignup ? 'Criar conta' : 'Entrar';
-  document.getElementById('authForgotBtn').style.display    = isSignup ? 'none' : 'block';
-  document.getElementById('authError').style.display        = 'none';
-  document.getElementById('authMsg').style.display          = 'none';
+  document.getElementById('authConfirmField').style.display  = isSignup ? 'block' : 'none';
+  document.getElementById('authConfirm').required            = isSignup;
+  document.getElementById('authSubmitBtn').textContent       = isSignup ? 'Criar conta' : 'Entrar';
+  document.getElementById('authForgotBtn').style.display     = isSignup ? 'none' : 'block';
+  document.getElementById('authResetSection').style.display  = 'none';
+  document.getElementById('authError').style.display         = 'none';
+  document.getElementById('authMsg').style.display           = 'none';
+  document.getElementById('authForm').style.display          = 'block';
 }
 
-// ─── Submit do formulário ─────────────────────────────────────────────────────
+// ─── Formulário de nova senha (após link de reset) ───────────────────────────
+function authShowPasswordReset() {
+  document.getElementById('authForm').style.display         = 'none';
+  document.getElementById('authResetSection').style.display = 'block';
+  document.getElementById('authTabLogin').classList.remove('active');
+  document.getElementById('authTabSignup').classList.remove('active');
+  document.getElementById('authForgotBtn').style.display    = 'none';
+}
+
+async function authUpdatePassword() {
+  const newPass  = document.getElementById('authNewPassword').value;
+  const confirm  = document.getElementById('authNewConfirm').value;
+  const btn      = document.getElementById('authUpdatePassBtn');
+
+  if (newPass.length < 6)       { authSetError('A senha deve ter pelo menos 6 caracteres.'); return; }
+  if (newPass !== confirm)      { authSetError('As senhas não coincidem.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+  const { error } = await supabase.auth.updateUser({ password: newPass });
+  btn.disabled = false;
+  btn.textContent = 'Salvar nova senha';
+
+  if (error) { authSetError(authTranslateError(error.message)); return; }
+  authSetMsg('Senha atualizada! Redirecionando...');
+  setTimeout(() => authShowTab('login'), 2000);
+}
+
+// ─── Submit principal ────────────────────────────────────────────────────────
 async function authSubmit(e) {
   e.preventDefault();
   const email    = document.getElementById('authEmail').value.trim();
@@ -80,17 +124,30 @@ async function authSubmit(e) {
   try {
     if (authMode === 'signup') {
       if (password !== confirm) { authSetError('As senhas não coincidem.'); return; }
-      const { error } = await supabase.auth.signUp({ email, password });
+
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: AUTH_REDIRECT },
+      });
       if (error) throw error;
-      authSetMsg('Cadastro realizado! Verifique seu e-mail para confirmar a conta.');
+
+      // Se o Supabase retornou uma sessão, confirmação de e-mail está desativada
+      // e o usuário já está logado — onAuthStateChange cuida do resto
+      if (!data.session) {
+        authSetMsg('Cadastro realizado! Verifique seu e-mail para confirmar a conta.');
+        authShowTab('login'); // já troca para aba de login
+        document.getElementById('authEmail').value    = email; // mantém e-mail preenchido
+        document.getElementById('authPassword').value = '';
+      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // onAuthStateChange SIGNED_IN vai cuidar do resto
     }
   } catch (err) {
     authSetError(authTranslateError(err.message));
   } finally {
-    btn.disabled = false;
+    btn.disabled    = false;
     btn.textContent = authMode === 'signup' ? 'Criar conta' : 'Entrar';
   }
 }
@@ -99,14 +156,18 @@ async function authSubmit(e) {
 async function authForgotPassword() {
   const email = document.getElementById('authEmail').value.trim();
   if (!email) { authSetError('Informe seu e-mail primeiro.'); return; }
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: AUTH_REDIRECT,  // redireciona de volta para o SimFin
+  });
   if (error) { authSetError(authTranslateError(error.message)); return; }
-  authSetMsg('Link de redefinição enviado para ' + email);
+  authSetMsg('Link de redefinição enviado para ' + email + '. Verifique sua caixa de entrada.');
 }
 
 // ─── Logout ──────────────────────────────────────────────────────────────────
 async function authLogout() {
   await supabase.auth.signOut();
+  // onAuthStateChange SIGNED_OUT cuida do resto
 }
 
 // ─── Callbacks de estado ─────────────────────────────────────────────────────
@@ -114,23 +175,27 @@ function authOnLogin(user) {
   currentUser = user;
   authHideOverlay();
   authUpdateTopbar();
-  // Inicializa o app normalmente (já estava pronto, so estava escondido)
-  try { autoRestoreInputs(); } catch(e) {}
-  try { updAno(); calc(); }    catch(e) {}
-  try { carteiraMigrar(); renderCarteira(); } catch(e) {}
-  try { renderGoals(); }       catch(e) {}
-  try { renderTrack(); }       catch(e) {}
-  try { reminderUpdateUI(); }  catch(e) {}
+
+  if (!appInitialized) {
+    appInitialized = true;
+    try { autoRestoreInputs(); }          catch(e) {}
+    try { updAno(); calc(); }             catch(e) {}
+    try { carteiraMigrar(); renderCarteira(); } catch(e) {}
+    try { renderGoals(); }                catch(e) {}
+    try { renderTrack(); }                catch(e) {}
+    try { reminderUpdateUI(); }           catch(e) {}
+  }
 }
 
 function authOnLogout() {
-  currentUser = null;
+  currentUser    = null;
+  appInitialized = false;
   authShowTab('login');
   authShowOverlay();
   authUpdateTopbar();
 }
 
-// ─── Topbar: badge de usuário + botão logout ──────────────────────────────────
+// ─── Badge de usuário na topbar ───────────────────────────────────────────────
 function authUpdateTopbar() {
   let el = document.getElementById('authUserBadge');
   if (!el) {
@@ -140,21 +205,24 @@ function authUpdateTopbar() {
     const topbarRight = document.querySelector('.topbar-right');
     if (topbarRight) topbarRight.prepend(el);
   }
+
   if (currentUser) {
-    const email = currentUser.email || '';
-    const initials = email.slice(0, 2).toUpperCase();
+    const email    = currentUser.email || '';
+    const initial  = (email.split('@')[0] || '?')[0].toUpperCase();
     el.innerHTML = `
       <div style="width:28px;height:28px;border-radius:50%;background:var(--acg);border:1px solid var(--bda);
-                  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
-                  color:var(--ac);cursor:default" title="${email}">${initials}</div>
-      <button onclick="authLogout()" style="background:none;border:1px solid var(--bd);border-radius:6px;
-              padding:4px 8px;font-size:11px;color:var(--t3);cursor:pointer" title="Sair">Sair</button>`;
+                  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+                  color:var(--ac);cursor:default;flex-shrink:0" title="${email}">${initial}</div>
+      <button onclick="authLogout()"
+              style="background:none;border:1px solid var(--bd);border-radius:6px;
+                     padding:4px 8px;font-size:11px;color:var(--t3);cursor:pointer"
+              title="Sair">Sair</button>`;
   } else {
     el.innerHTML = '';
   }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers de mensagem ──────────────────────────────────────────────────────
 function authSetError(msg) {
   const el = document.getElementById('authError');
   el.style.display = msg ? 'block' : 'none';
@@ -171,10 +239,12 @@ function authSetMsg(msg) {
 
 function authTranslateError(msg) {
   if (!msg) return 'Erro desconhecido.';
-  if (msg.includes('Invalid login credentials'))  return 'E-mail ou senha incorretos.';
-  if (msg.includes('Email not confirmed'))         return 'Confirme seu e-mail antes de entrar.';
-  if (msg.includes('User already registered'))     return 'Este e-mail já está cadastrado.';
-  if (msg.includes('Password should be at least')) return 'A senha deve ter pelo menos 6 caracteres.';
-  if (msg.includes('rate limit'))                  return 'Muitas tentativas. Aguarde alguns minutos.';
+  if (msg.includes('Invalid login credentials'))   return 'E-mail ou senha incorretos.';
+  if (msg.includes('Email not confirmed'))          return 'Confirme seu e-mail antes de entrar.';
+  if (msg.includes('User already registered'))      return 'Este e-mail já está cadastrado.';
+  if (msg.includes('Password should be at least'))  return 'A senha deve ter pelo menos 6 caracteres.';
+  if (msg.includes('rate limit'))                   return 'Muitas tentativas. Aguarde alguns minutos.';
+  if (msg.includes('Email link is invalid'))        return 'Link expirado ou inválido. Solicite um novo.';
+  if (msg.includes('Token has expired'))            return 'Link expirado. Solicite um novo.';
   return msg;
 }
