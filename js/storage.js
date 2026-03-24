@@ -142,6 +142,7 @@ Cancelar → Sobrescrever`
       saves[existsIdx] = { ...existing, inputs, summary, date };
     }
     persistSaves(saves);
+    dbPushSimulacoes(saves).catch(() => {});
     document.getElementById('smo').classList.remove('open');
     renderSavedList();
     showToast(choice ? `"${name}" — nova versão salva!` : `"${name}" sobrescrita!`, '💾');
@@ -150,8 +151,9 @@ Cancelar → Sobrescrever`
 
   // Nome novo — salva normalmente
   if (saves.length >= MAX_SAVES) { showToast(`Limite de ${MAX_SAVES} slots atingido`, '⚠️'); return; }
-  saves.push({ name, inputs, summary, date, versions: [] });
+  saves.push({ id: dbUUID(), name, inputs, summary, date, versions: [] });
   persistSaves(saves);
+  dbPushSimulacoes(saves).catch(() => {});
   document.getElementById('smo').classList.remove('open');
   renderSavedList();
   showToast(`"${name}" salva com sucesso!`, '💾');
@@ -170,8 +172,9 @@ function deleteSave(i) {
   const name  = saves[i]?.name || 'Simulação';
   saves.splice(i, 1);
   persistSaves(saves);
+  dbPushSimulacoes(saves).catch(() => {});
   renderSavedList();
-  showToast(`"${name}" excluída`, '🗑', 2500); // sincroniza exclusão com o Drive
+  showToast(`"${name}" excluída`, '🗑', 2500);
 }
 
 // ── Export JSON — exporta tudo: inputs, simulações salvas e acompanhamento ──

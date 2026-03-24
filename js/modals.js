@@ -29,6 +29,7 @@ function saveEditGoal() {
     data:  mesesParaData(meses),
   };
   saveGoals(goals);
+  dbPushMetas(goals).catch(() => {});
   closeEditGoal();
   renderGoals();
   showToast('Meta atualizada!', '✅');
@@ -78,6 +79,7 @@ function saveEditTrack() {
 
   entries.sort((a,b) => a.mes.localeCompare(b.mes));
   saveTrack(entries);
+  dbPushAcompanhamento(entries[idx]).catch(() => {});
   closeEditTrack();
   renderTrack();
   showToast('Registro atualizado!', '✅');

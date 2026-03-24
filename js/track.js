@@ -148,6 +148,7 @@ function saveTrackEntry() {
   }
   entries.sort((a,b) => a.mes.localeCompare(b.mes));
   saveTrack(entries);
+  dbPushAcompanhamento(entry).catch(() => {});
 
   const mesLbl = new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   showToast(`${mesLbl} registrado!`, '✅');
@@ -167,6 +168,7 @@ function deleteTrackEntry(mes) {
   if (!confirm('Excluir este registro?')) return;
   const entries = loadTrack().filter(e => e.mes !== mes);
   saveTrack(entries);
+  dbDeleteAcompanhamento(mes).catch(() => {});
   renderTrack();
   showToast('Registro excluído', '🗑', 2000);
 }

@@ -83,6 +83,7 @@ function addGoal(){
   const goals=loadGoals();
   goals.push({ id:Date.now(), cat, name, valor, meses:mesesFinal, data:mesesParaData(mesesFinal), criadoEm:new Date().toISOString() });
   saveGoals(goals);
+  dbPushMetas(goals).catch(() => {});
   document.getElementById('goalName').value='';
   document.getElementById('goalValor').value='';
   document.getElementById('goalMeses').value='';
@@ -93,7 +94,9 @@ function addGoal(){
 }
 
 function deleteGoal(id){
-  saveGoals(loadGoals().filter(g=>g.id!==id));
+  const goals = loadGoals().filter(g=>g.id!==id);
+  saveGoals(goals);
+  dbPushMetas(goals).catch(() => {});
   renderGoals();
   showToast('Meta excluída','🗑',2000);
 }

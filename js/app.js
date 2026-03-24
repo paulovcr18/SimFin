@@ -116,6 +116,7 @@ function autoSaveInputs() {
     const data = getInputs();
     data._regimes = { 1: regime[1], 2: regime[2] };
     localStorage.setItem(INPUTS_AUTOSAVE_KEY, JSON.stringify(data));
+    dbDebounce('autosave', () => dbPushConfig({ autosave: data }).catch(() => {}));
   } catch(e) {}
 }
 

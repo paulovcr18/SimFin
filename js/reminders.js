@@ -14,6 +14,7 @@ function reminderSaveConfig() {
   cfg.email      = document.getElementById('reminderEmail')?.value?.trim()      || cfg.email;
   cfg.dia        = parseInt(document.getElementById('reminderDia')?.value)      || cfg.dia;
   localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
+  dbPushConfig({ lembretes: cfg }).catch(() => {});
 }
 
 function reminderUpdateUI() {
@@ -84,10 +85,9 @@ async function reminderSchedule() {
     const data = await reminderFetch(fullUrl);
     if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
 
-    localStorage.setItem(REMINDER_KEY, JSON.stringify({
-      scriptUrl: url, email, dia, token: data.token || token,
-      secretKey: secretKey, ativo: true
-    }));
+    const newCfg = { scriptUrl: url, email, dia, token: data.token || token, secretKey, ativo: true };
+    localStorage.setItem(REMINDER_KEY, JSON.stringify(newCfg));
+    dbPushConfig({ lembretes: newCfg }).catch(() => {});
     reminderUpdateUI();
     showToast(`🔔 Lembrete ativo! E-mail todo dia ${dia} do mês.`, '🔔', 5000);
   } catch(e) {
@@ -131,6 +131,7 @@ async function reminderCancel() {
   }
   cfg.ativo = false;
   localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
+  dbPushConfig({ lembretes: cfg }).catch(() => {});
   reminderUpdateUI();
   showToast('Lembrete cancelado', '🔕', 3000);
 }

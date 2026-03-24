@@ -176,19 +176,27 @@ async function authLogout() {
 }
 
 // ─── Callbacks de estado ─────────────────────────────────────────────────────
-function authOnLogin(user) {
+async function authOnLogin(user) {
   currentUser = user;
-  authHideOverlay();
   authUpdateTopbar();
 
   if (!appInitialized) {
     appInitialized = true;
-    try { autoRestoreInputs(); }          catch(e) {}
-    try { updAno(); calc(); }             catch(e) {}
+
+    // Sincroniza com Supabase antes de iniciar o app:
+    // — na 1ª vez: migra localStorage → Supabase
+    // — nas demais: puxa Supabase → localStorage (dados de outro dispositivo)
+    try { await dbMigrateIfNeeded(); } catch(e) { console.warn('[db] migrate:', e); }
+    try { await dbPullAll();         } catch(e) { console.warn('[db] pull:',    e); }
+
+    authHideOverlay();
+
+    try { autoRestoreInputs(); }               catch(e) {}
+    try { updAno(); calc(); }                  catch(e) {}
     try { carteiraMigrar(); renderCarteira(); } catch(e) {}
-    try { renderGoals(); }                catch(e) {}
-    try { renderTrack(); }                catch(e) {}
-    try { reminderUpdateUI(); }           catch(e) {}
+    try { renderGoals(); }                     catch(e) {}
+    try { renderTrack(); }                     catch(e) {}
+    try { reminderUpdateUI(); }                catch(e) {}
   }
 }
 
