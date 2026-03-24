@@ -4,15 +4,29 @@
 //             Network First para fontes e Chart.js (CDN)
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'simfin-v1';
+const CACHE_NAME = 'simfin-v2';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [
   './',
   './index.html',
+  './styles.css',
   './manifest.json',
   './icon-192.svg',
   './icon-512.svg',
+  // JS modules
+  './js/payroll.js',
+  './js/utils.js',
+  './js/projection.js',
+  './js/app.js',
+  './js/storage.js',
+  './js/drive.js',
+  './js/goals.js',
+  './js/github.js',
+  './js/reminders.js',
+  './js/modals.js',
+  './js/carteira.js',
+  './js/track.js',
 ];
 
 // Assets externos — tentamos network, fallback para cache
