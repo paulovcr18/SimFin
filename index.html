@@ -1171,7 +1171,10 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   <!-- Token BRAPI oculto mas funcional -->
   <input type="hidden" id="cartBrapiToken">
   <input type="hidden" id="cartImportFile">
-  <div id="cartImportStatus" style="margin-bottom:8px"></div>
+  <div id="cartImportStatus" style="margin-bottom:4px"></div>
+  <div style="text-align:right;margin-bottom:8px">
+    <button onclick="carteiraLimparHistorico()" style="font-size:10px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:var(--fb)">🗑 Limpar todo o histórico e reimportar do zero</button>
+  </div>
 
   <!-- ── MÉTRICAS RESUMO ── -->
   <div class="cart-metrics-row" id="cartMetricsRow" style="display:none">
@@ -4371,52 +4374,89 @@ function movimSave(d)      { localStorage.setItem(MOVIM_KEY, JSON.stringify(d));
 
 // ── Atualiza UI da tela ──
 // ── Migração: normaliza tickers F e infere categorias nos dados existentes ──
+// ── Deduplicar lista de negociações (chave: data+ticker+tipo+qtd+preço) ──
+function negocDedup(lista) {
+  const vistas = new Set();
+  return lista.filter(n => {
+    const chave = `${n.data}|${n.ticker}|${n.tipo}|${n.qtd}|${Math.round((n.preco||0)*100)}`;
+    if (vistas.has(chave)) return false;
+    vistas.add(chave);
+    return true;
+  });
+}
+
 function carteiraMigrar() {
-  // 1. Migra ativos salvos
-  const ativos = carteiraLoad();
-  let mudou = false;
-  const migrados = ativos.map(a => {
-    const tickerNovo = normalizarTicker(a.ticker);
-    const catNova    = (a.categoria && a.categoria !== 'outro') ? a.categoria : inferirCategoria(tickerNovo);
-    if (tickerNovo !== a.ticker || catNova !== a.categoria) mudou = true;
-    return { ...a, ticker: tickerNovo, categoria: catNova };
+  // 1. Normaliza e deduplicata negociações (principal causa de PM inflado)
+  const negocs  = negocLoad();
+  const negocsN = negocs.map(n => ({ ...n, ticker: normalizarTicker(n.ticker) }));
+  const negocsD = negocDedup(negocsN); // remove duplicatas após normalização
+  const negocsMudou = negocsD.length !== negocs.length ||
+                      negocsN.some((n,i) => n.ticker !== negocs[i]?.ticker);
+  if (negocsMudou) negocSave(negocsD);
+
+  // 2. Normaliza movimentações
+  const movims  = movimLoad();
+  const movimsN = movims.map(m => ({ ...m, ticker: normalizarTicker(m.ticker) }));
+  const movimsD = movimsN.filter((m,i,arr) => {
+    const chave = `${m.data}|${m.ticker}|${m.tipo}|${Math.round((m.valor||0)*100)}`;
+    return arr.findIndex(x => `${x.data}|${x.ticker}|${x.tipo}|${Math.round((x.valor||0)*100)}` === chave) === i;
   });
-  // Consolida duplicatas geradas pela normalização (ex: WEGE3F e WEGE3 viram WEGE3)
-  const mapa = {};
-  migrados.forEach(a => {
-    if (!mapa[a.ticker]) { mapa[a.ticker] = a; return; }
-    // Mantém o com mais dados
-    if ((a.qtd||0) > (mapa[a.ticker].qtd||0)) mapa[a.ticker] = a;
-  });
-  if (mudou) carteiraSave(Object.values(mapa));
+  if (movimsD.length !== movims.length || movimsN.some((m,i) => m.ticker !== movims[i]?.ticker))
+    movimSave(movimsD);
 
-  // 2. Migra histórico de negociações
-  const negocs = negocLoad();
-  const negocsM = negocs.map(n => ({ ...n, ticker: normalizarTicker(n.ticker) }));
-  const negocsMudou = negocsM.some((n,i) => n.ticker !== negocs[i].ticker);
-  if (negocsMudou) negocSave(negocsM);
-
-  // 3. Migra histórico de movimentações
-  const movims = movimLoad();
-  const movimsM = movims.map(m => ({ ...m, ticker: normalizarTicker(m.ticker) }));
-  const movimsMudou = movimsM.some((m,i) => m.ticker !== movims[i].ticker);
-  if (movimsMudou) movimSave(movimsM);
-
-  // 4. Se havia negociações, recalcula posição com tickers normalizados
-  if (negocsMudou && negocsM.length) {
-    const posicoes = carteiraCalcularPosicaoDeNegociacoes(negocsM).filter(p => p.qtd > 0.001);
+  // 3. Recalcula posição a partir das negociações dedupadas
+  const negocsFinal = negocsMudou ? negocsD : negocs;
+  if (negocsFinal.length) {
+    const posicoes   = carteiraCalcularPosicaoDeNegociacoes(negocsFinal).filter(p => p.qtd > 0.001);
     const existentes = carteiraLoad();
-    posicoes.forEach(p => {
-      const idx = existentes.findIndex(e => e.ticker === p.ticker);
-      if (idx >= 0) {
-        existentes[idx].qtd            = p.qtd;
-        existentes[idx].pmedio         = p.pmedio > 0 ? Math.round(p.pmedio*100)/100 : existentes[idx].pmedio;
-        existentes[idx].ganhoRealizado = p.ganhoRealizado;
-        existentes[idx].categoria      = existentes[idx].categoria !== 'outro' ? existentes[idx].categoria : inferirCategoria(p.ticker);
-      }
+    // Normaliza tickers nos ativos existentes
+    const ativosN = existentes.map(a => ({
+      ...a,
+      ticker:    normalizarTicker(a.ticker),
+      categoria: (a.categoria && a.categoria !== 'outro') ? a.categoria : inferirCategoria(normalizarTicker(a.ticker)),
+    }));
+    // Consolida duplicatas de ativos (ex: WEGE3F e WEGE3 → WEGE3)
+    const mapaAtivos = {};
+    ativosN.forEach(a => {
+      if (!mapaAtivos[a.ticker] || (a.preco && !mapaAtivos[a.ticker].preco))
+        mapaAtivos[a.ticker] = a;
     });
-    carteiraSave(existentes);
+    // Atualiza qtd, PM e ganho de cada ativo com o cálculo correto
+    posicoes.forEach(p => {
+      if (!mapaAtivos[p.ticker]) {
+        mapaAtivos[p.ticker] = { ticker:p.ticker, categoria:inferirCategoria(p.ticker), nome:p.ticker };
+      }
+      mapaAtivos[p.ticker].qtd            = p.qtd;
+      mapaAtivos[p.ticker].pmedio         = p.pmedio > 0 ? Math.round(p.pmedio*100)/100 : null;
+      mapaAtivos[p.ticker].ganhoRealizado = p.ganhoRealizado;
+      mapaAtivos[p.ticker].fromNegociacao = true;
+    });
+    // Remove ativos que vieram de negociação e agora estão zerados
+    const final = Object.values(mapaAtivos)
+      .filter(a => !a.fromNegociacao || posicoes.some(p => p.ticker === a.ticker));
+    carteiraSave(final);
+  } else {
+    // Só normaliza tickers e categorias dos ativos
+    const existentes = carteiraLoad();
+    const mudou = existentes.some(a => normalizarTicker(a.ticker) !== a.ticker || a.categoria === 'outro');
+    if (mudou) {
+      const normalizados = existentes.map(a => ({
+        ...a,
+        ticker:    normalizarTicker(a.ticker),
+        categoria: (a.categoria && a.categoria !== 'outro') ? a.categoria : inferirCategoria(normalizarTicker(a.ticker)),
+      }));
+      carteiraSave(normalizados);
+    }
   }
+}
+
+function carteiraLimparHistorico() {
+  if (!confirm('Isso vai apagar todos os ativos, negociações e movimentações importadas.\nVocê precisará reimportar os arquivos da B3.\n\nContinuar?')) return;
+  localStorage.removeItem(CART_KEY);
+  localStorage.removeItem(NEGOC_KEY);
+  localStorage.removeItem(MOVIM_KEY);
+  carteiraRenderList();
+  showToast('Histórico apagado. Reimporte os arquivos da B3.', '🗑', 4000);
 }
 
 function carteiraUpdateUI() {
