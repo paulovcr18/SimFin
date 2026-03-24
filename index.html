@@ -4834,6 +4834,23 @@ function carteiraExtrairB3(rows) {
 }
 
 // ── Extrair trades do formato B3 Negociação ──
+// ── Normaliza ticker: remove sufixo F do mercado fracionário (ex: WEGE3F → WEGE3) ──
+function normalizarTicker(raw) {
+  const t = (raw||'').toString().trim().toUpperCase().replace(/\s+/g,'');
+  // Fracionário: letra(s) + dígito(s) + F no final (ex: WEGE3F, GOAU4F, KNRI11F)
+  return t.replace(/^([A-Z]{3,6}\d{1,2})F$/, '$1');
+}
+
+// ── Infere categoria a partir do padrão do ticker ──
+function inferirCategoria(ticker) {
+  if (/^[A-Z]{4}34$/.test(ticker))              return 'bdr';   // ex: AAPL34
+  if (/[A-Z]{2,4}1[13]$/.test(ticker))          return 'fii';   // ex: KNRI11, HGLG11
+  // ETFs conhecidos
+  if (/^(BOVA|IVVB|SMAL|HASH|DIVO|XFIX|FIXA|GOLD|SPXI|NASD|TECK|ACWI|FIND|MATB|UTIL|ISUS|ECOO|AGRI|IFNC|GOVE|BBSD|XBOV|BBOV|BOVV|PIBB)\d{2}$/.test(ticker)) return 'etf';
+  if (/[A-Z]{4}\d$/.test(ticker))               return 'acao';  // ex: WEGE3, PETR4
+  return 'outro';
+}
+
 function carteiraExtrairNegociacoes(rows) {
   const h = Object.keys(rows[0]);
   const dataCol   = h.find(k => /data.*neg[oó]cio/i.test(k));
@@ -4850,14 +4867,17 @@ function carteiraExtrairNegociacoes(rows) {
   };
 
   return rows
-    .map(r => ({
-      data:   parseData(r[dataCol]),
-      tipo:   (r[tipoCol]||'').toLowerCase(),
-      ticker: (r[tickerCol]||'').toString().trim().toUpperCase().replace(/\s+/g,''),
-      qtd:    parseBR(r[qtdCol]),
-      preco:  parseBR(r[precoCol]),
-      valor:  parseBR(r[valorCol]),
-    }))
+    .map(r => {
+      const ticker = normalizarTicker(r[tickerCol]);
+      return {
+        data:   parseData(r[dataCol]),
+        tipo:   (r[tipoCol]||'').toLowerCase(),
+        ticker,
+        qtd:    parseBR(r[qtdCol]),
+        preco:  parseBR(r[precoCol]),
+        valor:  parseBR(r[valorCol]),
+      };
+    })
     .filter(n => n.ticker.length >= 4 && n.qtd > 0 &&
       (n.tipo.includes('compra') || n.tipo.includes('venda')));
 }
@@ -4878,7 +4898,7 @@ function carteiraExtrairMovimentacoes(rows) {
     const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
     return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
   };
-  const extractTicker = p => (String(p||'').split(/[\s-]/)[0]||'').trim().toUpperCase();
+  const extractTicker = p => normalizarTicker((String(p||'').split(/[\s-]/)[0]||'').trim());
 
   return rows
     .map(r => ({
@@ -4983,7 +5003,7 @@ async function carteiraImportFile(file) {
           qtd:             p.qtd,
           pmedio:          p.pmedio > 0 ? Math.round(p.pmedio * 100) / 100 : null,
           ganhoRealizado:  p.ganhoRealizado,
-          categoria:       existentes[idx]?.categoria || 'outro',
+          categoria:       existentes[idx]?.categoria || inferirCategoria(p.ticker),
           nome:            q?.shortName || q?.longName || p.ticker,
           preco:           q?.regularMarketPrice || null,
           variacao:        q?.regularMarketChangePercent || null,
