@@ -7,8 +7,8 @@
 //   2. Vá em Project Settings > API
 //   3. Substitua os valores abaixo pelo seu Project URL e anon key
 //
-const SUPABASE_URL  = 'COLE_SEU_PROJECT_URL_AQUI';
-const SUPABASE_ANON = 'COLE_SUA_ANON_KEY_AQUI';
+const SUPABASE_URL  = 'https://qaopienbsmssjosttucn.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhb3BpZW5ic21zc2pvc3R0dWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODUyOTIsImV4cCI6MjA4OTk2MTI5Mn0.jwFSbkYYOc-fwD_UitBEwfNfQvZdOypHlELx6reMvQs';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
