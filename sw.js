@@ -4,7 +4,7 @@
 //             Network First para fontes e Chart.js (CDN)
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'simfin-v5';
+const CACHE_NAME = 'simfin-v6';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [

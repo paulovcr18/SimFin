@@ -1,10 +1,14 @@
 // ════════════════════════════════════════════════════════════════
 // SimFin — Edge Function: cotacoes
-// Proxy server-side para Yahoo Finance (resolve CORS do browser)
+// Proxy server-side para Yahoo Finance e Tesouro Nacional (resolve CORS do browser)
 //
-// Endpoint: GET /functions/v1/cotacoes?tickers=WEGE3,KNRI11,GMAT3
+// Endpoints:
+//   GET /functions/v1/cotacoes?tickers=WEGE3,KNRI11,GMAT3
+//   GET /functions/v1/cotacoes?tesouro=1
 //
-// Resposta: { results: { WEGE3: { regularMarketPrice, regularMarketChangePercent, shortName, symbol } } }
+// Respostas:
+//   tickers: { results: { WEGE3: { regularMarketPrice, regularMarketChangePercent, shortName, symbol } } }
+//   tesouro: { results: [{ nome, preco, venc }] }
 // ════════════════════════════════════════════════════════════════
 
 const CORS_HEADERS = {
@@ -13,6 +17,8 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
+const TESOURO_NACIONAL_API = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
+
 Deno.serve(async (req: Request) => {
   // Preflight CORS
   if (req.method === 'OPTIONS') {
@@ -20,7 +26,27 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const url     = new URL(req.url);
+    const url = new URL(req.url);
+
+    // ── Rota Tesouro Direto ──
+    if (url.searchParams.get('tesouro') === '1') {
+      const tRes = await fetch(TESOURO_NACIONAL_API, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (SimFin/1.0)' },
+      });
+      if (!tRes.ok) throw new Error(`Tesouro Nacional retornou HTTP ${tRes.status}`);
+      const tData = await tRes.json() as { response?: { TrsrBdTradgList?: { TrsrBd: Record<string, unknown> }[] } };
+      const list  = tData?.response?.TrsrBdTradgList ?? [];
+      const results = list.map(item => ({
+        nome:  item.TrsrBd.nm  as string,
+        preco: item.TrsrBd.untrRedVal as number,
+        venc:  item.TrsrBd.mtrtyDt   as string,
+      }));
+      return new Response(JSON.stringify({ results }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ── Rota Yahoo Finance (B3 tickers) ──
     const raw     = url.searchParams.get('tickers') || '';
     const tickers = raw.split(',').map(t => t.trim().toUpperCase()).filter(t => t.length >= 4);
 

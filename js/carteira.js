@@ -33,7 +33,41 @@ function movimSave(d)      {
 }
 
 // ── Atualiza UI da tela ──
-// ── Migração: normaliza tickers F e infere categorias nos dados existentes ──
+// ── Computa posições de Tesouro Direto a partir das movimentações (síncrono) ──
+// Chamado por carteiraMigrar() para garantir que Tesouro sempre aparece na carteira
+function tesouroComputarPosicoes(movims) {
+  const tesMovims = (movims||[]).filter(m => /^tesouro/i.test(m.produto));
+  if (!tesMovims.length) return [];
+  const map = {};
+  tesMovims.forEach(m => {
+    const nome = m.produto.trim();
+    if (!map[nome]) map[nome] = { nome, qtd: 0, totalCusto: 0 };
+    const isCompra  = /compra/i.test(m.tipo) ||
+      (/liquidação|liquidacao/i.test(m.tipo) && m.entradaSaida === 'debito');
+    const isResgate = /resgate|venda|vencimento/i.test(m.tipo) ||
+      (/liquidação|liquidacao/i.test(m.tipo) && m.entradaSaida === 'credito');
+    if (isCompra)  { map[nome].qtd += m.qtd;  map[nome].totalCusto += m.valor; }
+    if (isResgate) { map[nome].qtd -= m.qtd;  map[nome].totalCusto -= m.valor; }
+  });
+  return Object.values(map)
+    .filter(t => t.qtd >= 0.0001)
+    .map(t => {
+      const pmedio = t.qtd > 0 ? Math.round((t.totalCusto / t.qtd) * 100) / 100 : 0;
+      return {
+        ticker:           tesouroSyntheticTicker(t.nome),
+        nome:             t.nome,
+        qtd:              Math.round(t.qtd * 10000) / 10000,
+        pmedio,
+        preco:            pmedio,  // melhor estimativa até próximo refresh
+        variacao:         0,
+        tipo:             'tesouro',
+        categoria:        'tesouro',
+        valorInvestido:   Math.round(t.totalCusto * 100) / 100,
+        fromMovimentacao: true,
+      };
+    });
+}
+
 // ── Deduplicar lista de negociações (chave: data+ticker+tipo+qtd+preço) ──
 function negocDedup(lista) {
   const vistas = new Set();
@@ -94,18 +128,31 @@ function carteiraMigrar() {
     // Remove ativos que vieram de negociação e agora estão zerados
     const final = Object.values(mapaAtivos)
       .filter(a => !a.fromNegociacao || posicoes.some(p => p.ticker === a.ticker));
+    // Merge Tesouro Direto (calculado das movimentações)
+    tesouroComputarPosicoes(movims).forEach(t => {
+      const idx = final.findIndex(a => a.ticker === t.ticker);
+      if (idx >= 0) final[idx] = { ...t, preco: final[idx].preco || t.preco, updatedAt: final[idx].updatedAt };
+      else final.push(t);
+    });
     carteiraSave(final);
   } else {
     // Só normaliza tickers e categorias dos ativos
     const existentes = carteiraLoad();
     const mudou = existentes.some(a => normalizarTicker(a.ticker) !== a.ticker || a.categoria === 'outro');
-    if (mudou) {
-      const normalizados = existentes.map(a => ({
+    const tesouroPos = tesouroComputarPosicoes(movims);
+    const temTesouroNovo = tesouroPos.some(t => !existentes.find(a => a.ticker === t.ticker));
+    if (mudou || temTesouroNovo) {
+      const base = existentes.map(a => ({
         ...a,
         ticker:    normalizarTicker(a.ticker),
         categoria: (a.categoria && a.categoria !== 'outro') ? a.categoria : inferirCategoria(normalizarTicker(a.ticker)),
       }));
-      carteiraSave(normalizados);
+      tesouroPos.forEach(t => {
+        const idx = base.findIndex(a => a.ticker === t.ticker);
+        if (idx >= 0) base[idx] = { ...t, preco: base[idx].preco || t.preco, updatedAt: base[idx].updatedAt };
+        else base.push(t);
+      });
+      carteiraSave(base);
     }
   }
 }
@@ -874,14 +921,20 @@ async function carteiraImportFile(file) {
       const newMovims = movims.filter(m => !existingMovims.some(e =>
         e.data===m.data && e.ticker===m.ticker && e.tipo===m.tipo && Math.abs(e.valor-m.valor)<0.01
       ));
-      movimSave([...existingMovims, ...newMovims]);
+      const todasMovims = [...existingMovims, ...newMovims];
+      movimSave(todasMovims);
+
+      // Tesouro é sincronizado automaticamente via carteiraMigrar() no próximo render
+      carteiraMigrar();
       carteiraRenderList();
 
+      const tesouroCount = tesouroComputarPosicoes(todasMovims).length;
       const proventos   = movims.filter(m => /dividendo|jcp|juros.*capital|provento|rendimento/i.test(m.tipo));
       const totalProv   = proventos.reduce((s,m) => s + m.valor, 0);
       const tiposUnicos = [...new Set(movims.map(m => m.tipo))].slice(0,4).join(', ');
+      const tesStr      = tesouroCount > 0 ? ` · 🏛 ${tesouroCount} título(s) Tesouro Direto` : '';
       carteiraSetStatus(statusEl,
-        `✅ [Movimentação B3] ${movims.length} eventos (${newMovims.length} novos) · ${proventos.length} proventos = ${fmt(totalProv)} · Tipos: ${tiposUnicos}`, 'ok');
+        `✅ [Movimentação B3] ${movims.length} eventos (${newMovims.length} novos) · ${proventos.length} proventos = ${fmt(totalProv)} · Tipos: ${tiposUnicos}${tesStr}`, 'ok');
 
     } else {
       // ── B3 Posição (snapshot) ou CSV genérico ──
@@ -1132,25 +1185,27 @@ function calcPatrimonio() {
 }
 
 // ════════════════════════════════════════════════════════════════
-// TESOURO DIRETO — API pública do Tesouro Nacional
-// https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json
+// TESOURO DIRETO — via Edge Function (mesmo proxy do Yahoo Finance)
 // ════════════════════════════════════════════════════════════════
-const TESOURO_API = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
+
+// Gera ticker sintético a partir do nome do título
+// Ex: "Tesouro Selic 2031" → "TD_SELIC2031", "Tesouro IPCA+ 2035" → "TD_IPCA2035"
+function tesouroSyntheticTicker(produto) {
+  const name  = (produto||'').replace(/tesouro\s+/i, '').toUpperCase();
+  const noNum = name.replace(/\d+/g, '').replace(/[^A-Z]/g, '');  // só letras
+  const ano   = (name.match(/\d{4}/) || [''])[0];
+  return ('TD_' + noNum.slice(0, 5) + ano).slice(0, 14);
+}
 
 async function tesouroFetchPrices() {
   try {
-    // Tesouro bloqueia CORS direto — usa proxy CORS gratuito
-    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(TESOURO_API);
-    const res   = await fetch(proxy);
+    // Reutiliza Edge Function do Supabase — sem CORS, sem proxy externo instável
+    const res  = await fetch(`${COTACOES_FN}?tesouro=1`,
+      { headers: { 'apikey': SUPABASE_ANON }, cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data  = await res.json();
-    // Estrutura: { response: { TrsrBdTradgList: [ { TrsrBd: { nm, untrRedVal, ... } } ] } }
-    const list  = data?.response?.TrsrBdTradgList || [];
-    return list.map(item => ({
-      nome:    item.TrsrBd.nm,           // "Tesouro Selic 2029"
-      preco:   item.TrsrBd.untrRedVal,   // preço unitário atual
-      venc:    item.TrsrBd.mtrtyDt,      // data de vencimento
-    }));
+    const data = await res.json();
+    // Retorna: { results: [{ nome, preco, venc }] }
+    return data?.results || null;
   } catch(e) {
     console.warn('[Tesouro]', e);
     return null;
@@ -1197,39 +1252,41 @@ async function carteiraAddTesouro() {
   carteiraSetStatus(statusEl, `Buscando preço do ${tipoTitulo}...`, 'load');
 
   const prices = await tesouroFetchPrices();
-  let precoAtual = null;
+  let precoUnit  = null;
   let nomeCompleto = tipoTitulo + (venc ? ' ' + venc : '');
 
   if (prices) {
-    // Busca o título mais próximo pelo nome
     const match = prices.find(p =>
       p.nome.toLowerCase().includes(tipoTitulo.toLowerCase().replace('tesouro ','')) &&
       (!venc || p.nome.includes(venc))
     ) || prices.find(p => p.nome.toLowerCase().includes(tipoTitulo.toLowerCase().replace('tesouro ','')));
 
     if (match) {
-      precoAtual   = match.preco;
+      precoUnit    = match.preco;
       nomeCompleto = match.nome;
     }
   }
 
-  // Ticker sintético para identificar Tesouro no sistema
-  const ticker = ('TD_' + tipoTitulo.replace(/[^A-Z]/gi,'').toUpperCase() + (venc||'').replace(/\D/g,'').slice(-4)).slice(0,12);
+  // Modelo por unidade: qtd = valor / preço_unit, pmedio = preço_unit
+  // Sem preço disponível: qtd=1, pmedio=valor (posição como unidade total)
+  const qtd    = precoUnit ? Math.round((valor / precoUnit) * 10000) / 10000 : 1;
+  const pmedio = precoUnit || valor;
+  const ticker = tesouroSyntheticTicker(nomeCompleto);
 
   const ativos = carteiraLoad();
   const idx    = ativos.findIndex(a => a.ticker === ticker);
 
   const ativo = {
     ticker,
-    nome:      nomeCompleto,
-    qtd:       1,
-    pmedio:    valor,
-    preco:     precoAtual || valor,
-    variacao:  precoAtual ? ((precoAtual - valor) / valor * 100) : null,
-    tipo:      'tesouro',
-    categoria: 'tesouro',
+    nome:           nomeCompleto,
+    qtd,
+    pmedio,
+    preco:          precoUnit || valor,
+    variacao:       0,
+    tipo:           'tesouro',
+    categoria:      'tesouro',
     valorInvestido: valor,
-    updatedAt: new Date().toISOString(),
+    updatedAt:      new Date().toISOString(),
   };
 
   if (idx >= 0) ativos[idx] = { ...ativos[idx], ...ativo };
@@ -1237,9 +1294,9 @@ async function carteiraAddTesouro() {
 
   carteiraSave(ativos);
   carteiraSetStatus(statusEl,
-    precoAtual
-      ? `${nomeCompleto} adicionado! Valor atual: ${fmt(precoAtual)}`
-      : `${nomeCompleto} adicionado (preço atual indisponível — usando valor investido)`,
+    precoUnit
+      ? `${nomeCompleto} adicionado! ${qtd} unidades · PM: ${fmt(pmedio)}`
+      : `${nomeCompleto} adicionado (preço indisponível — usando valor investido como PM)`,
     'ok');
 
   document.getElementById('cartTesouoValor').value = '';
@@ -1302,7 +1359,7 @@ async function carteiraRefresh() {
 function carteiraUsarTotal() {
   const total = carteiraLoad().reduce((s,a) => {
     // Para Tesouro: usa preço atual
-    return s + (a.preco||a.valorInvestido||0) * (a.tipo==='tesouro'?1:(a.qtd||0));
+    return s + (a.preco||0) * (a.qtd||0);
   }, 0);
   if (!total) { showToast('Atualize as cotações primeiro', '⚠️'); return; }
   const el = document.getElementById('trackPatrimonio');
@@ -1316,7 +1373,7 @@ function carteiraUsarTotal() {
 // ── Atualiza patInvestimentos quando carteira muda ──
 function carteiraSyncPatrimonio() {
   const total = carteiraLoad().reduce((s,a) => {
-    return s + (a.preco||a.valorInvestido||0) * (a.tipo==='tesouro'?1:(a.qtd||0));
+    return s + (a.preco||0) * (a.qtd||0);
   }, 0);
   const el = document.getElementById('patInvestimentos');
   if (el && !el.value) { // só preenche se estiver vazio
