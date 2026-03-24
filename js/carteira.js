@@ -7,6 +7,8 @@ const CART_TOKEN_KEY = 'simfin_brapi_token';
 const NEGOC_KEY      = 'simfin_negociacoes';
 const MOVIM_KEY      = 'simfin_movimentacoes';
 const BRAPI_BASE     = 'https://brapi.dev/api/quote/';
+// Edge Function Supabase — proxy server-side para Yahoo Finance (resolve CORS)
+const COTACOES_FN    = 'https://qaopienbsmssjosttucn.supabase.co/functions/v1/cotacoes';
 
 function carteiraLoad()    { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
 function carteiraSave(d)   {
@@ -229,41 +231,51 @@ async function carteiraRefresh() {
 }
 
 // ── Buscar cotações via BRAPI (com batching e cache-busting) ──
+// ── Cotações: Edge Function (Yahoo Finance proxy) com fallback BRAPI ─────────
 async function carteiraBuscarCotacao(tickers) {
+  // 1ª opção: Supabase Edge Function (proxy server-side — sem CORS, sem token)
+  try {
+    const res = await fetch(
+      `${COTACOES_FN}?tickers=${tickers.join(',')}`,
+      { headers: { 'apikey': SUPABASE_ANON }, cache: 'no-store' }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (data.results && Object.keys(data.results).length) {
+        return data.results;  // formato idêntico ao BRAPI: { TICKER: { regularMarketPrice, ... } }
+      }
+    }
+    console.warn('[cotacoes] edge fn retornou vazio, tentando BRAPI...');
+  } catch(e) {
+    console.warn('[cotacoes] edge fn falhou, tentando BRAPI...', e.message);
+  }
+
+  // 2ª opção: BRAPI com token do usuário
   const token = carteiraGetToken();
+  if (!token) {
+    showToast('Cotações indisponíveis. Se o problema persistir, configure um token em brapi.dev.', '⚠️', 5000);
+    return null;
+  }
+
   const BATCH = 30;
   const map   = {};
-
   for (let i = 0; i < tickers.length; i += BATCH) {
-    const batch  = tickers.slice(i, i + BATCH);
-    const params = new URLSearchParams();
-    if (token) params.set('token', token);
-    // range/interval são parâmetros do plano pago da BRAPI — omitir para compatibilidade
-    const qs  = token ? '?' + params.toString() : '';
-    const url = BRAPI_BASE + batch.join(',') + qs;
+    const batch = tickers.slice(i, i + BATCH);
+    const url   = `${BRAPI_BASE}${batch.join(',')}?token=${token}`;
     try {
       const res  = await fetch(url, { cache: 'no-store' });
       if (!res.ok) {
-        // 401 = sem token ou token inválido; 429 = rate limit
-        if (res.status === 401) {
-          showToast('BRAPI: token inválido ou não configurado. Acesse brapi.dev e insira seu token.', '🔑', 6000);
-        } else if (res.status === 429) {
-          showToast('BRAPI: limite de requisições atingido. Configure um token em brapi.dev.', '⏱', 5000);
-        }
-        console.warn('[BRAPI] HTTP', res.status, url);
+        if (res.status === 401) showToast('Token BRAPI inválido. Verifique em brapi.dev.', '🔑', 5000);
+        if (res.status === 429) showToast('Limite BRAPI atingido. Tente novamente em alguns minutos.', '⏱', 5000);
+        console.warn('[BRAPI] HTTP', res.status);
         continue;
       }
       const data = await res.json();
-      if (data.results) {
-        data.results.forEach(r => {
-          if (r.regularMarketPrice) map[r.symbol] = r;
-        });
-      }
+      (data.results || []).forEach(r => { if (r.regularMarketPrice) map[r.symbol] = r; });
     } catch(e) {
       console.error('[BRAPI]', e);
     }
   }
-
   return Object.keys(map).length ? map : null;
 }
 
