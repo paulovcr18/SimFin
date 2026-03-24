@@ -1198,16 +1198,30 @@ function tesouroSyntheticTicker(produto) {
 }
 
 async function tesouroFetchPrices() {
+  // Fonte 1: Edge Function Supabase (deploy com ?tesouro=1)
   try {
-    // Reutiliza Edge Function do Supabase — sem CORS, sem proxy externo instável
     const res  = await fetch(`${COTACOES_FN}?tesouro=1`,
       { headers: { 'apikey': SUPABASE_ANON }, cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data?.results?.length) return data.results;
+    }
+  } catch(e) { console.warn('[Tesouro] Edge Function indisponível, tentando fallback...'); }
+
+  // Fonte 2: API Tesouro Nacional via corsproxy.io (fallback)
+  try {
+    const TESOURO_NACIONAL = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
+    const res  = await fetch('https://corsproxy.io/?' + encodeURIComponent(TESOURO_NACIONAL));
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    // Retorna: { results: [{ nome, preco, venc }] }
-    return data?.results || null;
+    const list = data?.response?.TrsrBdTradgList || [];
+    return list.map(item => ({
+      nome:  item.TrsrBd.nm,
+      preco: item.TrsrBd.untrRedVal,
+      venc:  item.TrsrBd.mtrtyDt,
+    }));
   } catch(e) {
-    console.warn('[Tesouro]', e);
+    console.warn('[Tesouro] Fallback também falhou:', e.message);
     return null;
   }
 }
