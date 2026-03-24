@@ -627,6 +627,42 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 .cart-import-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:4px}
 .cart-import-sub{font-size:11px;color:var(--t3)}
 
+/* ── Dashboard Patrimônio ── */
+.pat-hero{background:var(--bg7);border:1px solid var(--bda);border-radius:var(--r);padding:20px 22px;margin-bottom:10px}
+.pat-hero-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.pat-hero-val{font-family:var(--fm);font-size:30px;font-weight:500;color:var(--ac);line-height:1}
+.pat-hero-sub{font-size:11px;color:var(--t3);margin-top:6px}
+.pat-buckets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.pat-bucket{background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.pat-bucket-label{font-size:10px;color:var(--t3);margin-bottom:5px;font-weight:600;letter-spacing:.3px}
+.pat-bucket-val{font-family:var(--fm);font-size:16px;font-weight:600;color:var(--t1)}
+.pat-bucket-sub{font-size:10px;color:var(--t3);margin-top:3px}
+.pat-bucket-inp{background:transparent;border:none;outline:none;font-family:var(--fm);font-size:16px;font-weight:600;color:var(--t1);width:100%;padding:0}
+.pat-bucket-inp::placeholder{color:var(--t3);font-weight:400}
+.pat-import-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.pat-import-btn{background:var(--bg7);border:2px dashed var(--bd);border-radius:var(--r);padding:18px 14px;text-align:center;cursor:pointer;transition:all .18s}
+.pat-import-btn:hover,.pat-import-btn.drag-over{border-color:var(--ac);background:var(--acg)}
+.pat-import-btn-icon{font-size:26px;margin-bottom:7px}
+.pat-import-btn-title{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:3px}
+.pat-import-btn-sub{font-size:10px;color:var(--t3);line-height:1.4}
+.cart-metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.cart-metric-card{background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);padding:11px 14px}
+.cart-metric-label{font-size:10px;color:var(--t3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.cart-metric-val{font-family:var(--fm);font-size:14px;font-weight:600;color:var(--t1)}
+.cart-main-wrap{display:grid;grid-template-columns:1fr 210px;gap:10px;align-items:start;margin-bottom:10px}
+.cart-bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cart-table-wrap{overflow-x:auto}
+.cart-table{width:100%;border-collapse:collapse;font-size:12px}
+.cart-table th{font-size:10px;color:var(--t3);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;text-transform:uppercase;letter-spacing:.4px}
+.cart-table th.r,.cart-table td.r{text-align:right}
+.cart-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.035);vertical-align:middle;font-family:var(--fm)}
+.cart-table tr:last-child td{border-bottom:none}
+.cart-table tr:hover td{background:rgba(255,255,255,.02)}
+.cart-trow-del{background:none;border:none;cursor:pointer;color:var(--t3);padding:2px 5px;border-radius:5px;font-size:11px;transition:all .12s}
+.cart-trow-del:hover{color:var(--re);background:var(--reg)}
+@media(max-width:700px){.cart-main-wrap{grid-template-columns:1fr}.cart-metrics-row{grid-template-columns:1fr 1fr}.cart-bottom-row{grid-template-columns:1fr}}
+@media(max-width:500px){.pat-buckets{grid-template-columns:1fr 1fr}.pat-import-row{grid-template-columns:1fr}}
+
 /* ── Categoria badge nos cards ── */
 .cart-cat-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
 .cart-cat-badge.acao{background:rgba(16,185,129,.15);color:#10b981}
@@ -1064,162 +1100,147 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
     <div style="font-size:18px">💼</div>
     <div style="font-size:14px;font-weight:700;color:var(--t1)">Carteira de Investimentos</div>
     <div style="height:1px;background:var(--bd);flex:1"></div>
-    <button onclick="carteiraRefresh()" id="cartRefreshBtn" style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--bg6);color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .15s">🔄 Atualizar cotações</button>
+    <button onclick="carteiraRefresh()" id="cartRefreshBtn" style="font-size:11px;padding:5px 12px;border-radius:7px;border:1px solid var(--bd);background:var(--bg6);color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .15s">🔄 Atualizar</button>
   </div>
 
-  <!-- Total patrimônio carteira -->
-  <div class="cart-total" id="cartTotalArea" style="display:none">
-    <div>
-      <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Patrimônio em Carteira</div>
-      <div class="cart-total-val" id="cartTotalVal">R$ 0,00</div>
-      <div class="cart-total-sub" id="cartTotalSub">—</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span id="cartLastUpdate" style="font-size:10px;color:var(--t3)"></span>
-      <button onclick="carteiraUsarTotal()" style="font-size:11px;padding:6px 12px;border-radius:7px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);cursor:pointer;font-family:var(--fb);font-weight:600">📥 Usar como saldo do mês</button>
-    </div>
-  </div>
-
-  <!-- Adicionar ativo manual -->
-  <div class="cart-form">
-    <div class="ph2"><span style="font-size:15px">➕</span><span class="pt">Adicionar Ativo</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--t3)">Ações · FIIs · Tesouro Direto</span>
-    </div>
-    <div class="cart-form-body">
-      <div class="cart-form-grid">
-        <div class="cart-ig">
-          <label>Tipo</label>
-          <select id="cartTipo" onchange="carteiraToggleTipo()">
-            <option value="acao">📈 Ação / FII (B3)</option>
-            <option value="tesouro">🏛 Tesouro Direto</option>
-          </select>
-        </div>
-        <!-- Campos para Ação/FII -->
-        <div id="cartCamposAcao" class="cart-form-grid" style="display:contents">
-          <div class="cart-ig">
-            <label>Ticker (ex: PETR4)</label>
-            <input type="text" id="cartTicker" placeholder="PETR4" maxlength="10" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')carteiraAdd()">
-          </div>
-          <div class="cart-ig">
-            <label>Quantidade</label>
-            <input type="number" id="cartQtd" placeholder="100" min="0" onkeydown="if(event.key==='Enter')carteiraAdd()">
-          </div>
-          <div class="cart-ig">
-            <label>Preço médio (R$) <span style="color:var(--t3);font-weight:400;font-size:10px">opcional</span></label>
-            <input type="number" id="cartPmedio" placeholder="38,50" min="0" step="0.01">
-          </div>
-        </div>
-        <!-- Campos para Tesouro Direto -->
-        <div id="cartCamposTesouro" style="display:none;grid-column:1/-1">
-          <div class="cart-form-grid">
-            <div class="cart-ig">
-              <label>Título</label>
-              <select id="cartTesouoTipo">
-                <option value="Tesouro Selic">Tesouro SELIC</option>
-                <option value="Tesouro IPCA+">Tesouro IPCA+</option>
-                <option value="Tesouro Prefixado">Tesouro Prefixado</option>
-              </select>
-            </div>
-            <div class="cart-ig">
-              <label>Valor investido (R$)</label>
-              <input type="number" id="cartTesouoValor" placeholder="5.000" min="0" step="0.01">
-            </div>
-            <div class="cart-ig">
-              <label>Vencimento <span style="color:var(--t3);font-weight:400;font-size:10px">opcional</span></label>
-              <input type="text" id="cartTesouoVenc" placeholder="2029, 2035...">
-            </div>
-          </div>
-        </div>
+  <!-- ── HERO: PATRIMÔNIO TOTAL ── -->
+  <div class="pat-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="pat-hero-label">Patrimônio Total</div>
+        <div class="pat-hero-val" id="patHeroTotal">R$ 0,00</div>
+        <div class="pat-hero-sub" id="patHeroSub">Importe os relatórios da B3 para começar</div>
       </div>
-      <!-- Token BRAPI -->
-      <div id="cartBrapiArea" class="cart-brapi-key">
-        <span>🔑</span>
-        <input type="password" id="cartBrapiToken" placeholder="Token BRAPI (opcional — para tickers fora dos gratuitos)" oninput="carteiraSaveToken()">
-        <a href="https://brapi.dev/dashboard" target="_blank" style="color:var(--ac);font-size:10px;white-space:nowrap;text-decoration:none">brapi.dev grátis →</a>
-      </div>
-      <div id="cartAddStatus"></div>
-      <div style="display:flex;justify-content:flex-end">
-        <button class="track-btn primary" onclick="carteiraAdd()">+ Adicionar</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:10px;color:var(--t3)" id="cartLastUpdate"></span>
+        <button onclick="carteiraUsarTotal()" style="font-size:11px;padding:6px 12px;border-radius:7px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);cursor:pointer;font-family:var(--fb);font-weight:600">📥 Usar na projeção</button>
       </div>
     </div>
   </div>
 
-  <!-- Importar B3 / Corretora -->
-  <div class="cart-form">
-    <div class="ph2"><span style="font-size:15px">📂</span><span class="pt">Importar da B3 / Corretora</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--t3)">Detecta formato B3 automaticamente</span>
+  <!-- ── TRÊS BUCKETS ── -->
+  <div class="pat-buckets">
+    <div class="pat-bucket" style="border-color:var(--bda)">
+      <div class="pat-bucket-label">💼 Carteira B3</div>
+      <div class="pat-bucket-val" id="patBucketB3">R$ 0,00</div>
+      <div class="pat-bucket-sub" id="patBucketB3Sub">importe os extratos abaixo</div>
     </div>
-    <div class="cart-form-body">
-      <div class="cart-import-zone" id="cartImportZone" onclick="document.getElementById('cartImportFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');carteiraImportFile(event.dataTransfer.files[0])">
-        <div class="cart-import-icon">🏦</div>
-        <div class="cart-import-title">Arraste ou clique para selecionar</div>
-        <div class="cart-import-sub">
-          <strong>B3 Negociação</strong> (calcula posição + PM) · <strong>B3 Movimentação</strong> (proventos) · <strong>B3 Posição</strong> (snapshot) · CSV genérico
-        </div>
-        <div class="cart-import-sub" style="margin-top:4px;font-size:10px;opacity:.7">
-          investidor.b3.com.br → Extrato de Negociação ou Extrato de Movimentação
-        </div>
+    <div class="pat-bucket">
+      <div class="pat-bucket-label">🏦 FGTS</div>
+      <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px">
+        <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">R$</span>
+        <input class="pat-bucket-inp" type="number" id="patFGTSCart" placeholder="0,00" step="100" min="0" oninput="carteiraUpdatePatrimonio()">
       </div>
-      <input type="file" id="cartImportFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
-      <div id="cartImportStatus"></div>
+      <div class="pat-bucket-sub">inserir manualmente</div>
+    </div>
+    <div class="pat-bucket">
+      <div class="pat-bucket-label">🛡 Reserva de Emergência</div>
+      <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:3px">
+        <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">R$</span>
+        <input class="pat-bucket-inp" type="number" id="patReservaCart" placeholder="0,00" step="100" min="0" oninput="carteiraUpdatePatrimonio()">
+      </div>
+      <div class="pat-bucket-sub">inserir manualmente</div>
     </div>
   </div>
 
-  <!-- Lista de ativos -->
-  <div class="panel">
-    <div class="ph2">
-      <span style="font-size:15px">📋</span>
-      <span class="pt">Meus Ativos</span>
-      <span style="font-size:11px;color:var(--t3);margin-left:auto" id="cartCount"></span>
+  <!-- ── IMPORTAR ── -->
+  <div class="pat-import-row">
+    <div class="pat-import-btn" id="cartImportNegocZone"
+      onclick="document.getElementById('cartImportNegocFile').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="event.preventDefault();this.classList.remove('drag-over');carteiraImportFile(event.dataTransfer.files[0])">
+      <div class="pat-import-btn-icon">📊</div>
+      <div class="pat-import-btn-title">Negociação B3</div>
+      <div class="pat-import-btn-sub">Calcula posição atual e preço médio automaticamente</div>
+      <div class="pat-import-btn-sub" style="margin-top:4px;opacity:.55">investidor.b3.com.br → Extrato de Negociação</div>
     </div>
-    <div class="pb"><div id="cartListArea">
-      <div class="track-empty">
-        <div class="track-empty-icon">💼</div>
-        <div class="track-empty-title">Nenhum ativo cadastrado</div>
-        <div class="track-empty-sub">Importe o arquivo da B3 ou adicione ativos manualmente acima.</div>
-      </div>
-    </div></div>
+    <div class="pat-import-btn" id="cartImportMovimZone"
+      onclick="document.getElementById('cartImportMovimFile').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="event.preventDefault();this.classList.remove('drag-over');carteiraImportFile(event.dataTransfer.files[0])">
+      <div class="pat-import-btn-icon">💰</div>
+      <div class="pat-import-btn-title">Movimentação B3</div>
+      <div class="pat-import-btn-sub">Importa dividendos, JCP e todos os proventos</div>
+      <div class="pat-import-btn-sub" style="margin-top:4px;opacity:.55">investidor.b3.com.br → Extrato de Movimentação</div>
+    </div>
+  </div>
+  <input type="file" id="cartImportNegocFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
+  <input type="file" id="cartImportMovimFile" accept=".csv,.xlsx,.xls" style="display:none" onchange="carteiraImportFile(this.files[0])">
+  <!-- Token BRAPI oculto mas funcional -->
+  <input type="hidden" id="cartBrapiToken">
+  <input type="hidden" id="cartImportFile">
+  <div id="cartImportStatus" style="margin-bottom:8px"></div>
+
+  <!-- ── MÉTRICAS RESUMO ── -->
+  <div class="cart-metrics-row" id="cartMetricsRow" style="display:none">
+    <div class="cart-metric-card">
+      <div class="cart-metric-label">Custo Total</div>
+      <div class="cart-metric-val" id="metricInvestido">—</div>
+    </div>
+    <div class="cart-metric-card">
+      <div class="cart-metric-label">Resultado Atual</div>
+      <div class="cart-metric-val" id="metricResultado">—</div>
+    </div>
+    <div class="cart-metric-card">
+      <div class="cart-metric-label">Ganho Realizado</div>
+      <div class="cart-metric-val" id="metricRealizado">—</div>
+    </div>
+    <div class="cart-metric-card">
+      <div class="cart-metric-label">Proventos</div>
+      <div class="cart-metric-val" id="metricProventos">—</div>
+    </div>
   </div>
 
-  <!-- Alocação por Categoria -->
-  <div class="panel" id="cartAlocacaoPanel" style="display:none">
-    <div class="ph2"><span style="font-size:15px">🥧</span><span class="pt">Alocação por Categoria</span></div>
-    <div class="pb">
-      <div class="aloc-wrap">
-        <div class="aloc-chart-wrap">
+  <!-- ── ATIVOS (tabela) + ALOCAÇÃO (donut) ── -->
+  <div class="cart-main-wrap" id="cartMainWrap" style="display:none">
+    <div class="panel">
+      <div class="ph2">
+        <span style="font-size:15px">📋</span>
+        <span class="pt">Ativos</span>
+        <span style="font-size:11px;color:var(--t3);margin-left:auto" id="cartCount"></span>
+      </div>
+      <div id="cartListArea"></div>
+    </div>
+    <div class="panel" id="cartAlocacaoPanel">
+      <div class="ph2"><span style="font-size:15px">🥧</span><span class="pt">Alocação</span></div>
+      <div class="pb" style="padding-top:4px">
+        <div style="position:relative;width:150px;height:150px;margin:0 auto 14px">
           <canvas id="cartAlocacaoChart"></canvas>
         </div>
-        <div class="aloc-legend" id="cartAlocacaoLegend"></div>
+        <div id="cartAlocacaoLegend"></div>
       </div>
     </div>
   </div>
 
-  <!-- Recomendações ativas -->
-  <div class="panel" id="cartRecomPanel" style="display:none">
-    <div class="ph2"><span style="font-size:15px">💡</span><span class="pt">Recomendações</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--t3)">baseadas na sua carteira atual</span>
+  <!-- ── LINHA INFERIOR: Proventos | Ganhos + Recomendações ── -->
+  <div class="cart-bottom-row" id="cartBottomRow" style="display:none">
+    <div class="panel" id="cartProventosPanel">
+      <div class="ph2">
+        <span style="font-size:15px">💰</span>
+        <span class="pt">Proventos Recebidos</span>
+        <span style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ac)" id="cartProventosTotal"></span>
+      </div>
+      <div class="pb"><div id="cartProventosArea"></div></div>
     </div>
-    <div class="pb"><div id="cartRecomArea"></div></div>
-  </div>
-
-  <!-- Proventos Recebidos -->
-  <div class="panel" id="cartProventosPanel" style="display:none">
-    <div class="ph2">
-      <span style="font-size:15px">💰</span>
-      <span class="pt">Proventos Recebidos</span>
-      <span style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ac)" id="cartProventosTotal"></span>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="panel" id="cartGanhosPanel">
+        <div class="ph2">
+          <span style="font-size:15px">📊</span>
+          <span class="pt">Ganhos Realizados</span>
+          <span style="margin-left:auto;font-size:12px;font-weight:700" id="cartGanhosTotal"></span>
+        </div>
+        <div class="pb"><div id="cartGanhosArea"></div></div>
+      </div>
+      <div class="panel" id="cartRecomPanel">
+        <div class="ph2">
+          <span style="font-size:15px">💡</span>
+          <span class="pt">Recomendações</span>
+        </div>
+        <div class="pb"><div id="cartRecomArea"></div></div>
+      </div>
     </div>
-    <div class="pb"><div id="cartProventosArea"></div></div>
-  </div>
-
-  <!-- Ganhos Realizados -->
-  <div class="panel" id="cartGanhosPanel" style="display:none">
-    <div class="ph2">
-      <span style="font-size:15px">📊</span>
-      <span class="pt">Ganhos/Perdas Realizados</span>
-      <span style="margin-left:auto;font-size:12px;font-weight:700" id="cartGanhosTotal"></span>
-    </div>
-    <div class="pb"><div id="cartGanhosArea"></div></div>
   </div>
 
   <!-- ═══ SEPARADOR ═══ -->
@@ -4350,9 +4371,13 @@ function movimSave(d)      { localStorage.setItem(MOVIM_KEY, JSON.stringify(d));
 
 // ── Atualiza UI da tela ──
 function carteiraUpdateUI() {
-  const token = carteiraGetToken();
-  const el = document.getElementById('cartBrapiToken');
-  if (el && token) el.value = token;
+  // Carrega FGTS e Reserva salvos (sincroniza com campos da projeção)
+  const patFGTSEl    = document.getElementById('patFGTS');
+  const patReservaEl = document.getElementById('patReserva');
+  const fgtsCart     = document.getElementById('patFGTSCart');
+  const reservaCart  = document.getElementById('patReservaCart');
+  if (fgtsCart    && patFGTSEl?.value)    fgtsCart.value    = patFGTSEl.value;
+  if (reservaCart && patReservaEl?.value) reservaCart.value = patReservaEl.value;
   carteiraRenderList();
 }
 
@@ -4501,109 +4526,144 @@ const CAT_LABELS = { acao:'Ações', fii:'FIIs', etf:'ETFs', bdr:'BDRs', 'renda-
 const CAT_COLORS = { acao:'#10b981', fii:'#818cf8', etf:'#f59e0b', bdr:'#a78bfa', 'renda-fixa':'#60a5fa', tesouro:'#2dd4bf', outro:'#94a3b8' };
 const CAT_ICONS  = { acao:'📈', fii:'🏢', etf:'🌐', bdr:'🌎', 'renda-fixa':'🏛', tesouro:'🏛', outro:'📦' };
 
-// ── Renderizar lista de ativos ──
+// ── Atualizar patrimônio total (B3 + FGTS + Reserva) ──
+function carteiraUpdatePatrimonio() {
+  const ativos  = carteiraLoad();
+  const b3      = ativos.reduce((s,a) => s + (a.preco||0)*(a.qtd||0), 0);
+  const fgts    = parseFloat(document.getElementById('patFGTSCart')?.value)    || 0;
+  const reserva = parseFloat(document.getElementById('patReservaCart')?.value) || 0;
+  const total   = b3 + fgts + reserva;
+
+  // Hero
+  const heroEl = document.getElementById('patHeroTotal');
+  if (heroEl) heroEl.textContent = fmt(total);
+
+  // Bucket B3
+  const b3El    = document.getElementById('patBucketB3');
+  const b3SubEl = document.getElementById('patBucketB3Sub');
+  if (b3El)    b3El.textContent = fmt(b3);
+  if (b3SubEl) b3SubEl.textContent = ativos.length
+    ? `${ativos.length} ativo${ativos.length!==1?'s':''} · ${(b3/total*100||0).toFixed(1)}% do patrimônio`
+    : 'importe os extratos abaixo';
+
+  // Subtítulo hero
+  const subEl = document.getElementById('patHeroSub');
+  if (subEl && total > 0) {
+    const parts = [];
+    if (b3 > 0)    parts.push(`B3 ${(b3/total*100).toFixed(1)}%`);
+    if (fgts > 0)  parts.push(`FGTS ${(fgts/total*100).toFixed(1)}%`);
+    if (reserva>0) parts.push(`Reserva ${(reserva/total*100).toFixed(1)}%`);
+    subEl.textContent = parts.join(' · ');
+  }
+
+  // Sincroniza com campos da projeção
+  const patFGTSEl    = document.getElementById('patFGTS');
+  const patReservaEl = document.getElementById('patReserva');
+  const patInvEl     = document.getElementById('patInvestimentos');
+  if (patFGTSEl)    patFGTSEl.value    = fgts    || '';
+  if (patReservaEl) patReservaEl.value = reserva  || '';
+  if (patInvEl)     patInvEl.value     = b3       || '';
+}
+
+// ── Renderizar lista de ativos (tabela compacta) ──
 function carteiraRenderList() {
   const ativos  = carteiraLoad();
   const area    = document.getElementById('cartListArea');
   const countEl = document.getElementById('cartCount');
-  const totalEl = document.getElementById('cartTotalVal');
-  const subEl   = document.getElementById('cartTotalSub');
-  const totalArea = document.getElementById('cartTotalArea');
   const lastEl  = document.getElementById('cartLastUpdate');
+  const mainWrap   = document.getElementById('cartMainWrap');
+  const metricsRow = document.getElementById('cartMetricsRow');
+  const bottomRow  = document.getElementById('cartBottomRow');
 
   if (!ativos.length) {
-    area.innerHTML = `<div class="track-empty">
+    if (area) area.innerHTML = `<div class="track-empty" style="padding:28px 20px">
       <div class="track-empty-icon">💼</div>
-      <div class="track-empty-title">Nenhum ativo cadastrado</div>
-      <div class="track-empty-sub">Importe o arquivo da B3 ou adicione ativos manualmente acima.</div>
+      <div class="track-empty-title">Nenhum ativo importado</div>
+      <div class="track-empty-sub">Use os botões acima para importar o Extrato de Negociação da B3.</div>
     </div>`;
-    if (totalArea) totalArea.style.display = 'none';
-    if (countEl)   countEl.textContent = '';
-    const ap = document.getElementById('cartAlocacaoPanel');
-    const rp = document.getElementById('cartRecomPanel');
-    const pp = document.getElementById('cartProventosPanel');
-    const gp = document.getElementById('cartGanhosPanel');
-    if (ap) ap.style.display = 'none';
-    if (rp) rp.style.display = 'none';
-    if (pp) pp.style.display = 'none';
-    if (gp) gp.style.display = 'none';
+    if (mainWrap)   mainWrap.style.display   = 'none';
+    if (metricsRow) metricsRow.style.display = 'none';
+    if (bottomRow)  bottomRow.style.display  = 'none';
+    carteiraUpdatePatrimonio();
     return;
   }
 
   const total      = ativos.reduce((s,a) => s + (a.preco||0)*(a.qtd||0), 0);
   const totalCusto = ativos.reduce((s,a) => s + (a.pmedio||0)*(a.qtd||0), 0);
   const lucroTotal = totalCusto > 0 ? total - totalCusto : null;
+  const ganhoReal  = ativos.reduce((s,a) => s + (a.ganhoRealizado||0), 0);
+  const proventos  = movimLoad().filter(m => /dividendo|jcp|juros.*capital|provento|rendimento/i.test(m.tipo))
+                                .reduce((s,m) => s+m.valor, 0);
 
-  if (totalArea) totalArea.style.display = 'flex';
-  if (totalEl)   totalEl.textContent = fmt(total);
-  if (subEl) {
-    subEl.innerHTML = lucroTotal !== null
-      ? `${ativos.length} ativo${ativos.length!==1?'s':''} · L/P: <span style="color:${lucroTotal>=0?'var(--ac)':'var(--re)'}">${lucroTotal>=0?'+':''}${fmt(lucroTotal)} (${((lucroTotal/totalCusto)*100).toFixed(1)}%)</span>`
-      : `${ativos.length} ativo${ativos.length!==1?'s':''}`;
-  }
-  if (countEl) countEl.textContent = `${ativos.length} ativo${ativos.length!==1?'s':''}`;
+  if (mainWrap)   mainWrap.style.display   = 'grid';
+  if (metricsRow) metricsRow.style.display = 'grid';
+  if (bottomRow)  bottomRow.style.display  = 'grid';
+  if (countEl)    countEl.textContent = `${ativos.length} ativo${ativos.length!==1?'s':''}`;
 
   const lastUpdate = ativos.map(a=>a.updatedAt).filter(Boolean).sort().pop();
-  if (lastEl && lastUpdate) {
-    lastEl.textContent = 'Atualizado: ' + new Date(lastUpdate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  if (lastEl && lastUpdate)
+    lastEl.textContent = 'atualizado ' + new Date(lastUpdate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  // ── Métricas ──
+  const mInv = document.getElementById('metricInvestido');
+  const mRes = document.getElementById('metricResultado');
+  const mRea = document.getElementById('metricRealizado');
+  const mPro = document.getElementById('metricProventos');
+  if (mInv) mInv.textContent = totalCusto > 0 ? fmt(totalCusto) : '—';
+  if (mRes && lucroTotal !== null) {
+    mRes.innerHTML = `<span style="color:${lucroTotal>=0?'var(--ac)':'var(--re)'}">${lucroTotal>=0?'+':''}${fmt(lucroTotal)} (${((lucroTotal/totalCusto)*100).toFixed(1)}%)</span>`;
   }
+  if (mRea) mRea.innerHTML = ganhoReal !== 0
+    ? `<span style="color:${ganhoReal>=0?'var(--ac)':'var(--re)'}">${ganhoReal>=0?'+':''}${fmt(ganhoReal)}</span>` : '—';
+  if (mPro) mPro.innerHTML = proventos > 0 ? `<span style="color:var(--ac)">${fmt(proventos)}</span>` : '—';
 
-  area.innerHTML = `<div class="cart-grid">${ativos.map(a => {
-    const valor    = (a.preco||0) * (a.qtd||0);
-    const lucro    = a.pmedio ? ((a.preco||0) - a.pmedio) * a.qtd : null;
-    const lucroPct = a.pmedio && a.pmedio>0 ? ((a.preco||0)/a.pmedio-1)*100 : null;
-    const pct      = total > 0 ? (valor/total*100).toFixed(1) : '0';
-    const varCls   = !a.variacao ? 'neu' : a.variacao >= 0 ? 'pos' : 'neg';
-    const varStr   = a.variacao != null ? (a.variacao>=0?'+':'')+a.variacao.toFixed(2)+'%' : '—';
-    const cat      = a.categoria || 'outro';
-    const catLabel = CAT_LABELS[cat] || cat;
-    const unidade  = (cat === 'fii') ? 'cotas' : (cat === 'tesouro') ? 'títulos' : 'ações';
-
-    return `<div class="cart-asset">
-      <div class="cart-asset-header">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="cart-asset-ticker">${a.ticker}</div>
-            <span class="cart-cat-badge ${cat}">${CAT_ICONS[cat]||'📦'} ${catLabel}</span>
+  // ── Tabela de ativos ──
+  const sorted = [...ativos].sort((a,b) => (b.preco||0)*(b.qtd||0) - (a.preco||0)*(a.qtd||0));
+  area.innerHTML = `<div class="cart-table-wrap"><table class="cart-table">
+    <thead><tr>
+      <th>Ativo</th>
+      <th class="r">Qtd</th>
+      <th class="r">Preço Médio</th>
+      <th class="r">Cotação</th>
+      <th class="r">Resultado</th>
+      <th class="r">Valor</th>
+      <th class="r">%</th>
+      <th></th>
+    </tr></thead>
+    <tbody>${sorted.map(a => {
+      const valor    = (a.preco||0) * (a.qtd||0);
+      const lucro    = a.pmedio && a.preco ? (a.preco - a.pmedio) * a.qtd : null;
+      const lucroPct = a.pmedio && a.pmedio>0 && a.preco ? (a.preco/a.pmedio-1)*100 : null;
+      const pct      = total > 0 ? (valor/total*100).toFixed(1) : '0';
+      const varCls   = !a.variacao ? '' : a.variacao >= 0 ? 'var(--ac)' : 'var(--re)';
+      const cat      = a.categoria || 'outro';
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:7px">
+            <div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="cart-asset-ticker" style="font-size:13px">${a.ticker}</span>
+                <span class="cart-cat-badge ${cat}">${CAT_ICONS[cat]||'📦'} ${CAT_LABELS[cat]||cat}</span>
+              </div>
+              ${a.nome && a.nome!==a.ticker ? `<div style="font-size:10px;color:var(--t3);margin-top:1px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(a.nome)}</div>` : ''}
+            </div>
           </div>
-          <div class="cart-asset-name">${escHtml(a.nome||'')}</div>
-        </div>
-        <button class="cart-asset-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button>
-      </div>
-      <div class="cart-asset-price">${a.preco ? fmt(a.preco) : '—'}</div>
-      <div class="cart-asset-change ${varCls}">${varStr} hoje</div>
-      <div class="cart-asset-body">
-        <div class="cart-asset-row">
-          <span class="cart-asset-label">Quantidade</span>
-          <span class="cart-asset-val">${a.qtd.toLocaleString('pt-BR')} ${unidade}</span>
-        </div>
-        <div class="cart-asset-row">
-          <span class="cart-asset-label">Valor total</span>
-          <span class="cart-asset-val" style="color:var(--ac)">${fmt(valor)}</span>
-        </div>
-        <div class="cart-asset-row">
-          <span class="cart-asset-label">% da carteira</span>
-          <span class="cart-asset-val">${pct}%</span>
-        </div>
-        ${a.pmedio ? `
-        <div class="cart-asset-row">
-          <span class="cart-asset-label">Preço médio</span>
-          <span class="cart-asset-val">${fmt(a.pmedio)}</span>
-        </div>
-        <div class="cart-asset-row">
-          <span class="cart-asset-label">L/P</span>
-          <span class="cart-asset-val" style="color:${lucro>=0?'var(--ac)':'var(--re)'}">
-            ${lucro>=0?'+':''}${fmt(lucro)} (${lucroPct>=0?'+':''}${lucroPct?.toFixed(1)}%)
-          </span>
-        </div>` : ''}
-        <div style="height:4px;background:var(--bg5);border-radius:2px;margin-top:4px;overflow:hidden">
-          <div style="width:${Math.min(100,parseFloat(pct))}%;height:4px;background:${CAT_COLORS[cat]||'var(--ac)'};border-radius:2px"></div>
-        </div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
+        </td>
+        <td class="r" style="color:var(--t2)">${a.qtd?.toLocaleString('pt-BR')}</td>
+        <td class="r" style="color:var(--t3)">${a.pmedio ? fmt(a.pmedio) : '—'}</td>
+        <td class="r">
+          <div style="color:var(--t1)">${a.preco ? fmt(a.preco) : '—'}</div>
+          ${a.variacao!=null ? `<div style="font-size:10px;color:${varCls}">${a.variacao>=0?'+':''}${a.variacao.toFixed(2)}%</div>` : ''}
+        </td>
+        <td class="r">${lucro!==null ? `<span style="color:${lucro>=0?'var(--ac)':'var(--re)'};font-size:12px">${lucro>=0?'+':''}${fmt(lucro)}<br><span style="font-size:10px">${lucroPct>=0?'+':''}${lucroPct.toFixed(1)}%</span></span>` : '<span style="color:var(--t3)">—</span>'}</td>
+        <td class="r" style="color:var(--ac);font-weight:600">${valor > 0 ? fmt(valor) : '—'}</td>
+        <td class="r" style="color:var(--t3)">${pct}%</td>
+        <td><button class="cart-trow-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
 
-  // Renderiza painéis extras
+  carteiraUpdatePatrimonio();
   carteiraRenderAlocacao();
   carteiraRenderRecomendacoes();
   carteiraRenderProventos();
@@ -4665,18 +4725,16 @@ function carteiraRenderAlocacao() {
     });
   }
 
-  // Legenda
+  // Legenda compacta
   const legendEl = document.getElementById('cartAlocacaoLegend');
   if (legendEl) {
     legendEl.innerHTML = entries.map(([k, v]) => {
       const pct   = (v / total * 100).toFixed(1);
       const color = CAT_COLORS[k] || '#94a3b8';
-      return `<div class="aloc-row">
-        <span class="aloc-dot" style="background:${color}"></span>
-        <span class="aloc-label">${CAT_LABELS[k]||k}</span>
-        <div class="aloc-bar-wrap"><div class="aloc-bar" style="width:${pct}%;background:${color}"></div></div>
-        <span class="aloc-pct">${pct}%</span>
-        <span class="aloc-val">${fmt(v)}</span>
+      return `<div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--bd);font-size:11px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+        <span style="color:var(--t2);flex:1">${CAT_LABELS[k]||k}</span>
+        <span style="font-family:var(--fm);color:var(--t3)">${pct}%</span>
       </div>`;
     }).join('');
   }
