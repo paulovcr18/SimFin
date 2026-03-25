@@ -218,15 +218,35 @@ function handleImport(event) {
 
       if (data.carteira?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_carteira') || '[]');
-        if (!local.length) { localStorage.setItem('simfin_carteira', JSON.stringify(data.carteira)); restored.push('carteira'); }
+        const merged = [...local];
+        data.carteira.forEach(dc => {
+          const idx = merged.findIndex(l => l.ticker === dc.ticker);
+          if (idx < 0) merged.push(dc);
+          else if (dc.updatedAt && new Date(dc.updatedAt) > new Date(merged[idx].updatedAt || 0))
+            merged[idx] = dc;
+        });
+        localStorage.setItem('simfin_carteira', JSON.stringify(merged));
+        if (merged.length > local.length) restored.push(`carteira (${merged.length - local.length} novos)`);
       }
       if (data.negociacoes?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_negociacoes') || '[]');
-        if (!local.length) localStorage.setItem('simfin_negociacoes', JSON.stringify(data.negociacoes));
+        const merged = [...local];
+        data.negociacoes.forEach(dn => {
+          if (!merged.some(l => l.data===dn.data && l.ticker===dn.ticker && l.tipo===dn.tipo && Math.abs(l.preco-dn.preco)<0.01))
+            merged.push(dn);
+        });
+        localStorage.setItem('simfin_negociacoes', JSON.stringify(merged));
+        if (merged.length > local.length) restored.push(`${merged.length - local.length} negociação(ões)`);
       }
       if (data.movimentacoes?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]');
-        if (!local.length) localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
+        const merged = [...local];
+        data.movimentacoes.forEach(dm => {
+          if (!merged.some(l => l.data===dm.data && l.ticker===dm.ticker && l.tipo===dm.tipo && Math.abs(l.valor-dm.valor)<0.01))
+            merged.push(dm);
+        });
+        localStorage.setItem('simfin_movimentacoes', JSON.stringify(merged));
+        if (merged.length > local.length) restored.push(`${merged.length - local.length} movimentação(ões)`);
       }
 
       showToast(`Importado: ${restored.join(', ') || 'dados'}`, '📂');

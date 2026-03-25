@@ -1274,7 +1274,7 @@ function tesouroSyntheticTicker(produto) {
   return ('TD_' + noNum.slice(0, 5) + ano).slice(0, 14);
 }
 
-const TESOURO_CACHE_KEY = 'simfin_tesouro_cache';
+// TESOURO_CACHE_KEY já definido em tesouro-api.js — não redeclarar aqui
 
 async function tesouroFetchPrices() {
   // Fonte 1: Edge Function Supabase (deploy com ?tesouro=1)

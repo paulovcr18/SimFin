@@ -115,12 +115,26 @@ async function _dbPullCarteira(uid) {
       preco:          r.preco_atual     !== null ? parseFloat(r.preco_atual)     : null,
       cotadoEm:       r.cotado_em,
     }));
-    localStorage.setItem(CART_KEY, JSON.stringify(posicoes));
+    // Só sobrescrever se versão remota for mais recente ou se local estiver vazio
+    const localCart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    if (!localCart.length || (posicoes.length > localCart.length)) {
+      localStorage.setItem(CART_KEY, JSON.stringify(posicoes));
+    }
   }
   if (histRes.status === 'fulfilled' && histRes.value.data) {
     const h = histRes.value.data;
-    if (h.negociacoes)    localStorage.setItem(NEGOC_KEY, JSON.stringify(h.negociacoes));
-    if (h.movimentacoes)  localStorage.setItem(MOVIM_KEY, JSON.stringify(h.movimentacoes));
+    if (h.negociacoes) {
+      const localNegocs = JSON.parse(localStorage.getItem(NEGOC_KEY) || '[]');
+      if (!localNegocs.length || (h.negociacoes.length > localNegocs.length)) {
+        localStorage.setItem(NEGOC_KEY, JSON.stringify(h.negociacoes));
+      }
+    }
+    if (h.movimentacoes) {
+      const localMovims = JSON.parse(localStorage.getItem(MOVIM_KEY) || '[]');
+      if (!localMovims.length || (h.movimentacoes.length > localMovims.length)) {
+        localStorage.setItem(MOVIM_KEY, JSON.stringify(h.movimentacoes));
+      }
+    }
   }
 }
 
