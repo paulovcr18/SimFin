@@ -25,7 +25,6 @@ function getInputs() {
                 'p2fat','p2retirada','p2prolabore','p2reserva',
                 'pctMoradia','pctAlimentacao','pctTransporte','pctContas','pctLazer','pctInvest',
                 'taxaAnual','anos','reajuste','patrimonioInicial','taxaInflacao',
-        'patInvestimentos','patFGTS','patReserva',
                 'p1regime','p2regime'];
   const out = { _regime1: regime[1], _regime2: regime[2] };
   ids.forEach(id => {

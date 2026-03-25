@@ -236,25 +236,10 @@
   </div>
   <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" oninput="calc()"></div>
   <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" oninput="calc()"></div>
-  <hr class="dv">
-  <div class="stitle">💰 Patrimônio Atual</div>
-  <div style="font-size:10px;color:var(--t3);margin-bottom:8px;line-height:1.5">Os três valores são somados como patrimônio inicial da projeção.</div>
-  <div class="ig">
-    <label>📈 Investimentos (R$)</label>
-    <input type="number" id="patInvestimentos" value="" min="0" oninput="calcPatrimonio()" placeholder="Ações, FIIs, Tesouro...">
-  </div>
-  <div class="ig">
-    <label>🏦 FGTS (R$)</label>
-    <input type="number" id="patFGTS" value="" min="0" oninput="calcPatrimonio()" placeholder="Saldo FGTS acumulado">
-  </div>
-  <div class="ig">
-    <label>🛡 Reserva de Emergência (R$)</label>
-    <input type="number" id="patReserva" value="" min="0" oninput="calcPatrimonio()" placeholder="Reserva em conta/CDB">
-  </div>
-  <div style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">
-    <span style="font-size:11px;color:var(--t3)">Total para projeção</span>
-    <span style="font-family:var(--fm);font-size:13px;color:var(--ac);font-weight:500" id="patTotal">R$&nbsp;0,00</span>
-  </div>
+  <!-- Patrimônio alimentado pela aba Finanças via carteiraUpdatePatrimonio() -->
+  <input type="hidden" id="patInvestimentos" value="">
+  <input type="hidden" id="patFGTS" value="">
+  <input type="hidden" id="patReserva" value="">
   <input type="hidden" id="patrimonioInicial" value="0">
 </aside>
 
