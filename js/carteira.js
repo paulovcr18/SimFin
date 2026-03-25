@@ -961,6 +961,9 @@ async function carteiraImportFile(file) {
       carteiraMigrar();
       carteiraRenderList();
 
+      // Enriquecer cotações de Tesouro via API AA40 (assíncrono)
+      enriquecerTesouroMovimentacoes().catch(e => console.warn('[Tesouro API]', e));
+
       const tesouroCount = tesouroComputarPosicoes(todasMovims).length;
       const proventos   = movims.filter(m => /dividendo|jcp|juros.*capital|provento|rendimento/i.test(m.tipo));
       const totalProv   = proventos.reduce((s,m) => s + m.valor, 0);
@@ -1497,6 +1500,43 @@ function carteiraSyncPatrimonio() {
   if (el && !el.value) { // só preenche se estiver vazio
     el.value = total.toFixed(2);
     calcPatrimonio();
+  }
+}
+
+// ── Enriquecer movimentações de Tesouro com cotações via API AA40 ──
+// Chamado após importar arquivo com movimentações
+async function enriquecerTesouroMovimentacoes() {
+  const movims = movimLoad();
+  const tesouroMovs = movims.filter(m => /^tesouro/i.test(m.produto));
+  if (!tesouroMovs.length) return;
+
+  showToast('Atualizando cotações de Tesouro Direto...', '📊', 8000);
+
+  // Coletar títulos únicos
+  const titulos = [...new Set(tesouroMovs.map(m => tesouroNormalizarTitulo(m.produto)).filter(Boolean))];
+  if (!titulos.length) return;
+
+  // Consultar cotações (batch)
+  const cotacoes = await tesouroFetchMultiplos(titulos);
+
+  // Enriquecer movimentações
+  let atualizadas = 0;
+  tesouroMovs.forEach(mov => {
+    const titulo = tesouroNormalizarTitulo(mov.produto);
+    const cot = cotacoes[titulo];
+    if (cot) {
+      mov.precoUnitario = cot.pu || mov.precoUnitario;
+      mov.cotacaoAtualizada = true;
+      mov.cotacaoAtualizadaEm = new Date().toISOString();
+      atualizadas++;
+    }
+  });
+
+  // Salvar atualizado
+  if (atualizadas > 0) {
+    movimSave(movims);
+    carteiraUpdateUI();
+    showToast(`✅ ${atualizadas} cotação(ões) de Tesouro atualizada(s) via AA40`, '📈', 4000);
   }
 }
 

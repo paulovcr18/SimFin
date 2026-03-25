@@ -226,52 +226,13 @@ function handleImport(event) {
       }
       if (data.movimentacoes?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]');
-        if (!local.length) {
-          localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
-          // Enriquecer cotações de Tesouro via API AA40
-          enriquecerTesouroAsync(data.movimentacoes);
-        }
+        if (!local.length) localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
       }
 
       showToast(`Importado: ${restored.join(', ') || 'dados'}`, '📂');
     } catch { showToast('Arquivo inválido ou corrompido', '❌', 4000); }
   };
   reader.readAsText(file);
-}
-
-// ── Enriquecer movimentações de Tesouro com cotações via API AA40 ──
-async function enriquecerTesouroAsync(movims) {
-  const tesouroMovs = movims.filter(m => /^tesouro/i.test(m.produto));
-  if (!tesouroMovs.length) return;
-
-  showToast('Atualizando cotações de Tesouro Direto...', '📊', 8000);
-
-  // Coletar títulos únicos
-  const titulos = [...new Set(tesouroMovs.map(m => tesouroNormalizarTitulo(m.produto)).filter(Boolean))];
-  if (!titulos.length) return;
-
-  // Consultar cotações (batch)
-  const cotacoes = await tesouroFetchMultiplos(titulos);
-
-  // Enriquecer movimentações
-  let atualizadas = 0;
-  tesouroMovs.forEach(mov => {
-    const titulo = tesouroNormalizarTitulo(mov.produto);
-    const cot = cotacoes[titulo];
-    if (cot) {
-      mov.precoUnitario = cot.pu || mov.precoUnitario;
-      mov.cotacaoAtualizada = true;
-      mov.cotacaoAtualizadaEm = new Date().toISOString();
-      atualizadas++;
-    }
-  });
-
-  // Salvar atualizado
-  if (atualizadas > 0) {
-    movimSave(movims);
-    carteiraUpdateUI();
-    showToast(`✅ ${atualizadas} cotação(ões) de Tesouro atualizada(s) via AA40`, '📈', 4000);
-  }
 }
 
 function exportCSV() {
