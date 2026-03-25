@@ -2,8 +2,10 @@
 // SAVE / EXPORT / IMPORT SYSTEM
 // ════════════════════════════════════════════════════════
 
-const STORAGE_KEY = 'simfin_saves';
-const MAX_SAVES   = 10;
+// Keys compartilhadas (também usadas por db.js)
+const STORAGE_KEY    = 'simfin_saves';      // legado — mantido para migração no import
+const SCENARIO_KEY   = 'simfin_scenario';   // cenário único atual
+const REMINDER_KEY   = 'simfin_reminder_config'; // usado por reminders.js e db.js
 
 // ── Toast ──
 let toastTimer;
@@ -49,136 +51,85 @@ function applyInputs(data) {
   calc();
 }
 
-// ── LocalStorage helpers ──
-function loadSaves()        { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
-function persistSaves(s)    { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
-
 // ── Escape HTML ──
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ── Render saved list ──
-function renderSavedList() {
-  const saves = loadSaves();
-  const listEl  = document.getElementById('savesDropList');
-  const countEl = document.getElementById('savesDropCount');
-  const lblEl   = document.getElementById('savesCountLbl');
-  if (countEl) countEl.textContent = `${saves.length} / ${MAX_SAVES}`;
-  if (lblEl)   lblEl.textContent   = saves.length ? `Salvas (${saves.length})` : 'Salvas';
-  if (!listEl) return;
-  if (!saves.length) {
-    listEl.innerHTML = '<div class="saves-drop-empty">Nenhuma simulação salva ainda.</div>';
-    return;
+// ════════════════════════════════════════════════════════
+// CENÁRIO ÚNICO
+// ════════════════════════════════════════════════════════
+
+function scenarioLoad() {
+  try { return JSON.parse(localStorage.getItem(SCENARIO_KEY)) || {}; } catch { return {}; }
+}
+
+function scenarioSave() {
+  const nameEl = document.getElementById('scenarioName');
+  const sc     = scenarioLoad();
+  const now    = new Date().toISOString();
+  const name   = nameEl?.value?.trim() || sc.name || 'Meu Cenário';
+  const updated = {
+    name,
+    createdAt:  sc.createdAt || now,
+    updatedAt:  now,
+  };
+  localStorage.setItem(SCENARIO_KEY, JSON.stringify(updated));
+  dbPushConfig({ scenario: updated }).catch(() => {});
+  scenarioBtnUpdate();
+  closeScenarioDrop();
+  showToast(`Cenário "${name}" salvo!`, '💾');
+}
+
+function scenarioBtnUpdate() {
+  const sc    = scenarioLoad();
+  const lbl   = document.getElementById('scenarioBtnLabel');
+  const nameEl = document.getElementById('scenarioName');
+  const dates  = document.getElementById('scenarioDates');
+  const name   = sc.name || 'Cenário';
+
+  if (lbl) lbl.textContent = name.length > 18 ? name.slice(0, 16) + '…' : name;
+  if (nameEl && !nameEl.matches(':focus')) nameEl.value = sc.name || '';
+
+  if (dates) {
+    const fmtDate = iso => iso
+      ? new Date(iso).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      : '—';
+    dates.innerHTML = sc.createdAt
+      ? `Criado em: ${fmtDate(sc.createdAt)}<br>Editado em: ${fmtDate(sc.updatedAt)}`
+      : 'Nenhum cenário salvo ainda.';
   }
-  listEl.innerHTML = saves.map((s, i) => `
-    <div class="sdrop-item" onclick="loadSave(${i});closeSavesDrop()" title="Carregar simulação" style="position:relative">
-      <div style="font-size:16px;flex-shrink:0">📋</div>
-      <div class="sdrop-item-info">
-        <div class="sdrop-item-name">${escHtml(s.name)}</div>
-        <div class="sdrop-item-meta">${escHtml(s.summary)} · ${escHtml(s.date)}</div>
-      </div>
-      <button class="sdrop-del" onclick="event.stopPropagation();openVersions(${i})" title="Histórico de versões" style="color:var(--t3);font-size:11px;background:none;border:none;cursor:pointer;padding:2px 4px">🕐</button>
-      <button class="sdrop-del" onclick="event.stopPropagation();deleteSave(${i})" title="Excluir">🗑</button>
-    </div>`).join('');
 }
 
-function toggleSavesDrop(e) {
-  e.stopPropagation();
-  document.getElementById('savesDrop').classList.toggle('open');
+// Inicializa o cenário na primeira vez (auto-cria ao salvar inputs)
+function scenarioAutoTouch() {
+  const sc = scenarioLoad();
+  if (!sc.createdAt) {
+    const now = new Date().toISOString();
+    const initial = { name: 'Meu Cenário', createdAt: now, updatedAt: now };
+    localStorage.setItem(SCENARIO_KEY, JSON.stringify(initial));
+    dbPushConfig({ scenario: initial }).catch(() => {});
+  }
+  scenarioBtnUpdate();
 }
-function closeSavesDrop() {
-  document.getElementById('savesDrop').classList.remove('open');
+
+// ── Dropdown ──
+function toggleScenarioDrop(e) {
+  e.stopPropagation();
+  const drop = document.getElementById('scenarioDrop');
+  drop.classList.toggle('open');
+  if (drop.classList.contains('open')) scenarioBtnUpdate();
+}
+function closeScenarioDrop() {
+  document.getElementById('scenarioDrop')?.classList.remove('open');
 }
 document.addEventListener('click', e => {
-  if (!document.getElementById('savesWrap').contains(e.target)) closeSavesDrop();
+  const wrap = document.getElementById('scenarioWrap');
+  if (wrap && !wrap.contains(e.target)) closeScenarioDrop();
 });
 
-// ── Open save modal ──
-function openSaveModal() {
-  const saves = loadSaves();
-  const hint  = document.getElementById('saveHint');
-  const over  = saves.length >= MAX_SAVES;
-  hint.textContent = over
-    ? `⚠️ Limite de ${MAX_SAVES} simulações atingido. Exclua uma antes.`
-    : `${saves.length} de ${MAX_SAVES} slots usados`;
-  hint.style.color = over ? 'var(--re)' : 'var(--t3)';
-  document.getElementById('saveName').value = '';
-  document.getElementById('smo').classList.add('open');
-  setTimeout(() => document.getElementById('saveName').focus(), 180);
-}
+// ════════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════════════════════════
 
-// ── Confirm save ──
-function confirmSave() {
-  const saves   = loadSaves();
-  const name    = document.getElementById('saveName').value.trim() || `Simulação ${new Date().toLocaleDateString('pt-BR')}`;
-  const inputs  = getInputs();
-  const g       = id => parseFloat(document.getElementById(id).value) || 0;
-  const f1      = calcFolha(g('p1bruto'), g('p1vr'), g('p1plr'));
-  const f2      = calcFolha(g('p2bruto'), g('p2vr'), g('p2plr'));
-  const renda   = f1.rendaReal + f2.rendaReal;
-  const anos    = parseInt(document.getElementById('anos').value) || 20;
-  const taxa    = document.getElementById('taxaAnual').value;
-  const summary = `Renda ${fmtK(renda)}/mês · ${anos} anos · ${taxa}% a.a.`;
-  const now     = new Date();
-  const date    = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
-  // Verifica se já existe simulação com o mesmo nome
-  const existsIdx = saves.findIndex(s => s.name === name);
-  if (existsIdx >= 0) {
-    // Pergunta: sobrescrever ou criar nova versão?
-    const choice = confirm(
-      `"${name}" já existe.
-
-OK → Criar nova versão (mantém histórico)
-Cancelar → Sobrescrever`
-    );
-    const existing = saves[existsIdx];
-    if (choice) {
-      // Nova versão — guarda o estado atual no histórico (máx 10 versões)
-      const versions = existing.versions || [];
-      versions.push({ inputs: existing.inputs, summary: existing.summary, savedAt: existing.date });
-      if (versions.length > 10) versions.splice(0, versions.length - 10); // mantém só as 10 mais recentes
-      saves[existsIdx] = { ...existing, inputs, summary, date, versions };
-    } else {
-      // Sobrescreve sem histórico adicional
-      saves[existsIdx] = { ...existing, inputs, summary, date };
-    }
-    persistSaves(saves);
-    dbPushSimulacoes(saves).catch(() => {});
-    document.getElementById('smo').classList.remove('open');
-    renderSavedList();
-    showToast(choice ? `"${name}" — nova versão salva!` : `"${name}" sobrescrita!`, '💾');
-    return;
-  }
-
-  // Nome novo — salva normalmente
-  if (saves.length >= MAX_SAVES) { showToast(`Limite de ${MAX_SAVES} slots atingido`, '⚠️'); return; }
-  saves.push({ id: dbUUID(), name, inputs, summary, date, versions: [] });
-  persistSaves(saves);
-  dbPushSimulacoes(saves).catch(() => {});
-  document.getElementById('smo').classList.remove('open');
-  renderSavedList();
-  showToast(`"${name}" salva com sucesso!`, '💾');
-}
-
-// ── Load / Delete ──
-function loadSave(i) {
-  const saves = loadSaves();
-  if (!saves[i]) return;
-  applyInputs(saves[i].inputs);
-  renderSavedList();
-  showToast(`"${saves[i].name}" carregada!`, '📋');
-}
-function deleteSave(i) {
-  const saves = loadSaves();
-  const name  = saves[i]?.name || 'Simulação';
-  saves.splice(i, 1);
-  persistSaves(saves);
-  dbPushSimulacoes(saves).catch(() => {});
-  renderSavedList();
-  showToast(`"${name}" excluída`, '🗑', 2500);
-}
-
-// ── Export JSON — exporta tudo: inputs, simulações salvas e acompanhamento ──
 function exportJSON() {
   const inputs  = getInputs();
   const g       = id => parseFloat(document.getElementById(id).value) || 0;
@@ -188,7 +139,7 @@ function exportJSON() {
   const anos    = parseInt(document.getElementById('anos').value) || 20;
   const taxa    = parseFloat(document.getElementById('taxaAnual').value) || 10;
   const payload = {
-    _schemaVersion: 2,  // incrementar ao mudar estrutura do payload para permitir migrações futuras
+    _schemaVersion: 2,
     meta: {
       app: 'SimFin · Simulador Financeiro Familiar',
       versao: '3.0',
@@ -197,12 +148,12 @@ function exportJSON() {
       projecaoAnos: anos,
       taxaAnual: taxa,
     },
+    cenario:        scenarioLoad(),
     inputs,
-    simulacoes:     JSON.parse(localStorage.getItem('simfin_saves')  || '[]'),
-    acompanhamento: JSON.parse(localStorage.getItem('simfin_track')  || '[]'),
-    metas:          JSON.parse(localStorage.getItem('simfin_goals')  || '[]'),
-    carteira:       JSON.parse(localStorage.getItem('simfin_carteira') || '[]'),
-    negociacoes:    JSON.parse(localStorage.getItem('simfin_negociacoes') || '[]'),
+    acompanhamento: JSON.parse(localStorage.getItem('simfin_track')         || '[]'),
+    metas:          JSON.parse(localStorage.getItem('simfin_goals')         || '[]'),
+    carteira:       JSON.parse(localStorage.getItem('simfin_carteira')      || '[]'),
+    negociacoes:    JSON.parse(localStorage.getItem('simfin_negociacoes')   || '[]'),
     movimentacoes:  JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]'),
     projecao: snaps.map(s => ({
       ano:             s.ano,
@@ -220,102 +171,71 @@ function exportJSON() {
   const a    = document.createElement('a');
   a.href = url; a.download = `simfin_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
   URL.revokeObjectURL(url);
-  showToast('Backup completo exportado! (inputs + simulações + acompanhamento)', '📦');
+  showToast('Backup exportado com sucesso!', '📦');
 }
 
-// ── Import JSON — restaura inputs, simulações salvas e acompanhamento ──
 function triggerImport() { document.getElementById('importInput').value=''; document.getElementById('importInput').click(); }
+
 function handleImport(event) {
   const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (!data.inputs && !data.simulacoes && !data.acompanhamento && !data.metas) throw new Error('Formato inválido');
+      if (!data.inputs && !data.acompanhamento && !data.metas) throw new Error('Formato inválido');
 
       const restored = [];
 
-      // Restaura inputs da simulação atual
-      if (data.inputs) {
-        applyInputs(data.inputs);
-        restored.push('configuração atual');
+      if (data.inputs) { applyInputs(data.inputs); restored.push('configuração'); }
+
+      if (data.cenario) {
+        localStorage.setItem(SCENARIO_KEY, JSON.stringify(data.cenario));
+        scenarioBtnUpdate();
       }
 
-      // Restaura simulações salvas (merge — não sobrescreve existentes)
-      if (data.simulacoes && Array.isArray(data.simulacoes) && data.simulacoes.length) {
-        const local  = loadSaves();
-        const merged = [...local];
-        data.simulacoes.forEach(ds => {
-          const exists = merged.findIndex(l => l.name === ds.name && l.date === ds.date);
-          if (exists < 0) merged.push(ds);
-        });
-        persistSaves(merged);
-        renderSavedList();
-        const novas = merged.length - local.length;
-        if (novas > 0) restored.push(`${novas} simulação(ões)`);
-      }
-
-      // Restaura acompanhamento (merge — não sobrescreve meses existentes)
-      if (data.acompanhamento && Array.isArray(data.acompanhamento) && data.acompanhamento.length) {
+      if (data.acompanhamento?.length) {
         const local  = JSON.parse(localStorage.getItem('simfin_track') || '[]');
         const merged = [...local];
         data.acompanhamento.forEach(dr => {
           const idx = merged.findIndex(l => l.mes === dr.mes);
           if (idx < 0) merged.push(dr);
-          else if (dr.registradoEm && new Date(dr.registradoEm) > new Date(merged[idx].registradoEm || 0)) {
+          else if (dr.registradoEm && new Date(dr.registradoEm) > new Date(merged[idx].registradoEm || 0))
             merged[idx] = dr;
-          }
         });
         merged.sort((a,b) => a.mes.localeCompare(b.mes));
         localStorage.setItem('simfin_track', JSON.stringify(merged));
         const novos = merged.length - local.length;
-        if (novos > 0) restored.push(`${novos} mês(es) de acompanhamento`);
+        if (novos > 0) restored.push(`${novos} mês(es)`);
       }
 
-      // Restaura metas (merge — não duplica por id)
-      if (data.metas && Array.isArray(data.metas) && data.metas.length) {
+      if (data.metas?.length) {
         const local  = JSON.parse(localStorage.getItem('simfin_goals') || '[]');
         const merged = [...local];
-        data.metas.forEach(dm => {
-          if (!merged.find(l => l.id === dm.id)) merged.push(dm);
-        });
+        data.metas.forEach(dm => { if (!merged.find(l => l.id === dm.id)) merged.push(dm); });
         localStorage.setItem('simfin_goals', JSON.stringify(merged));
         const novas = merged.length - local.length;
         if (novas > 0) restored.push(`${novas} meta(s)`);
       }
 
-      // Restaura carteira e histórico de negociações (schema v2+)
-      if (data.carteira && Array.isArray(data.carteira) && data.carteira.length) {
+      if (data.carteira?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_carteira') || '[]');
-        if (!local.length) {
-          localStorage.setItem('simfin_carteira', JSON.stringify(data.carteira));
-          restored.push('carteira');
-        }
+        if (!local.length) { localStorage.setItem('simfin_carteira', JSON.stringify(data.carteira)); restored.push('carteira'); }
       }
-      if (data.negociacoes && Array.isArray(data.negociacoes) && data.negociacoes.length) {
+      if (data.negociacoes?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_negociacoes') || '[]');
-        if (!local.length) {
-          localStorage.setItem('simfin_negociacoes', JSON.stringify(data.negociacoes));
-        }
+        if (!local.length) localStorage.setItem('simfin_negociacoes', JSON.stringify(data.negociacoes));
       }
-      if (data.movimentacoes && Array.isArray(data.movimentacoes) && data.movimentacoes.length) {
+      if (data.movimentacoes?.length) {
         const local = JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]');
-        if (!local.length) {
-          localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
-        }
+        if (!local.length) localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
       }
 
-      const msg = restored.length ? restored.join(', ') : 'dados';
-      showToast(`Importado: ${msg}`, '📂');
-
-      // Sincroniza com Drive se conectado
-
-    } catch(err) { showToast('Arquivo inválido ou corrompido', '❌', 4000); }
+      showToast(`Importado: ${restored.join(', ') || 'dados'}`, '📂');
+    } catch { showToast('Arquivo inválido ou corrompido', '❌', 4000); }
   };
   reader.readAsText(file);
 }
 
-// ── Export CSV ──
 function exportCSV() {
   if (!snaps.length) { showToast('Gere a simulação primeiro', '⚠️'); return; }
   const pcts = getPcts();
@@ -348,5 +268,3 @@ function exportCSV() {
   URL.revokeObjectURL(url);
   showToast('CSV exportado! Abra no Excel ou Google Sheets', '📊');
 }
-
-

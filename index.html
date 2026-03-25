@@ -94,7 +94,7 @@
         <span class="nav-tab-icon">🎯</span> Metas
       </button>
       <button class="nav-tab" id="tabReminder" onclick="switchScreen('reminder')">
-        <span class="nav-tab-icon">🔔</span> Lembretes
+        <span class="nav-tab-icon">🔔</span> Alertas
       </button>
     </div>
   </div>
@@ -105,46 +105,30 @@
     <!-- Badge regime (compacto) -->
     <span class="badge" id="badgeRegime" style="color: var(--ac); border-color: var(--bda); background: var(--acg);">CLT · 2026</span>
 
-    <!-- Grupo de ações principais -->
-    <div class="action-group">
-      <!-- Saves dropdown -->
-      <div class="saves-wrap" id="savesWrap">
-        <button class="act-btn ac" onclick="toggleSavesDrop(event)" title="Simulações salvas">
-          <span class="act-btn-icon">📁</span>
-          <span id="savesCountLbl">Salvas</span>
-        </button>
-        <div class="saves-drop" id="savesDrop">
-          <div class="saves-drop-header">
-            <span class="saves-drop-title">📁 Simulações Salvas</span>
-            <span class="saves-drop-count" id="savesDropCount">0 / 10</span>
+    <!-- Cenário atual -->
+    <div class="saves-wrap" id="scenarioWrap">
+      <button class="act-btn ac" onclick="toggleScenarioDrop(event)" id="scenarioBtn" title="Cenário atual">
+        <span class="act-btn-icon">📋</span>
+        <span id="scenarioBtnLabel">Cenário</span>
+      </button>
+      <div class="saves-drop" id="scenarioDrop" style="width:300px">
+        <div class="saves-drop-header">
+          <span class="saves-drop-title">📋 Cenário Atual</span>
+        </div>
+        <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div>
+            <label style="font-size:11px;color:var(--t2);font-weight:500;display:block;margin-bottom:4px">Nome do cenário</label>
+            <input class="sm-input" id="scenarioName" placeholder="Ex: Planejamento 2026" maxlength="60"
+              onkeydown="if(event.key==='Enter')scenarioSave()" style="font-size:12px;padding:7px 10px">
           </div>
-          <div class="saves-drop-list" id="savesDropList"><div class="saves-drop-empty">Nenhuma simulação salva ainda.</div></div>
-          <div class="saves-drop-footer">
-            <button class="saves-new-btn" onclick="closeSavesDrop();openSaveModal()">＋ Salvar simulação atual</button>
+          <div id="scenarioDates" style="font-size:10px;color:var(--t3);line-height:1.6"></div>
+          <button onclick="scenarioSave()" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);font-size:11px;font-weight:600;font-family:var(--fb);cursor:pointer;transition:all .15s">💾 Salvar cenário</button>
+          <div style="border-top:1px solid var(--bd);padding-top:8px;display:flex;gap:6px">
+            <button onclick="closeScenarioDrop();exportJSON()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📦 Exportar</button>
+            <button onclick="closeScenarioDrop();triggerImport()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📂 Importar</button>
+            <button onclick="closeScenarioDrop();exportCSV()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📊 CSV</button>
           </div>
         </div>
-      </div>
-      <button class="act-btn ac" onclick="openSaveModal()" title="Salvar simulação">
-        <span class="act-btn-icon">💾</span>
-        <span>Salvar</span>
-      </button>
-    </div>
-
-    <!-- Menu "Mais" para ações secundárias -->
-    <div class="more-wrap" id="moreWrap">
-      <button class="act-btn" onclick="toggleMoreMenu(event)" title="Mais opções" style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:6px 10px">
-        <span style="font-size:15px;line-height:1;letter-spacing:1px">···</span>
-      </button>
-      <div class="more-drop" id="moreDrop">
-        <button class="more-drop-item" onclick="exportJSON();closeMoreMenu()">
-          <span>📦</span> Exportar JSON (backup)
-        </button>
-        <button class="more-drop-item" onclick="triggerImport();closeMoreMenu()">
-          <span>📂</span> Importar JSON
-        </button>
-        <button class="more-drop-item" onclick="exportCSV();closeMoreMenu()">
-          <span>📊</span> Exportar CSV
-        </button>
       </div>
     </div>
 
@@ -171,7 +155,7 @@
     </div>
   </div>
   <!-- PJ-only fields -->
-  <div id="p1pjFields" class="pj-fields" style="display:none">
+  <div id="p1pjFields" c lass="pj-fields" style="display:none">
     <div class="pj-note">PJ: sem FGTS, 13° ou férias legais. Calcule o pró-labore e custos de empresa abaixo.</div>
     <div class="ir">
       <div class="ig"><label>Pró-labore (R$)</label><input type="number" id="p1prolabore" value="" min="0" oninput="calc()" title="Base mínima para INSS do sócio"></div>
@@ -717,142 +701,32 @@
 
 </div><!-- end screenMetas -->
 
-<!-- LEMBRETES SCREEN -->
+<!-- NOTIFICAÇÕES SCREEN -->
 <div id="screenReminder" class="screen-full" style="display:none">
 
-  <!-- Status atual -->
+  <!-- Cabeçalho -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-family:var(--fd);font-size:22px;color:var(--t1);line-height:1.2;margin-bottom:6px">Central de Notificações</div>
+      <div style="font-size:12px;color:var(--t3)">Alertas e lembretes salvos automaticamente na sua conta</div>
+    </div>
+    <button id="notifPermBtn" onclick="reminderRequestPermission()" style="display:none;padding:8px 16px;border-radius:8px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);font-size:12px;font-weight:600;font-family:var(--fb);cursor:pointer">
+      🔔 Permitir notificações
+    </button>
+  </div>
+
+  <!-- Status geral -->
   <div class="reminder-panel" id="reminderStatusPanel">
-    <div class="ph2"><span style="font-size:16px">🔔</span><span class="pt">Status do Lembrete</span></div>
-    <div style="padding:0 20px 20px">
-      <div class="reminder-status" id="reminderStatusBar">
-        <div class="reminder-dot off" id="reminderDot"></div>
-        <span id="reminderStatusText" style="color:var(--t2)">Nenhum lembrete configurado</span>
-        <button id="reminderCancelBtn" onclick="reminderCancel()" style="display:none;margin-left:auto;background:var(--reg);border:1px solid var(--re);color:var(--re);font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--fb)">Cancelar</button>
-      </div>
+    <div style="padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="reminder-dot off" id="reminderDot"></div>
+      <span id="reminderStatusText" style="font-size:12px;color:var(--t2)">Nenhuma notificação ativa</span>
+      <span id="notifPermStatus" style="margin-left:auto;font-size:10px;color:var(--t3)"></span>
     </div>
   </div>
 
-  <!-- Configuração -->
-  <div class="reminder-panel">
-    <div class="ph2"><span style="font-size:16px">⚙️</span><span class="pt">Configurar Lembrete Mensal</span></div>
-    <div class="reminder-form">
-
-      <!-- URL do Apps Script -->
-      <div class="reminder-ig" style="grid-column:1/-1">
-        <label>🔗 URL do Google Apps Script <span style="color:var(--t3);font-weight:400">(cole após o deploy)</span></label>
-        <input type="url" id="reminderScriptUrl" placeholder="https://script.google.com/macros/s/...exec" oninput="reminderSaveConfig()">
-        <div style="font-size:11px;color:var(--t3);margin-top:2px">
-          Siga as instruções abaixo para obter esta URL
-        </div>
-      </div>
-
-      <!-- Chave secreta -->
-      <div class="reminder-ig" style="grid-column:1/-1">
-        <label>🔑 Chave secreta <span style="color:var(--t3);font-weight:400">(deve ser igual à definida no Code.gs)</span></label>
-        <input type="password" id="reminderSecretKey" placeholder="Ex: minha-chave-super-secreta-2026" oninput="reminderSaveConfig()">
-        <div style="font-size:11px;color:var(--t3);margin-top:2px">
-          No Code.gs, substitua <code style="background:var(--bg5);padding:1px 5px;border-radius:4px;font-size:10px">DEFINA_SUA_CHAVE_AQUI</code> pela mesma chave que você digitar aqui
-        </div>
-      </div>
-
-      <div class="reminder-grid">
-        <div class="reminder-ig">
-          <label>📧 Seu e-mail</label>
-          <input type="email" id="reminderEmail" placeholder="seuemail@gmail.com" oninput="reminderSaveConfig()">
-        </div>
-        <div class="reminder-ig">
-          <label>📅 Dia do mês para receber</label>
-          <select id="reminderDia" onchange="reminderSaveConfig()">
-            <option value="1">1º dia do mês</option>
-            <option value="2">2º dia do mês</option>
-            <option value="3">3º dia do mês</option>
-            <option value="4">4º dia do mês</option>
-            <option value="5" selected="">5º dia do mês</option>
-            <option value="6">6º dia do mês</option>
-            <option value="7">7º dia do mês</option>
-            <option value="8">8º dia do mês</option>
-            <option value="9">9º dia do mês</option>
-            <option value="10">10º dia do mês</option>
-            <option value="11">11º dia do mês</option>
-            <option value="12">12º dia do mês</option>
-            <option value="13">13º dia do mês</option>
-            <option value="14">14º dia do mês</option>
-            <option value="15">15º dia do mês</option>
-            <option value="16">16º dia do mês</option>
-            <option value="17">17º dia do mês</option>
-            <option value="18">18º dia do mês</option>
-            <option value="19">19º dia do mês</option>
-            <option value="20">20º dia do mês</option>
-            <option value="21">21º dia do mês</option>
-            <option value="22">22º dia do mês</option>
-            <option value="23">23º dia do mês</option>
-            <option value="24">24º dia do mês</option>
-            <option value="25">25º dia do mês</option>
-            <option value="26">26º dia do mês</option>
-            <option value="27">27º dia do mês</option>
-            <option value="28">28º dia do mês</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-        <button class="track-btn" onclick="reminderTest()" style="background:var(--bg6);border:1px solid var(--bd);color:var(--t2);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb)">
-          📧 Enviar e-mail de teste
-        </button>
-        <button class="track-btn primary" onclick="reminderSchedule()">
-          🔔 Ativar Lembrete
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Instruções -->
-  <div class="reminder-panel">
-    <div class="ph2"><span style="font-size:16px">📋</span><span class="pt">Como configurar o Google Apps Script</span></div>
-    <div style="padding:0 20px 20px;display:flex;flex-direction:column;gap:12px">
-
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">1</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6">
-          Acesse <a href="https://script.google.com" target="_blank" style="color:var(--ac)">script.google.com</a> e clique em <strong style="color:var(--t1)">Novo projeto</strong>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">2</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6">
-          Apague o código existente e cole o código do arquivo <strong style="color:var(--t1)">Code.gs</strong> que você baixou junto com o SimFin
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">3</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6">
-          Clique em <strong style="color:var(--t1)">Implantar → Nova implantação</strong><br>
-          Tipo: <strong style="color:var(--t1)">Aplicativo da Web</strong><br>
-          Executar como: <strong style="color:var(--t1)">Eu</strong><br>
-          Quem tem acesso: <strong style="color:var(--t1)">Qualquer pessoa</strong>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">4</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6">
-          Copie a <strong style="color:var(--t1)">URL do aplicativo da web</strong> gerada e cole no campo acima
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;align-items:flex-start">
-        <div style="width:24px;height:24px;background:var(--acg);border:1px solid var(--bda);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0">5</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6">
-          Preencha seu e-mail, escolha o dia e clique em <strong style="color:var(--t1)">Ativar Lembrete</strong>
-        </div>
-      </div>
-
-      <div style="background:var(--bg6);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--t3);line-height:1.6;margin-top:4px">
-        💡 <strong style="color:var(--t2)">100% gratuito.</strong> O Apps Script roda na sua conta Google. Os e-mails são enviados pelo Gmail sem custo até 100/dia (mais que suficiente).
-      </div>
-    </div>
+  <!-- Cards de notificação (renderizados via JS) -->
+  <div id="notifCardsList" style="display:flex;flex-direction:column;gap:12px">
+    <!-- Renderizado por reminderRenderCards() -->
   </div>
 
 </div><!-- end screenReminder -->
@@ -1017,49 +891,11 @@
   </div>
 </div>
 
-<!-- VERSIONS MODAL -->
-<div class="edit-modal" id="versionsModal" onclick="if(event.target===this)closeVersions()">
-  <div class="edit-box" style="max-width:480px">
-    <div class="edit-header">
-      <span style="font-size:13px;font-weight:600;color:var(--t1)">🕐 Histórico de Versões</span>
-      <button class="mcl" onclick="closeVersions()">✕</button>
-    </div>
-    <div class="edit-body">
-      <div style="font-size:12px;color:var(--t2);margin-bottom:8px" id="versionsSimName"></div>
-      <div class="ver-list" id="versionsList"></div>
-    </div>
-    <div class="edit-actions">
-      <button class="sm-btn cancel" onclick="closeVersions()">Fechar</button>
-    </div>
-  </div>
-</div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastMsg"></span></div>
 
 <!-- Hidden file input for JSON import -->
 <input type="file" id="importInput" accept=".json" style="display:none" onchange="handleImport(event)">
-
-<!-- SAVE NAME MODAL -->
-<div class="smo" id="smo" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="smbox">
-    <div class="smh">
-      <span class="smt">💾 Salvar Simulação</span>
-      <button class="mcl" onclick="document.getElementById('smo').classList.remove('open')">✕</button>
-    </div>
-    <div class="smb">
-      <div>
-        <label style="font-size:11px;color:var(--t2);font-weight:500;display:block;margin-bottom:6px">Nome da simulação</label>
-        <input class="sm-input" id="saveName" placeholder="Ex: Cenário Otimista 2025" maxlength="60" onkeydown="if(event.key==='Enter')confirmSave()">
-      </div>
-      <div class="sm-hint" id="saveHint" style="font-size:11px;color:var(--t3)"></div>
-      <div class="sm-row">
-        <button class="sm-btn cancel" onclick="document.getElementById('smo').classList.remove('open')">Cancelar</button>
-        <button class="sm-btn confirm" onclick="confirmSave()">Salvar ✓</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script src="js/payroll.js"></script>
 <script src="js/utils.js"></script>
@@ -1067,6 +903,7 @@
 <script src="js/app.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/goals.js"></script>
+<script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/reminders.js"></script>
 <script src="js/modals.js"></script>

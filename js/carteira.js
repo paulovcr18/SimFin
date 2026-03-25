@@ -1501,7 +1501,8 @@ function carteiraSyncPatrimonio() {
 }
 
 // ── Init ──
-renderSavedList();
+scenarioAutoTouch();
+reminderCheckDue();
 // Restaura últimos inputs usados (se houver)
 if (autoRestoreInputs()) {
   updAno();

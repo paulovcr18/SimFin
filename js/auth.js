@@ -224,7 +224,8 @@ async function authOnLogin(user) {
     try { carteiraMigrar(); renderCarteira(); } catch(e) {}
     try { renderGoals(); }                     catch(e) {}
     try { renderTrack(); }                     catch(e) {}
-    try { reminderUpdateUI(); }                catch(e) {}
+    try { scenarioAutoTouch(); }               catch(e) {}
+    try { reminderUpdateUI(); reminderCheckDue(); } catch(e) {}
   }
 }
 

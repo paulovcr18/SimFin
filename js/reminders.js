@@ -1,139 +1,259 @@
 // ════════════════════════════════════════════════════════════════
-// LEMBRETES — Google Apps Script integration
+// CENTRAL DE NOTIFICAÇÕES — alertas automáticos baseados nos dados
 // ════════════════════════════════════════════════════════════════
 
-const REMINDER_KEY = 'simfin_reminder_config';
+// REMINDER_KEY definido em storage.js
 
 function reminderLoadConfig() {
   try { return JSON.parse(localStorage.getItem(REMINDER_KEY)) || {}; } catch { return {}; }
 }
-function reminderSaveConfig() {
-  const cfg = reminderLoadConfig();
-  cfg.scriptUrl  = document.getElementById('reminderScriptUrl')?.value?.trim()  || cfg.scriptUrl;
-  cfg.secretKey  = document.getElementById('reminderSecretKey')?.value?.trim()  || cfg.secretKey;
-  cfg.email      = document.getElementById('reminderEmail')?.value?.trim()      || cfg.email;
-  cfg.dia        = parseInt(document.getElementById('reminderDia')?.value)      || cfg.dia;
-  localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
-  dbPushConfig({ lembretes: cfg }).catch(() => {});
+
+// ── Pedir permissão de notificação do browser ──
+function reminderRequestPermission() {
+  if (!('Notification' in window)) { showToast('Navegador não suporta notificações', '⚠️'); return; }
+  Notification.requestPermission().then(p => {
+    reminderUpdatePermStatus();
+    if (p === 'granted') showToast('Notificações ativadas!', '🔔');
+    else showToast('Permissão negada', '🔕');
+  });
 }
 
-function reminderUpdateUI() {
-  const cfg = reminderLoadConfig();
+function reminderUpdatePermStatus() {
+  const btn  = document.getElementById('notifPermBtn');
+  const txt  = document.getElementById('notifPermStatus');
+  if (!('Notification' in window)) {
+    if (btn) btn.style.display = 'none';
+    if (txt) txt.textContent = 'Navegador não suporta notificações';
+    return;
+  }
+  const perm = Notification.permission;
+  if (btn) btn.style.display = perm === 'granted' ? 'none' : '';
+  if (txt) {
+    const map = { granted: '✅ Permitido', denied: '❌ Bloqueado', default: '⏸ Não solicitado' };
+    txt.textContent = map[perm] || '';
+  }
+}
 
-  // Preenche campos com config salva
-  const urlEl = document.getElementById('reminderScriptUrl');
-  const keyEl = document.getElementById('reminderSecretKey');
-  const emEl  = document.getElementById('reminderEmail');
-  const diaEl = document.getElementById('reminderDia');
-  if (urlEl && cfg.scriptUrl) urlEl.value = cfg.scriptUrl;
-  if (keyEl && cfg.secretKey) keyEl.value = cfg.secretKey;
-  if (emEl  && cfg.email)     emEl.value  = cfg.email;
-  if (diaEl && cfg.dia)       diaEl.value = cfg.dia;
+// ── Envia notificação nativa ──
+function reminderNotify(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
+  }
+}
 
-  // Status
-  const dot     = document.getElementById('reminderDot');
-  const txt     = document.getElementById('reminderStatusText');
-  const cancelB = document.getElementById('reminderCancelBtn');
+// ── Gera cards de alerta a partir dos dados ──
+function reminderBuildAlerts() {
+  const alerts = [];
+  const track  = JSON.parse(localStorage.getItem('simfin_track') || '[]');
+  const goals  = JSON.parse(localStorage.getItem('simfin_goals') || '[]');
+  const now    = new Date();
+  const mesAtual = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-  if (cfg.ativo && cfg.email && cfg.dia) {
-    dot.className = 'reminder-dot on';
-    txt.innerHTML = `Ativo · e-mail para <strong style="color:var(--t1)">${cfg.email}</strong> todo dia <strong style="color:var(--ac)">${cfg.dia}</strong> do mês`;
-    txt.style.color = 'var(--ac)';
-    if (cancelB) cancelB.style.display = 'block';
+  // 1) Lembrete de acompanhamento mensal
+  const jaRegistrouMes = track.some(t => t.mes === mesAtual);
+  if (!jaRegistrouMes) {
+    alerts.push({
+      id: 'track_mensal',
+      icon: '📊',
+      color: 'ac',
+      title: 'Registrar acompanhamento',
+      body: `Você ainda não registrou o mês de ${now.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}. Mantenha seu histórico atualizado!`,
+      action: () => { switchScreen('track'); },
+      actionLabel: 'Ir para Acompanhamento'
+    });
+  }
+
+  // 2) Metas próximas do prazo
+  goals.forEach(g => {
+    if (!g.dataLimite || g.concluida) return;
+    const diff = Math.round((new Date(g.dataLimite) - now) / 86400000);
+    if (diff >= 0 && diff <= 30) {
+      alerts.push({
+        id: 'meta_' + g.id,
+        icon: '🎯',
+        color: 'go',
+        title: `Meta "${g.nome}" vence em ${diff} dia${diff !== 1 ? 's' : ''}`,
+        body: `Valor: R$ ${(g.valor||0).toLocaleString('pt-BR')} · Prazo: ${new Date(g.dataLimite).toLocaleDateString('pt-BR')}`,
+        action: () => { switchScreen('goals'); },
+        actionLabel: 'Ver Metas'
+      });
+    }
+  });
+
+  // 3) Metas vencidas
+  goals.forEach(g => {
+    if (!g.dataLimite || g.concluida) return;
+    const diff = Math.round((new Date(g.dataLimite) - now) / 86400000);
+    if (diff < 0) {
+      alerts.push({
+        id: 'meta_vencida_' + g.id,
+        icon: '⚠️',
+        color: 're',
+        title: `Meta "${g.nome}" venceu há ${Math.abs(diff)} dia${Math.abs(diff) !== 1 ? 's' : ''}`,
+        body: `Considere atualizar o prazo ou marcar como concluída.`,
+        action: () => { switchScreen('goals'); },
+        actionLabel: 'Ver Metas'
+      });
+    }
+  });
+
+  // 4) Queda de patrimônio sem resgate
+  if (track.length >= 2) {
+    const sorted = [...track].sort((a, b) => a.mes.localeCompare(b.mes));
+    const last = sorted[sorted.length - 1];
+    const prev = sorted[sorted.length - 2];
+    if (last.patrimonio < prev.patrimonio && !last.resgate) {
+      const queda = prev.patrimonio - last.patrimonio;
+      alerts.push({
+        id: 'queda_pat',
+        icon: '📉',
+        color: 're',
+        title: 'Queda no patrimônio detectada',
+        body: `De R$ ${prev.patrimonio.toLocaleString('pt-BR')} para R$ ${last.patrimonio.toLocaleString('pt-BR')} (−R$ ${queda.toLocaleString('pt-BR')}) sem resgate registrado.`,
+        action: () => { switchScreen('track'); },
+        actionLabel: 'Verificar'
+      });
+    }
+  }
+
+  // 5) Sem acompanhamento há 2+ meses
+  if (track.length > 0) {
+    const sorted = [...track].sort((a, b) => a.mes.localeCompare(b.mes));
+    const lastMes = sorted[sorted.length - 1].mes;
+    const [ly, lm] = lastMes.split('-').map(Number);
+    const lastDate = new Date(ly, lm - 1);
+    const diffMonths = (now.getFullYear() - lastDate.getFullYear()) * 12 + (now.getMonth() - lastDate.getMonth());
+    if (diffMonths >= 2) {
+      alerts.push({
+        id: 'track_atrasado',
+        icon: '⏰',
+        color: 'go',
+        title: `${diffMonths} meses sem registrar acompanhamento`,
+        body: 'A consistência é fundamental para acompanhar sua evolução patrimonial.',
+        action: () => { switchScreen('track'); },
+        actionLabel: 'Registrar agora'
+      });
+    }
+  }
+
+  // 6) Cenário sem salvar
+  const sc = JSON.parse(localStorage.getItem(SCENARIO_KEY) || '{}');
+  if (!sc.createdAt) {
+    alerts.push({
+      id: 'cenario_vazio',
+      icon: '💾',
+      color: 'pu',
+      title: 'Cenário não salvo',
+      body: 'Salve seu cenário para manter backup dos seus dados de simulação.',
+      action: () => { document.getElementById('scenarioBtn')?.click(); },
+      actionLabel: 'Salvar Cenário'
+    });
+  }
+
+  return alerts;
+}
+
+// ── Renderiza os cards ──
+function reminderRenderCards() {
+  const container = document.getElementById('notifCardsList');
+  if (!container) return;
+
+  const alerts = reminderBuildAlerts();
+  const dismissed = JSON.parse(localStorage.getItem('simfin_dismissed_alerts') || '[]');
+  const active = alerts.filter(a => !dismissed.includes(a.id));
+
+  // Atualiza status
+  const dot = document.getElementById('reminderDot');
+  const txt = document.getElementById('reminderStatusText');
+  if (active.length > 0) {
+    if (dot) dot.className = 'reminder-dot on';
+    if (txt) { txt.textContent = `${active.length} alerta${active.length > 1 ? 's' : ''} ativo${active.length > 1 ? 's' : ''}`; txt.style.color = 'var(--ac)'; }
   } else {
-    dot.className = 'reminder-dot off';
-    txt.textContent = 'Nenhum lembrete ativo';
-    txt.style.color = 'var(--t2)';
-    if (cancelB) cancelB.style.display = 'none';
+    if (dot) dot.className = 'reminder-dot off';
+    if (txt) { txt.textContent = 'Nenhum alerta no momento — tudo em dia!'; txt.style.color = 'var(--t2)'; }
+  }
+
+  if (active.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;color:var(--t3)">
+        <div style="font-size:40px;margin-bottom:12px">✅</div>
+        <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:4px">Tudo em dia!</div>
+        <div style="font-size:12px">Nenhuma ação pendente no momento.</div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = active.map(a => `
+    <div class="notif-card notif-${a.color}" data-alert-id="${a.id}">
+      <div class="notif-card-icon">${a.icon}</div>
+      <div class="notif-card-body">
+        <div class="notif-card-title">${escHtml(a.title)}</div>
+        <div class="notif-card-text">${escHtml(a.body)}</div>
+        <div class="notif-card-actions">
+          <button class="notif-action-btn" onclick="reminderAlertAction('${a.id}')">${a.actionLabel}</button>
+          <button class="notif-dismiss-btn" onclick="reminderDismiss('${a.id}')">Dispensar</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Armazena callbacks para os botões de ação
+  window._notifActions = {};
+  active.forEach(a => { window._notifActions[a.id] = a.action; });
+}
+
+function reminderAlertAction(id) {
+  if (window._notifActions && window._notifActions[id]) window._notifActions[id]();
+}
+
+function reminderDismiss(id) {
+  const dismissed = JSON.parse(localStorage.getItem('simfin_dismissed_alerts') || '[]');
+  if (!dismissed.includes(id)) {
+    dismissed.push(id);
+    localStorage.setItem('simfin_dismissed_alerts', JSON.stringify(dismissed));
+  }
+  reminderRenderCards();
+}
+
+// ── Limpa dismissals antigos a cada dia ──
+function reminderResetDismissals() {
+  const key = 'simfin_dismissed_reset';
+  const today = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem(key) !== today) {
+    localStorage.removeItem('simfin_dismissed_alerts');
+    localStorage.setItem(key, today);
   }
 }
 
-// ── Monta URL com parâmetros GET (evita CORS do navegador) ──
-function reminderBuildUrl(baseUrl, params) {
-  const u = new URL(baseUrl);
-  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
-  return u.toString();
-}
+// ── Verifica alertas e envia notificação browser se houver pendências ──
+function reminderCheckDue() {
+  reminderResetDismissals();
+  const alerts = reminderBuildAlerts();
+  const dismissed = JSON.parse(localStorage.getItem('simfin_dismissed_alerts') || '[]');
+  const active = alerts.filter(a => !dismissed.includes(a.id));
 
-async function reminderFetch(url) {
-  const res  = await fetch(url);
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { throw new Error('Resposta inválida do script'); }
-}
+  // Badge no tab
+  const tab = document.getElementById('tabReminder');
+  if (tab) {
+    const existing = tab.querySelector('.notif-badge');
+    if (existing) existing.remove();
+    if (active.length > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'notif-badge';
+      badge.textContent = active.length;
+      tab.appendChild(badge);
+    }
+  }
 
-async function reminderSchedule() {
-  const cfg   = reminderLoadConfig();
-  const url   = document.getElementById('reminderScriptUrl')?.value?.trim();
-  const email = document.getElementById('reminderEmail')?.value?.trim();
-  const dia   = parseInt(document.getElementById('reminderDia')?.value);
-
-  const secretKey = document.getElementById('reminderSecretKey')?.value?.trim();
-  if (!url)       { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
-  if (!email)     { showToast('Informe seu e-mail', '⚠️'); return; }
-  if (!secretKey) { showToast('Informe a chave secreta', '⚠️'); return; }
-  if (!url.includes('script.google.com')) { showToast('URL inválida', '❌'); return; }
-
-  showToast('Configurando lembrete...', '⏳', 30000);
-
-  try {
-    const token = cfg.token || ('tk_' + Date.now().toString(36));
-    const fullUrl = reminderBuildUrl(url, {
-      action: 'schedule', email, dia, key: secretKey,
-      appUrl: 'https://paulovcr18.github.io/SimFin/',
-      nome: 'SimFin', token,
-    });
-    const data = await reminderFetch(fullUrl);
-    if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
-
-    const newCfg = { scriptUrl: url, email, dia, token: data.token || token, secretKey, ativo: true };
-    localStorage.setItem(REMINDER_KEY, JSON.stringify(newCfg));
-    dbPushConfig({ lembretes: newCfg }).catch(() => {});
-    reminderUpdateUI();
-    showToast(`🔔 Lembrete ativo! E-mail todo dia ${dia} do mês.`, '🔔', 5000);
-  } catch(e) {
-    console.error('[Reminder]', e);
-    showToast('Erro: ' + e.message, '❌', 6000);
+  // Notificação browser (1x por sessão)
+  if (active.length > 0 && !window._notifSent) {
+    window._notifSent = true;
+    reminderNotify('SimFin', `Você tem ${active.length} alerta${active.length > 1 ? 's' : ''} pendente${active.length > 1 ? 's' : ''}`);
   }
 }
 
-async function reminderTest() {
-  const url   = document.getElementById('reminderScriptUrl')?.value?.trim();
-  const email = document.getElementById('reminderEmail')?.value?.trim();
-
-  const secretKeyT = document.getElementById('reminderSecretKey')?.value?.trim();
-  if (!url)        { showToast('Cole a URL do Google Apps Script', '⚠️'); return; }
-  if (!email)      { showToast('Informe seu e-mail', '⚠️'); return; }
-  if (!secretKeyT) { showToast('Informe a chave secreta', '⚠️'); return; }
-
-  showToast('Enviando e-mail de teste...', '📧', 15000);
-
-  try {
-    const fullUrl = reminderBuildUrl(url, {
-      action: 'test', email, key: secretKeyT,
-      appUrl: 'https://paulovcr18.github.io/SimFin/',
-      nome: 'SimFin',
-    });
-    const data = await reminderFetch(fullUrl);
-    if (!data.ok) throw new Error(data.error);
-    showToast('E-mail de teste enviado! Verifique sua caixa.', '✅', 5000);
-  } catch(e) {
-    showToast('Erro: ' + e.message, '❌', 5000);
-  }
+// ── UI update (chamado por auth.js) ──
+function reminderUpdateUI() {
+  reminderUpdatePermStatus();
+  reminderRenderCards();
 }
-
-async function reminderCancel() {
-  const cfg = reminderLoadConfig();
-  if (cfg.scriptUrl && cfg.token) {
-    try {
-      const fullUrl = reminderBuildUrl(cfg.scriptUrl, { action: 'cancel', token: cfg.token, key: cfg.secretKey || '' });
-      await reminderFetch(fullUrl);
-    } catch(e) { console.warn('[Reminder cancel]', e); }
-  }
-  cfg.ativo = false;
-  localStorage.setItem(REMINDER_KEY, JSON.stringify(cfg));
-  dbPushConfig({ lembretes: cfg }).catch(() => {});
-  reminderUpdateUI();
-  showToast('Lembrete cancelado', '🔕', 3000);
-}
-
-

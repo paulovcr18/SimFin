@@ -131,6 +131,8 @@ async function _dbPullConfig(uid) {
   if (data.brapi_token) localStorage.setItem(CART_TOKEN_KEY, data.brapi_token);
   if (data.lembretes && Object.keys(data.lembretes).length)
     localStorage.setItem(REMINDER_KEY, JSON.stringify(data.lembretes));
+  if (data.scenario && data.scenario.name)
+    localStorage.setItem(SCENARIO_KEY, JSON.stringify(data.scenario));
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
