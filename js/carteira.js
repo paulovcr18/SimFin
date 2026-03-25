@@ -1277,34 +1277,27 @@ function tesouroSyntheticTicker(produto) {
 // TESOURO_CACHE_KEY já definido em tesouro-api.js — não redeclarar aqui
 
 async function tesouroFetchPrices() {
-  // Fonte 1: Edge Function Supabase (deploy com ?tesouro=1)
-  try {
-    const res  = await fetch(`${COTACOES_FN}?tesouro=1`,
-      { headers: { 'apikey': SUPABASE_ANON }, cache: 'no-store' });
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.results?.length) {
-        // Persiste no cache local com timestamp
-        localStorage.setItem(TESOURO_CACHE_KEY, JSON.stringify({
-          ts: Date.now(), results: data.results,
-        }));
-        return data.results;
-      }
-    }
-  } catch(e) { console.warn('[Tesouro] Edge Function indisponível, tentando cache local...'); }
+  // Obter ativos de Tesouro da carteira e suas movimentações para extrair titulos
+  const ativos = carteiraLoad().filter(a => a.tipo === 'tesouro');
+  if (!ativos.length) return [];
 
-  // Fonte 2: cache local com última cotação bem-sucedida (válido por 24h)
-  try {
-    const cached = JSON.parse(localStorage.getItem(TESOURO_CACHE_KEY) || 'null');
-    if (cached?.results?.length && (Date.now() - cached.ts) < 86400_000) {
-      const horas = Math.round((Date.now() - cached.ts) / 3600_000);
-      console.info(`[Tesouro] Usando cache local (${horas}h atrás)`);
-      return cached.results.map(r => ({ ...r, _fromCache: true, _cacheAge: horas }));
-    }
-  } catch(e) { /* cache corrompido — ignora */ }
+  // Mapear nomes dos ativos para títulos normalizados
+  const titulos = [...new Set(
+    ativos.map(a => tesouroNormalizarTitulo(a.nome)).filter(Boolean)
+  )];
 
-  console.warn('[Tesouro] Sem cotação disponível (Edge Function offline, sem cache válido)');
-  return null;
+  if (!titulos.length) return [];
+
+  // Consultar cotações via API AA40
+  const cotacoes = await tesouroFetchMultiplos(titulos);
+
+  // Converter para formato esperado (compatível com a UI)
+  return Object.entries(cotacoes).map(([titulo, cot]) => ({
+    nome: titulo,
+    preco: cot.pu,
+    taxa: cot.taxa,
+    _fromCache: false,
+  }));
 }
 
 // ── Toggle tipo de ativo no formulário ──
