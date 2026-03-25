@@ -1276,15 +1276,20 @@ function tesouroSyntheticTicker(produto) {
 
 // TESOURO_CACHE_KEY já definido em tesouro-api.js — não redeclarar aqui
 
-async function tesouroFetchPrices() {
-  // Obter ativos de Tesouro da carteira e suas movimentações para extrair titulos
-  const ativos = carteiraLoad().filter(a => a.tipo === 'tesouro');
-  if (!ativos.length) return [];
+async function tesouroFetchPrices(titulosEspecificos = null) {
+  // Se passaram títulos específicos, usa-os. Senão, extrai dos ativos carregados
+  let titulos = [];
 
-  // Mapear nomes dos ativos para títulos normalizados
-  const titulos = [...new Set(
-    ativos.map(a => tesouroNormalizarTitulo(a.nome)).filter(Boolean)
-  )];
+  if (titulosEspecificos && titulosEspecificos.length) {
+    // Usado ao adicionar novo Tesouro: recebe título(s) do formulário
+    titulos = titulosEspecificos.map(t => tesouroNormalizarTitulo(t)).filter(Boolean);
+  } else {
+    // Usado ao atualizar cotações: extrai de ativos já carregados
+    const ativos = carteiraLoad().filter(a => a.tipo === 'tesouro');
+    titulos = [...new Set(
+      ativos.map(a => tesouroNormalizarTitulo(a.nome)).filter(Boolean)
+    )];
+  }
 
   if (!titulos.length) return [];
 
@@ -1339,7 +1344,7 @@ async function carteiraAddTesouro() {
 
   carteiraSetStatus(statusEl, `Buscando preço do ${tipoTitulo}...`, 'load');
 
-  const prices = await tesouroFetchPrices();
+  const prices = await tesouroFetchPrices([tipoTitulo]);
   let precoUnit  = null;
   let nomeCompleto = tipoTitulo + (venc ? ' ' + venc : '');
 
