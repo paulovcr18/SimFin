@@ -58,11 +58,12 @@ function tesouroComputarPosicoes(movims) {
         nome:             t.nome,
         qtd:              Math.round(t.qtd * 10000) / 10000,
         pmedio,
-        preco:            pmedio,  // melhor estimativa até próximo refresh
+        preco:            pmedio,   // melhor estimativa até próximo refresh
+        precoEstimado:    true,     // sinaliza que preco = custo, não mercado
         variacao:         0,
         tipo:             'tesouro',
         categoria:        'tesouro',
-        valorInvestido:   Math.round(t.totalCusto * 100) / 100,
+        valorInvestido:   Math.round(Math.max(0, t.totalCusto) * 100) / 100,
         fromMovimentacao: true,
       };
     });
@@ -158,7 +159,42 @@ function carteiraMigrar() {
 }
 
 function carteiraLimparHistorico() {
-  if (!confirm('Isso vai apagar todos os ativos, negociações e movimentações importadas.\nVocê precisará reimportar os arquivos da B3.\n\nContinuar?')) return;
+  // 1ª confirmação
+  if (!confirm(
+    '⚠️ ATENÇÃO — Esta ação é irreversível!\n\n' +
+    'Isso vai apagar todos os ativos, negociações e movimentações importadas da B3.\n' +
+    'Você precisará reimportar os arquivos.\n\n' +
+    'Continuar?'
+  )) return;
+
+  // 2ª confirmação — palavra-chave para evitar clique acidental
+  const confirmacao = prompt('Para confirmar, digite a palavra  LIMPAR  em maiúsculas:');
+  if (confirmacao?.trim() !== 'LIMPAR') {
+    showToast('Operação cancelada', 'ℹ️', 2500);
+    return;
+  }
+
+  // Auto-backup antes de deletar
+  try {
+    const backup = {
+      _schemaVersion: 1,
+      _backupAt: new Date().toISOString(),
+      _motivo: 'auto-backup antes de limpar histórico',
+      carteira:      carteiraLoad(),
+      negociacoes:   negocLoad(),
+      movimentacoes: movimLoad(),
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `simfin-backup-carteira-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    console.warn('[SimFin] Auto-backup falhou antes de limpar histórico:', e);
+  }
+
   localStorage.removeItem(CART_KEY);
   localStorage.removeItem(NEGOC_KEY);
   localStorage.removeItem(MOVIM_KEY);
@@ -166,7 +202,7 @@ function carteiraLimparHistorico() {
   dbPushCarteira([]).catch(() => {});
   dbPushHistorico([], []).catch(() => {});
   carteiraRenderList();
-  showToast('Histórico apagado. Reimporte os arquivos da B3.', '🗑', 4000);
+  showToast('Histórico apagado. Backup salvo automaticamente.', '🗑', 5000);
 }
 
 function carteiraUpdateUI() {
@@ -242,40 +278,8 @@ function carteiraRemove(ticker) {
   showToast(`${ticker} removido`, '🗑', 2000);
 }
 
-// ── Atualizar cotações de todos os ativos ──
-async function carteiraRefresh() {
-  const ativos = carteiraLoad();
-  if (!ativos.length) return;
-  const btn = document.getElementById('cartRefreshBtn');
-  if (btn) { btn.textContent = '⏳ Atualizando...'; btn.disabled = true; }
-
-  const tickers = ativos.map(a => a.ticker);
-  const quotes  = await carteiraBuscarCotacao(tickers);
-
-  if (!quotes) {
-    showToast('Erro ao buscar cotações', '❌', 3000);
-    if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
-    return;
-  }
-
-  const agora = new Date().toISOString();
-  const updated = ativos.map(a => {
-    const q = quotes[a.ticker];
-    if (!q) return a;
-    return {
-      ...a,
-      preco:     q.regularMarketPrice,
-      variacao:  q.regularMarketChangePercent,
-      nome:      q.shortName || q.longName || a.nome,
-      updatedAt: agora,
-    };
-  });
-
-  carteiraSave(updated);
-  carteiraRenderList();
-  if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
-  showToast('Cotações atualizadas!', '✅', 3000);
-}
+// ── Rate-limit: impede refresh em menos de 60s (usado pela função abaixo) ──
+let _lastRefreshTs = 0;
 
 // ── Buscar cotações via BRAPI (com batching e cache-busting) ──
 // ── Cotações: Edge Function (Yahoo Finance proxy) com fallback BRAPI ─────────
@@ -418,8 +422,19 @@ function carteiraRenderList() {
   if (countEl)    countEl.textContent = `${ativos.length} ativo${ativos.length!==1?'s':''}`;
 
   const lastUpdate = ativos.map(a=>a.updatedAt).filter(Boolean).sort().pop();
-  if (lastEl && lastUpdate)
-    lastEl.textContent = 'atualizado ' + new Date(lastUpdate).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  if (lastEl) {
+    if (lastUpdate) {
+      const dt = new Date(lastUpdate);
+      const hoje = new Date();
+      const mesmodia = dt.toDateString() === hoje.toDateString();
+      const dtStr = mesmodia
+        ? dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+        : dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) + ' ' + dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      lastEl.textContent = `cotações ${dtStr}`;
+    } else {
+      lastEl.textContent = 'cotações não atualizadas';
+    }
+  }
 
   // ── Métricas ──
   const mInv = document.getElementById('metricInvestido');
@@ -469,8 +484,12 @@ function carteiraRenderList() {
         <td class="r" style="color:var(--t2)">${a.qtd?.toLocaleString('pt-BR')}</td>
         <td class="r" style="color:var(--t3)">${a.pmedio ? fmt(a.pmedio) : '—'}</td>
         <td class="r">
-          <div style="color:var(--t1)">${a.preco ? fmt(a.preco) : '—'}</div>
-          ${a.variacao!=null ? `<div style="font-size:10px;color:${varCls}">${a.variacao>=0?'+':''}${a.variacao.toFixed(2)}%</div>` : ''}
+          <div style="color:${a.precoEstimado?'var(--t3)':'var(--t1)'}">
+            ${a.precoEstimado?'<span title="Preço estimado (custo médio) — clique em Atualizar cotações para ver o valor de mercado" style="font-size:9px;color:var(--go);margin-right:2px;vertical-align:middle">~</span>':''}${a.preco ? fmt(a.preco) : '—'}
+          </div>
+          ${a.precoEstimado
+            ? `<div style="font-size:9px;color:var(--t3)">custo — atualizar</div>`
+            : (a.variacao!=null ? `<div style="font-size:10px;color:${varCls}">${a.variacao>=0?'+':''}${a.variacao.toFixed(2)}%</div>` : '')}
         </td>
         <td class="r">${lucro!==null ? `<span style="color:${lucro>=0?'var(--ac)':'var(--re)'};font-size:12px">${lucro>=0?'+':''}${fmt(lucro)}<br><span style="font-size:10px">${lucroPct>=0?'+':''}${lucroPct.toFixed(1)}%</span></span>` : '<span style="color:var(--t3)">—</span>'}</td>
         <td class="r" style="color:var(--ac);font-weight:600">${valor > 0 ? fmt(valor) : '—'}</td>
@@ -650,28 +669,21 @@ function carteiraRenderRecomendacoes() {
     </div>`).join('');
 }
 
-// ── Detectar formato B3 Posição (snapshot) ──
-function carteiraIsFormatoB3(rows) {
-  if (!rows.length) return false;
+// ── Detectar formato B3 — função unificada ──
+// Retorna 'b3' | 'negociacao' | 'movimentacao' | 'desconhecido'
+function carteiraDetectarFormato(rows) {
+  if (!rows.length) return 'desconhecido';
   const headers = Object.keys(rows[0]);
-  // Tem "Código de Negociação" mas NÃO tem "Data do Negócio" (que é do Extrato de Negociação)
-  return headers.some(h => /c[oó]digo de negoci/i.test(h)) &&
-        !headers.some(h => /data.*neg[oó]cio/i.test(h));
+  if (headers.some(h => /entrada.*sa[íi]da/i.test(h)))          return 'movimentacao';
+  if (headers.some(h => /data.*neg[oó]cio/i.test(h)))            return 'negociacao';
+  if (headers.some(h => /c[oó]digo de negoci/i.test(h)))         return 'b3';
+  return 'desconhecido';
 }
 
-// ── Detectar formato B3 Negociação (histórico de trades) ──
-function carteiraIsFormatoNegociacao(rows) {
-  if (!rows.length) return false;
-  const headers = Object.keys(rows[0]);
-  return headers.some(h => /data.*neg[oó]cio/i.test(h));
-}
-
-// ── Detectar formato B3 Movimentação (proventos, eventos) ──
-function carteiraIsFormatoMovimentacao(rows) {
-  if (!rows.length) return false;
-  const headers = Object.keys(rows[0]);
-  return headers.some(h => /entrada.*sa[íi]da/i.test(h));
-}
+// Aliases mantidos para compatibilidade com chamadas existentes no código
+function carteiraIsFormatoB3(rows)          { return carteiraDetectarFormato(rows) === 'b3'; }
+function carteiraIsFormatoNegociacao(rows)  { return carteiraDetectarFormato(rows) === 'negociacao'; }
+function carteiraIsFormatoMovimentacao(rows){ return carteiraDetectarFormato(rows) === 'movimentacao'; }
 
 // ── Extrair categoria a partir do campo "Tipo" da B3 ──
 function carteiraExtrairCategoria(tipo) {
@@ -718,11 +730,32 @@ function normalizarTicker(raw) {
 
 // ── Infere categoria a partir do padrão do ticker ──
 function inferirCategoria(ticker) {
-  if (/^[A-Z]{4}34$/.test(ticker))              return 'bdr';   // ex: AAPL34
-  if (/[A-Z]{2,4}1[13]$/.test(ticker))          return 'fii';   // ex: KNRI11, HGLG11
-  // ETFs conhecidos
-  if (/^(BOVA|IVVB|SMAL|HASH|DIVO|XFIX|FIXA|GOLD|SPXI|NASD|TECK|ACWI|FIND|MATB|UTIL|ISUS|ECOO|AGRI|IFNC|GOVE|BBSD|XBOV|BBOV|BOVV|PIBB)\d{2}$/.test(ticker)) return 'etf';
-  if (/[A-Z]{4}\d$/.test(ticker))               return 'acao';  // ex: WEGE3, PETR4
+  if (!ticker) return 'outro';
+  const t = ticker.toUpperCase();
+
+  // Tesouro Direto sintético
+  if (/^TD_/.test(t)) return 'tesouro';
+
+  // BDRs: 4-5 letras + 2 dígitos entre 32-39 (ex: AAPL34, MSFT34, GOOGL32)
+  if (/^[A-Z]{4,5}3[2-9]$/.test(t)) return 'bdr';
+
+  // ETFs: tickers conhecidos da B3 (sufixo 10, 11 ou 12)
+  const ETF_SET = new Set([
+    'BOVA11','IVVB11','SMAL11','HASH11','DIVO11','XFIX11','FIXA11','GOLD11',
+    'SPXI11','NASD11','TECK11','ACWI11','FIND11','MATB11','UTIL11','ISUS11',
+    'ECOO11','AGRI11','IFNC11','GOVE11','BBSD11','XBOV11','BBOV11','BOVV11',
+    'PIBB11','SMAC11','CSMO11','EURP11','ASIA11','USTK11','WRLD11','NTNB11',
+    'B5P211','IRFM11','IMAB11','FIIM11','VILG11',
+    'BOVA10','SMAL10','SPXI10',
+  ]);
+  if (ETF_SET.has(t)) return 'etf';
+
+  // FIIs: 2–4 letras + 11 (após descartar ETFs acima)
+  if (/^[A-Z]{2,4}11$/.test(t)) return 'fii';
+
+  // Ações: 4 letras + 1 dígito (ON=3, PN=4, UNT=5, etc.)
+  if (/^[A-Z]{4}\d$/.test(t)) return 'acao';
+
   return 'outro';
 }
 
@@ -1188,14 +1221,57 @@ function calcPatrimonio() {
 // TESOURO DIRETO — via Edge Function (mesmo proxy do Yahoo Finance)
 // ════════════════════════════════════════════════════════════════
 
-// Gera ticker sintético a partir do nome do título
-// Ex: "Tesouro Selic 2031" → "TD_SELIC2031", "Tesouro IPCA+ 2035" → "TD_IPCA2035"
+// Mapa estático de nomes conhecidos → ticker sintético
+// Garante consistência entre dispositivos e evita colisão de nomes similares.
+// Para títulos não listados, usa a função de fallback abaixo.
+const TESOURO_TICKER_MAP = {
+  // Tesouro Selic
+  'Tesouro Selic 2026':          'TD_SELIC2026',
+  'Tesouro Selic 2027':          'TD_SELIC2027',
+  'Tesouro Selic 2028':          'TD_SELIC2028',
+  'Tesouro Selic 2029':          'TD_SELIC2029',
+  'Tesouro Selic 2031':          'TD_SELIC2031',
+  // Tesouro IPCA+
+  'Tesouro IPCA+ 2029':          'TD_IPCA2029',
+  'Tesouro IPCA+ 2035':          'TD_IPCA2035',
+  'Tesouro IPCA+ 2040':          'TD_IPCA2040',
+  'Tesouro IPCA+ 2045':          'TD_IPCA2045',
+  'Tesouro IPCA+ 2055':          'TD_IPCA2055',
+  // Tesouro IPCA+ com Juros Semestrais
+  'Tesouro IPCA+ com Juros Semestrais 2030': 'TD_IPCAJS2030',
+  'Tesouro IPCA+ com Juros Semestrais 2032': 'TD_IPCAJS2032',
+  'Tesouro IPCA+ com Juros Semestrais 2035': 'TD_IPCAJS2035',
+  'Tesouro IPCA+ com Juros Semestrais 2040': 'TD_IPCAJS2040',
+  'Tesouro IPCA+ com Juros Semestrais 2055': 'TD_IPCAJS2055',
+  // Tesouro Prefixado
+  'Tesouro Prefixado 2026':      'TD_PRE2026',
+  'Tesouro Prefixado 2027':      'TD_PRE2027',
+  'Tesouro Prefixado 2029':      'TD_PRE2029',
+  'Tesouro Prefixado 2031':      'TD_PRE2031',
+  // Tesouro Prefixado com Juros Semestrais
+  'Tesouro Prefixado com Juros Semestrais 2029': 'TD_PREJS2029',
+  'Tesouro Prefixado com Juros Semestrais 2031': 'TD_PREJS2031',
+  'Tesouro Prefixado com Juros Semestrais 2033': 'TD_PREJS2033',
+};
+
+// Gera ticker sintético — usa mapa estático primeiro, fallback por extração de nome
 function tesouroSyntheticTicker(produto) {
-  const name  = (produto||'').replace(/tesouro\s+/i, '').toUpperCase();
-  const noNum = name.replace(/\d+/g, '').replace(/[^A-Z]/g, '');  // só letras
+  const nomeTrimado = (produto||'').trim();
+  // 1. Busca exata no mapa
+  if (TESOURO_TICKER_MAP[nomeTrimado]) return TESOURO_TICKER_MAP[nomeTrimado];
+  // 2. Busca case-insensitive no mapa
+  const chaveCI = Object.keys(TESOURO_TICKER_MAP).find(k =>
+    k.toLowerCase() === nomeTrimado.toLowerCase()
+  );
+  if (chaveCI) return TESOURO_TICKER_MAP[chaveCI];
+  // 3. Fallback: extração heurística (títulos futuros não mapeados)
+  const name  = nomeTrimado.replace(/tesouro\s+/i, '').toUpperCase();
+  const noNum = name.replace(/\d+/g, '').replace(/[^A-Z]/g, '');
   const ano   = (name.match(/\d{4}/) || [''])[0];
   return ('TD_' + noNum.slice(0, 5) + ano).slice(0, 14);
 }
+
+const TESOURO_CACHE_KEY = 'simfin_tesouro_cache';
 
 async function tesouroFetchPrices() {
   // Fonte 1: Edge Function Supabase (deploy com ?tesouro=1)
@@ -1204,26 +1280,28 @@ async function tesouroFetchPrices() {
       { headers: { 'apikey': SUPABASE_ANON }, cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
-      if (data?.results?.length) return data.results;
+      if (data?.results?.length) {
+        // Persiste no cache local com timestamp
+        localStorage.setItem(TESOURO_CACHE_KEY, JSON.stringify({
+          ts: Date.now(), results: data.results,
+        }));
+        return data.results;
+      }
     }
-  } catch(e) { console.warn('[Tesouro] Edge Function indisponível, tentando fallback...'); }
+  } catch(e) { console.warn('[Tesouro] Edge Function indisponível, tentando cache local...'); }
 
-  // Fonte 2: API Tesouro Nacional via corsproxy.io (fallback)
+  // Fonte 2: cache local com última cotação bem-sucedida (válido por 24h)
   try {
-    const TESOURO_NACIONAL = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
-    const res  = await fetch('https://corsproxy.io/?' + encodeURIComponent(TESOURO_NACIONAL));
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const list = data?.response?.TrsrBdTradgList || [];
-    return list.map(item => ({
-      nome:  item.TrsrBd.nm,
-      preco: item.TrsrBd.untrRedVal,
-      venc:  item.TrsrBd.mtrtyDt,
-    }));
-  } catch(e) {
-    console.warn('[Tesouro] Fallback também falhou:', e.message);
-    return null;
-  }
+    const cached = JSON.parse(localStorage.getItem(TESOURO_CACHE_KEY) || 'null');
+    if (cached?.results?.length && (Date.now() - cached.ts) < 86400_000) {
+      const horas = Math.round((Date.now() - cached.ts) / 3600_000);
+      console.info(`[Tesouro] Usando cache local (${horas}h atrás)`);
+      return cached.results.map(r => ({ ...r, _fromCache: true, _cacheAge: horas }));
+    }
+  } catch(e) { /* cache corrompido — ignora */ }
+
+  console.warn('[Tesouro] Sem cotação disponível (Edge Function offline, sem cache válido)');
+  return null;
 }
 
 // ── Toggle tipo de ativo no formulário ──
@@ -1319,9 +1397,19 @@ async function carteiraAddTesouro() {
 }
 
 // ── Atualizar cotações — inclui Tesouro Direto ──
-const _carteiraRefreshOrig = carteiraRefresh;
 async function carteiraRefresh() {
   const ativos = carteiraLoad();
+  if (!ativos.length) return;
+
+  // Rate-limit: impede múltiplos refreshes em menos de 60s
+  const now = Date.now();
+  if (now - _lastRefreshTs < 60_000) {
+    const segs = Math.ceil((60_000 - (now - _lastRefreshTs)) / 1000);
+    showToast(`Aguarde ${segs}s para atualizar novamente`, '⏱', 2500);
+    return;
+  }
+  _lastRefreshTs = now;
+
   const acoes   = ativos.filter(a => a.tipo !== 'tesouro');
   const tesouro = ativos.filter(a => a.tipo === 'tesouro');
 
@@ -1350,23 +1438,39 @@ async function carteiraRefresh() {
         ) && a.nome.includes(p.nome.split(' ').slice(-1)[0])
       ) || pricesTesouro.find(p => p.nome === a.nome);
       if (!match) return { ...a, updatedAt: agora };
+      const fromCache = match._fromCache;
       return {
         ...a,
-        preco:     match.preco,
-        variacao:  ((match.preco - a.pmedio) / a.pmedio * 100),
-        updatedAt: agora,
+        preco:          match.preco,
+        precoEstimado:  false,  // preço real recebido — remove flag de estimativa
+        variacao:       ((match.preco - a.pmedio) / a.pmedio * 100),
+        updatedAt:      agora,
+        cotadoEm:       fromCache ? `cache ${match._cacheAge}h` : agora,
       };
     } else {
       const q = quotesAcoes[a.ticker];
       if (!q) return a;
-      return { ...a, preco: q.regularMarketPrice, variacao: q.regularMarketChangePercent, nome: q.shortName||q.longName||a.nome, updatedAt: agora };
+      return {
+        ...a,
+        preco:         q.regularMarketPrice,
+        precoEstimado: false,
+        variacao:      q.regularMarketChangePercent,
+        nome:          q.shortName||q.longName||a.nome,
+        updatedAt:     agora,
+      };
     }
   });
+
+  // Feedback com aviso se Tesouro veio de cache local
+  const tesouroCacheAge = pricesTesouro.find(p => p._fromCache)?._cacheAge;
+  const toastMsg = tesouroCacheAge
+    ? `Cotações atualizadas · Tesouro: dados de ${tesouroCacheAge}h atrás (Edge Function offline)`
+    : 'Cotações atualizadas!';
 
   carteiraSave(updated);
   carteiraRenderList();
   if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
-  showToast('Cotações atualizadas!', '✅', 3000);
+  showToast(toastMsg, '✅', tesouroCacheAge ? 5000 : 3000);
 }
 
 // ── Usar total da carteira para preencher saldo no acompanhamento ──

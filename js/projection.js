@@ -85,13 +85,13 @@ function buildSnaps(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
   const tM=Math.pow(1+taxa/100,1/12)-1;
   let pat=patI,totAp=patI,ap=apI;
   const d=[];
-  const f10=calcFolha(p1b,p1v,p1p,1),f20=calcFolha(p2b,p2v,p2p,2);
+  const f10=calcFolha(p1b,p1v,p1p,1),f20=calcFolha(p2b,p2v,p2p,2); // fac=1 implícito
   d.push({ano:0,pat,totAp,apN:ap,rendAnual:pat*(Math.pow(1+taxa/100,1)-1),renda:f10.rendaReal+f20.rendaReal,rendaOp:(f10.rendaOp||f10.rendaReal)+(f20.rendaOp||f20.rendaReal),f1:f10,f2:f20});
   for(let a=1;a<=anos;a++){
     const fac=Math.pow(1+reaj/100,a);
     // PJ: scale faturamento and retirada via fac; CLT: scale bruto/vr/plr
-    const f1a=calcFolha(p1b*fac,p1v*fac,p1p*fac,1,'scale',fac);
-    const f2a=calcFolha(p2b*fac,p2v*fac,p2p*fac,2,'scale',fac);
+    const f1a=calcFolha(p1b*fac,p1v*fac,p1p*fac,1,fac);
+    const f2a=calcFolha(p2b*fac,p2v*fac,p2p*fac,2,fac);
     const pBef=pat,apN=ap;
     for(let m=0;m<12;m++){pat=pat*(1+tM)+ap;totAp+=ap;}
     const rendAnual=pat-pBef-ap*12;
@@ -151,10 +151,18 @@ function renderChart(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
   snaps=buildSnaps(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
   renderMilestones(snaps);
   const inflAnual = parseFloat(document.getElementById('taxaInflacao')?.value)||4.5;
-  const labels=snaps.map(d=>d.ano===0?'Hoje':`Ano ${d.ano}`);
-  const vals =snaps.map(d=>d.pat);
-  const aps  =snaps.map(d=>d.totAp);
-  const reais=snaps.map(d=>d.pat/Math.pow(1+inflAnual/100,d.ano)); // poder de compra
+
+  // Cenários pessimista (−2 p.p.) e otimista (+2 p.p.)
+  const snapsPess = buildSnaps(anos, Math.max(0, taxa-2), apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
+  const snapsOtim = buildSnaps(anos, taxa+2,               apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
+
+  const labels =snaps.map(d=>d.ano===0?'Hoje':`Ano ${d.ano}`);
+  const vals   =snaps.map(d=>d.pat);
+  const aps    =snaps.map(d=>d.totAp);
+  const reais  =snaps.map(d=>d.pat/Math.pow(1+inflAnual/100,d.ano));
+  const pessim =snapsPess.map(d=>d.pat);
+  const otimis =snapsOtim.map(d=>d.pat);
+
   const ctx=document.getElementById('chartP').getContext('2d');
   if(myChart)myChart.destroy();
   myChart=new Chart(ctx,{
@@ -163,6 +171,8 @@ function renderChart(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
       {label:'Patrimônio com Juros',data:vals,borderColor:'#5dd4a0',backgroundColor:'rgba(93,212,160,0.08)',borderWidth:2.5,fill:true,tension:.4,pointRadius:4,pointHoverRadius:9,pointBackgroundColor:'#5dd4a0',pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'#5dd4a0',pointHoverBorderWidth:2.5},
       {label:'Aportes sem Juros',data:aps,borderColor:'#6aace6',backgroundColor:'rgba(106,172,230,0.05)',borderWidth:1.5,fill:true,tension:.4,borderDash:[6,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#6aace6'},
       {label:`Valor Real (−${inflAnual}% inflação/ano)`,data:reais,borderColor:'rgba(167,139,250,.8)',backgroundColor:'transparent',borderWidth:1.5,fill:false,tension:.4,borderDash:[3,3],pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'rgba(167,139,250,.8)'},
+      {label:`Otimista (+2% → ${taxa+2}% a.a.)`,data:otimis,borderColor:'rgba(93,212,160,0.4)',backgroundColor:'transparent',borderWidth:1,fill:false,tension:.4,borderDash:[2,4],pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'rgba(93,212,160,0.6)'},
+      {label:`Pessimista (−2% → ${Math.max(0,taxa-2)}% a.a.)`,data:pessim,borderColor:'rgba(224,108,108,0.4)',backgroundColor:'transparent',borderWidth:1,fill:false,tension:.4,borderDash:[2,4],pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'rgba(224,108,108,0.6)'},
     ]},
     options:{
       responsive:true,maintainAspectRatio:false,
@@ -578,4 +588,16 @@ function popM(idx){
   document.getElementById('mFN').textContent=idx===0
     ?'Situação base · valores sem reajuste salarial acumulado'
     :`Reajuste ${reaj}% a.a. acumulado · use ‹ › ou ← → para navegar entre anos`;
+}
+
+// ════════════════════════
+// INFLAÇÃO — valor real (poder de compra)
+// Movido de modals.js para cá — pertence semanticamente à projeção
+// ════════════════════════
+function calcInflacaoSnaps(snapsArr) {
+  const inflAnual = parseFloat(document.getElementById('taxaInflacao')?.value) || 4.5;
+  return snapsArr.map(s => ({
+    ...s,
+    patReal: s.pat / Math.pow(1 + inflAnual/100, s.ano),
+  }));
 }

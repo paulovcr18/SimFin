@@ -69,6 +69,32 @@ function authHideOverlay() {
   document.getElementById('appRoot').style.display     = 'contents';
 }
 
+// ─── Loading state durante sincronização inicial ──────────────────────────────
+function authShowSyncLoading(show) {
+  let el = document.getElementById('authSyncLoading');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'authSyncLoading';
+    el.style.cssText = [
+      'position:fixed','top:0','left:0','right:0','bottom:0',
+      'background:var(--bg1,#0d1117)','display:flex','flex-direction:column',
+      'align-items:center','justify-content:center','z-index:9999',
+      'font-family:Sora,sans-serif','color:var(--t2,#8fa0b0)','gap:16px',
+    ].join(';');
+    el.innerHTML = `
+      <div style="font-size:28px">⏳</div>
+      <div style="font-size:14px;font-weight:500;color:var(--t1,#e8ead4)">Sincronizando seus dados…</div>
+      <div style="font-size:12px;color:var(--t3,#4d6070)">Conectando ao Supabase</div>
+      <div style="width:200px;height:3px;background:var(--bg6,#1e2a38);border-radius:3px;overflow:hidden;margin-top:8px">
+        <div style="height:100%;background:var(--ac,#5dd4a0);animation:authPulse 1.2s ease-in-out infinite;border-radius:3px"></div>
+      </div>
+      <style>@keyframes authPulse{0%,100%{width:20%;margin-left:0}50%{width:60%;margin-left:40%}}</style>
+    `;
+    document.body.appendChild(el);
+  }
+  el.style.display = show ? 'flex' : 'none';
+}
+
 // ─── Tabs ────────────────────────────────────────────────────────────────────
 function authShowTab(mode) {
   authMode = mode;
@@ -186,8 +212,10 @@ async function authOnLogin(user) {
     // Sincroniza com Supabase antes de iniciar o app:
     // — na 1ª vez: migra localStorage → Supabase
     // — nas demais: puxa Supabase → localStorage (dados de outro dispositivo)
+    authShowSyncLoading(true);
     try { await dbMigrateIfNeeded(); } catch(e) { console.warn('[db] migrate:', e); }
     try { await dbPullAll();         } catch(e) { console.warn('[db] pull:',    e); }
+    authShowSyncLoading(false);
 
     authHideOverlay();
 

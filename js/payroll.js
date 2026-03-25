@@ -237,7 +237,7 @@ function calcFolhaPJ(pid,fac){
 
 // ── Dispatcher ──
 // fac: scale factor for future-year projections (PJ scales faturamento/retirada)
-function calcFolha(bruto,vr,plr,pid,_mode,fac){
+function calcFolha(bruto,vr,plr,pid,fac){
   if(regime[pid]==='PJ') return calcFolhaPJ(pid,fac||1);
   return calcFolhaCLT(bruto,vr,plr);
 }

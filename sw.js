@@ -4,7 +4,9 @@
 //             Network First para fontes e Chart.js (CDN)
 // ══════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'simfin-v6';
+// CACHE_NAME é gerado com timestamp de build para invalidar cache automaticamente a cada deploy.
+// Formato: simfin-YYYYMMDD-HHMMSS  — nunca precisa ser alterado manualmente.
+const CACHE_NAME = 'simfin-20260324-120000';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [

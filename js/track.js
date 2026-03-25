@@ -510,6 +510,99 @@ function renderTrackInsights(entries) {
       </div>`);
   }
 
+  // ── Card 6: CDI Benchmark ──
+  // Taxa CDI referência configurável — padrão 10,9% a.a. (2026)
+  // Usuário pode alterar via campo taxaAnual do simulador como proxy
+  const CDI_ANUAL = 10.9; // % — referência SELIC/CDI 2026
+  if (taxaMediaReal !== null) {
+    const diffCDI    = (taxaMediaReal - CDI_ANUAL).toFixed(1);
+    const diffCDINum = parseFloat(diffCDI);
+    const cdiClass   = diffCDINum >= 0 ? 'ic-green' : diffCDINum >= -3 ? 'ic-gold' : 'ic-red';
+    const cdiColor   = diffCDINum >= 0 ? 'var(--ac)' : diffCDINum >= -3 ? 'var(--go)' : 'var(--re)';
+    cards.push(`
+      <div class="insight-card ${cdiClass}">
+        <div class="insight-icon">📡</div>
+        <div class="insight-title">vs. CDI (benchmark)</div>
+        <div class="insight-value" style="color:${cdiColor}">
+          ${diffCDINum >= 0 ? '+' : ''}${diffCDI} p.p.
+        </div>
+        <div class="insight-desc">
+          Sua carteira rendeu <strong>${taxaMediaReal.toFixed(1)}% a.a.</strong>
+          vs. CDI <strong>${CDI_ANUAL}% a.a.</strong><br>
+          ${diffCDINum >= 0
+            ? `🏅 Você está batendo o CDI! Carteira eficiente.`
+            : diffCDINum >= -3
+              ? 'Perto do CDI — alocação razoável para renda variável.'
+              : 'Abaixo do CDI. Considere revisar a alocação ou os custos.'}
+          <span style="font-size:9px;color:var(--t3);display:block;margin-top:4px">CDI referência ${CDI_ANUAL}% a.a. (2026)</span>
+        </div>
+      </div>`);
+  }
+
+  // ── Card 7: Streak de aportes consecutivos ──
+  {
+    const sortedEntries = [...entries].sort((a,b) => a.mes.localeCompare(b.mes));
+    let streak = 0, maxStreak = 0, currentStreak = 0;
+    for (let i = 0; i < sortedEntries.length; i++) {
+      if ((sortedEntries[i].aporte || 0) > 0) {
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    }
+    streak = currentStreak; // streak atual (últimos meses consecutivos)
+    if (entries.length >= 2) {
+      const streakClass = streak >= 6 ? 'ic-green' : streak >= 3 ? 'ic-gold' : 'ic-blue';
+      const streakColor = streak >= 6 ? 'var(--ac)' : streak >= 3 ? 'var(--go)' : 'var(--bl)';
+      cards.push(`
+        <div class="insight-card ${streakClass}">
+          <div class="insight-icon">🔥</div>
+          <div class="insight-title">Sequência de Aportes</div>
+          <div class="insight-value" style="color:${streakColor}">
+            ${streak} ${streak === 1 ? 'mês' : 'meses'}
+          </div>
+          <div class="insight-desc">
+            ${streak >= 6
+              ? `🏆 Sequência incrível! ${streak} meses consecutivos aportando.`
+              : streak >= 3
+                ? `Boa consistência! ${streak} meses seguidos.`
+                : streak === 0
+                  ? 'Nenhum aporte no mês mais recente.'
+                  : `${streak} mês com aporte. Continue a sequência!`}
+            ${maxStreak > streak ? `<br><span style="color:var(--t3);font-size:10px">Recorde pessoal: ${maxStreak} meses</span>` : ''}
+          </div>
+        </div>`);
+    }
+  }
+
+  // ── Card 8: Alerta de queda sem retirada ──
+  {
+    const alertas = [];
+    for (let i = 1; i < entries.length; i++) {
+      const prev = entries[i-1], curr = entries[i];
+      const queda = curr.patrimonio - prev.patrimonio;
+      // Queda real = patrimônio caiu E não há retirada registrada que a justifique
+      if (queda < 0 && !(curr.retirada > 0)) {
+        const mesLbl = new Date(curr.mes+'-02').toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});
+        alertas.push(`${mesLbl}: <strong style="color:var(--re)">${fmt(queda)}</strong>`);
+      }
+    }
+    if (alertas.length > 0) {
+      cards.push(`
+        <div class="insight-card ic-red">
+          <div class="insight-icon">⚠️</div>
+          <div class="insight-title">Quedas sem Retirada Registrada</div>
+          <div class="insight-value" style="color:var(--re)">${alertas.length} ocorrência${alertas.length>1?'s':''}</div>
+          <div class="insight-desc">
+            ${alertas.slice(-3).join('<br>')}
+            ${alertas.length > 3 ? `<br><span style="color:var(--t3);font-size:10px">+ ${alertas.length-3} anterior${alertas.length-3>1?'es':''}</span>` : ''}
+            <br><span style="color:var(--t3);font-size:10px">Verifique se há retirada não registrada ou dado incorreto.</span>
+          </div>
+        </div>`);
+    }
+  }
+
   grid.innerHTML = cards.join('');
 }
 

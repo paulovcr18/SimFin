@@ -129,15 +129,4 @@ function closeVersions() {
   document.getElementById('versionsModal').classList.remove('open');
 }
 
-// ════════════════════════════════════════════════════════════════
-// INFLAÇÃO — cálculo do valor real (poder de compra)
-// ════════════════════════════════════════════════════════════════
-function calcInflacaoSnaps(snaps) {
-  const inflAnual = parseFloat(document.getElementById('taxaInflacao')?.value) || 4.5;
-  return snaps.map(s => ({
-    ...s,
-    patReal: s.pat / Math.pow(1 + inflAnual/100, s.ano), // descontado
-  }));
-}
-
 

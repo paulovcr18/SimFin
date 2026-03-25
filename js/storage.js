@@ -133,9 +133,10 @@ Cancelar → Sobrescrever`
     );
     const existing = saves[existsIdx];
     if (choice) {
-      // Nova versão — guarda o estado atual no histórico
+      // Nova versão — guarda o estado atual no histórico (máx 10 versões)
       const versions = existing.versions || [];
       versions.push({ inputs: existing.inputs, summary: existing.summary, savedAt: existing.date });
+      if (versions.length > 10) versions.splice(0, versions.length - 10); // mantém só as 10 mais recentes
       saves[existsIdx] = { ...existing, inputs, summary, date, versions };
     } else {
       // Sobrescreve sem histórico adicional
@@ -187,6 +188,7 @@ function exportJSON() {
   const anos    = parseInt(document.getElementById('anos').value) || 20;
   const taxa    = parseFloat(document.getElementById('taxaAnual').value) || 10;
   const payload = {
+    _schemaVersion: 2,  // incrementar ao mudar estrutura do payload para permitir migrações futuras
     meta: {
       app: 'SimFin · Simulador Financeiro Familiar',
       versao: '3.0',
@@ -199,6 +201,9 @@ function exportJSON() {
     simulacoes:     JSON.parse(localStorage.getItem('simfin_saves')  || '[]'),
     acompanhamento: JSON.parse(localStorage.getItem('simfin_track')  || '[]'),
     metas:          JSON.parse(localStorage.getItem('simfin_goals')  || '[]'),
+    carteira:       JSON.parse(localStorage.getItem('simfin_carteira') || '[]'),
+    negociacoes:    JSON.parse(localStorage.getItem('simfin_negociacoes') || '[]'),
+    movimentacoes:  JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]'),
     projecao: snaps.map(s => ({
       ano:             s.ano,
       patrimonio:      +s.pat.toFixed(2),
@@ -277,6 +282,27 @@ function handleImport(event) {
         localStorage.setItem('simfin_goals', JSON.stringify(merged));
         const novas = merged.length - local.length;
         if (novas > 0) restored.push(`${novas} meta(s)`);
+      }
+
+      // Restaura carteira e histórico de negociações (schema v2+)
+      if (data.carteira && Array.isArray(data.carteira) && data.carteira.length) {
+        const local = JSON.parse(localStorage.getItem('simfin_carteira') || '[]');
+        if (!local.length) {
+          localStorage.setItem('simfin_carteira', JSON.stringify(data.carteira));
+          restored.push('carteira');
+        }
+      }
+      if (data.negociacoes && Array.isArray(data.negociacoes) && data.negociacoes.length) {
+        const local = JSON.parse(localStorage.getItem('simfin_negociacoes') || '[]');
+        if (!local.length) {
+          localStorage.setItem('simfin_negociacoes', JSON.stringify(data.negociacoes));
+        }
+      }
+      if (data.movimentacoes && Array.isArray(data.movimentacoes) && data.movimentacoes.length) {
+        const local = JSON.parse(localStorage.getItem('simfin_movimentacoes') || '[]');
+        if (!local.length) {
+          localStorage.setItem('simfin_movimentacoes', JSON.stringify(data.movimentacoes));
+        }
       }
 
       const msg = restored.length ? restored.join(', ') : 'dados';
