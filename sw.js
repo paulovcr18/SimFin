@@ -6,7 +6,7 @@
 
 // CACHE_NAME é gerado com timestamp de build para invalidar cache automaticamente a cada deploy.
 // Formato: simfin-YYYYMMDD-HHMMSS  — nunca precisa ser alterado manualmente.
-const CACHE_NAME = 'simfin-20260325-100000';
+const CACHE_NAME = 'simfin-20260325-120000';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [
