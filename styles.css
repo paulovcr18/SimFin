@@ -347,11 +347,16 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
 /* Screen switcher */
 .screen{display:none;animation:fu .3s ease both}
-.screen.active{display:contents}
+.screen.active{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  grid-column:1 / -1;
+  min-height:calc(100vh - 56px);
+}
 .screen-full{
   display:none;flex-direction:column;gap:20px;padding:24px;
   overflow-y:auto;animation:fu .3s ease both;
-  grid-column:1 / -1;   /* ocupa as 2 colunas do grid do .app */
+  grid-column:1 / -1;
   min-height:calc(100vh - 56px);
   background:var(--bg9);
 }
@@ -703,7 +708,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
 /* RESPONSIVE */
 @media(max-width:900px){
-  .app{grid-template-columns:1fr}
+  .screen.active{grid-template-columns:1fr}
   .sidebar{border-right:none;border-bottom:1px solid var(--bd);max-height:420px}
   .cg{grid-template-columns:1fr 1fr}
   .pgrid{grid-template-columns:1fr}

@@ -8,7 +8,7 @@ let compareChart = null;
 // ── Screen switcher ──
 function switchScreen(screen) {
   const screens = {
-    simulador:  { el:'screenSimulador',  display:'contents' },
+    simulador:  { el:'screenSimulador',  display:'grid'     },
     financas:   { el:'screenFinancas',   display:'flex'     },
     metas:      { el:'screenMetas',      display:'flex'     },
     reminder:   { el:'screenReminder',   display:'flex'     },
