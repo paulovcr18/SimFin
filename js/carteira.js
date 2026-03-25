@@ -1310,15 +1310,12 @@ function carteiraToggleTipo() {
   const tipo = document.getElementById('cartTipo')?.value;
   const acaoFields    = document.getElementById('cartCamposAcao');
   const tesouoFields  = document.getElementById('cartCamposTesouro');
-  const brapiArea     = document.getElementById('cartBrapiArea');
   if (tipo === 'tesouro') {
     if (acaoFields)   acaoFields.style.display   = 'none';
-    if (tesouoFields) tesouoFields.style.display = 'block';
-    if (brapiArea)    brapiArea.style.display    = 'none';
+    if (tesouoFields) tesouoFields.style.display = 'grid'; // display grid com repeat(auto-fit,minmax(...))
   } else {
-    if (acaoFields)   acaoFields.style.display   = 'contents';
+    if (acaoFields)   acaoFields.style.display   = 'grid'; // display grid com repeat(auto-fit,minmax(...))
     if (tesouoFields) tesouoFields.style.display = 'none';
-    if (brapiArea)    brapiArea.style.display    = 'flex';
   }
 }
 

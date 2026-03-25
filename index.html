@@ -419,6 +419,71 @@
     </div>
   </div>
 
+  <!-- ── ADICIONAR ATIVO MANUALMENTE ── -->
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 0 8px;border-top:1px solid var(--bd);margin-top:8px">
+    <div style="font-size:18px">➕</div>
+    <div style="font-size:14px;font-weight:700;color:var(--t1)">Adicionar Ativo Manualmente</div>
+  </div>
+
+  <div id="cartFormContainer">
+    <!-- Seletor de tipo -->
+    <div style="margin-bottom:10px">
+      <label style="font-size:11px;color:var(--t3);font-weight:600">Tipo de Ativo</label>
+      <select id="cartTipo" onchange="carteiraToggleTipo()" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+        <option value="acao">Ação</option>
+        <option value="fii">FII</option>
+        <option value="etf">ETF</option>
+        <option value="bdr">BDR</option>
+        <option value="renda-fixa">Renda Fixa</option>
+        <option value="tesouro">Tesouro Direto</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+
+    <!-- Campos para Ações/ETFs/FIIs/BDRs/Renda Fixa -->
+    <div id="cartCamposAcao" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px">
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Ticker</label>
+        <input id="cartTicker" type="text" placeholder="Ex: VALE3" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px;text-transform:uppercase">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Quantidade</label>
+        <input id="cartQtd" type="number" placeholder="Ex: 100" step="0.01" min="0" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Preço Médio (R$)</label>
+        <input id="cartPmedio" type="number" placeholder="Ex: 25.50" step="0.01" min="0" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+      </div>
+    </div>
+
+    <!-- Campos para Tesouro Direto -->
+    <div id="cartCamposTesouro" style="display:none;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px">
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Tipo de Título</label>
+        <select id="cartTesouoTipo" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+          <option>Tesouro Selic</option>
+          <option>Tesouro Prefixado</option>
+          <option>Tesouro IPCA+</option>
+          <option>Tesouro IGPM+</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Vencimento (opcional)</label>
+        <input id="cartTesouoVenc" type="text" placeholder="Ex: 2027" maxlength="4" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--t3);font-weight:600">Valor Investido (R$)</label>
+        <input id="cartTesouoValor" type="number" placeholder="Ex: 1000" step="0.01" min="0" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão para adicionar e status -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
+    <button id="cartAddBtn" onclick="carteiraAdd()" style="padding:10px 16px;border-radius:6px;border:none;background:var(--ac);color:white;font-weight:600;cursor:pointer;font-family:var(--fb);font-size:12px;transition:all .15s">➕ Adicionar Ativo</button>
+    <div id="cartAddStatus" style="font-size:11px;color:var(--t3)"></div>
+  </div>
+
   <!-- ── IMPORTAR ── -->
   <div class="pat-import-row">
     <div class="pat-import-btn" id="cartImportNegocZone"
