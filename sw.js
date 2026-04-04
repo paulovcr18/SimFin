@@ -6,7 +6,7 @@
 
 // CACHE_NAME é gerado com timestamp de build para invalidar cache automaticamente a cada deploy.
 // Formato: simfin-YYYYMMDD-HHMMSS  — nunca precisa ser alterado manualmente.
-const CACHE_NAME = 'simfin-20260325-160000';
+const CACHE_NAME = 'simfin-20260404-190000';
 
 // Assets locais — sempre cacheados
 const LOCAL_ASSETS = [
@@ -28,6 +28,9 @@ const LOCAL_ASSETS = [
   './js/carteira.js',
   './js/track.js',
   './js/db.js',
+  './js/tesouro-api.js',
+  './js/auth.js',
+  './js/db.js',
 ];
 
 // Assets externos — tentamos network, fallback para cache
@@ -41,9 +44,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       console.log('[SimFin SW] Cacheando assets...');
-      // Cache local assets (obrigatório)
       return cache.addAll(LOCAL_ASSETS).then(() => {
-        // Cache CDN assets (best-effort, não falha o install se offline)
         return Promise.allSettled(
           CDN_ASSETS.map(url =>
             fetch(url, { cache: 'no-cache' })
@@ -77,35 +78,28 @@ self.addEventListener('activate', event => {
 
 // ── Fetch: Cache First para tudo ──
 self.addEventListener('fetch', event => {
-  // Ignorar requests que não sejam GET
   if (event.request.method !== 'GET') return;
-
-  // Ignorar extensões de browser e requests internos
   const url = new URL(event.request.url);
   if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) {
-        // Cache hit — retorna do cache e atualiza em background
         const networkUpdate = fetch(event.request)
           .then(res => {
             if (res && res.ok) {
               caches.open(CACHE_NAME).then(cache => cache.put(event.request, res.clone()));
             }
           })
-          .catch(() => {}); // silencia erros offline
+          .catch(() => {});
         return cached;
       }
-
-      // Cache miss — tenta network
       return fetch(event.request).then(res => {
         if (!res || !res.ok || res.type === 'opaque') return res;
         const resClone = res.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
         return res;
       }).catch(() => {
-        // Offline e sem cache — retorna página principal como fallback
         if (event.request.destination === 'document') {
           return caches.match('./index.html');
         }
