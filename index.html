@@ -132,9 +132,60 @@
       </div>
     </div>
 
+    <!-- MOBILE: compact action buttons -->
+    <div class="topbar-mobile-actions" id="mobileActions">
+      <button class="act-btn" onclick="toggleMoreMenu(event)" title="Mais opções" style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:6px 10px">
+        <span style="font-size:15px;line-height:1;letter-spacing:1px">···</span>
+      </button>
+    </div>
   </div><!-- end topbar-right -->
 
 </header>
+
+<!-- MARKET TRENDS TICKER -->
+<div class="mkt-ticker" id="mktTicker">
+  <div class="mkt-ticker-label"><span>ao vivo</span></div>
+  <div class="mkt-ticker-track" id="mktTrack">
+    <div class="mkt-chip"><span class="mkt-chip-name">IBOV</span><span class="mkt-chip-val" id="mkt-ibov-val">–</span><span class="mkt-chip-chg nt" id="mkt-ibov-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">SELIC</span><span class="mkt-chip-val" id="mkt-selic-val">13,75%</span><span class="mkt-chip-chg nt" id="mkt-selic-chg">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">CDI</span><span class="mkt-chip-val" id="mkt-cdi-val">13,65%</span><span class="mkt-chip-chg nt" id="mkt-cdi-chg">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IPCA</span><span class="mkt-chip-val" id="mkt-ipca-val">5,48%</span><span class="mkt-chip-chg nt" id="mkt-ipca-chg">12m</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">USD/BRL</span><span class="mkt-chip-val" id="mkt-usd-val">–</span><span class="mkt-chip-chg nt" id="mkt-usd-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">EUR/BRL</span><span class="mkt-chip-val" id="mkt-eur-val">–</span><span class="mkt-chip-chg nt" id="mkt-eur-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IFIX</span><span class="mkt-chip-val" id="mkt-ifix-val">–</span><span class="mkt-chip-chg nt" id="mkt-ifix-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">BTC/BRL</span><span class="mkt-chip-val" id="mkt-btc-val">–</span><span class="mkt-chip-chg nt" id="mkt-btc-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IBOV</span><span class="mkt-chip-val" id="mkt-ibov-val2">–</span><span class="mkt-chip-chg nt" id="mkt-ibov-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">SELIC</span><span class="mkt-chip-val" id="mkt-selic-val2">13,75%</span><span class="mkt-chip-chg nt" id="mkt-selic-chg2">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">CDI</span><span class="mkt-chip-val" id="mkt-cdi-val2">13,65%</span><span class="mkt-chip-chg nt" id="mkt-cdi-chg2">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IPCA</span><span class="mkt-chip-val" id="mkt-ipca-val2">5,48%</span><span class="mkt-chip-chg nt" id="mkt-ipca-chg2">12m</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">USD/BRL</span><span class="mkt-chip-val" id="mkt-usd-val2">–</span><span class="mkt-chip-chg nt" id="mkt-usd-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">EUR/BRL</span><span class="mkt-chip-val" id="mkt-eur-val2">–</span><span class="mkt-chip-chg nt" id="mkt-eur-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IFIX</span><span class="mkt-chip-val" id="mkt-ifix-val2">–</span><span class="mkt-chip-chg nt" id="mkt-ifix-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">BTC/BRL</span><span class="mkt-chip-val" id="mkt-btc-val2">–</span><span class="mkt-chip-chg nt" id="mkt-btc-chg2">…</span></div>
+  </div>
+  <div class="mkt-ticker-fade"></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bn-btn active" id="bnSimulador" onclick="switchScreen('simulador')" aria-label="Simulador">
+    <span class="bn-icon">📊</span>
+    <span class="bn-label">Simulador</span>
+  </button>
+  <button class="bn-btn" id="bnFinancas" onclick="switchScreen('financas')" aria-label="Finanças">
+    <span class="bn-icon">💼</span>
+    <span class="bn-label">Finanças</span>
+  </button>
+  <button class="bn-btn" id="bnMetas" onclick="switchScreen('metas')" aria-label="Metas">
+    <span class="bn-icon">🎯</span>
+    <span class="bn-label">Metas</span>
+  </button>
+  <button class="bn-btn" id="bnReminder" onclick="switchScreen('reminder')" aria-label="Alertas">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Alertas</span>
+    <div class="bn-pip" id="bnReminderPip"></div>
+  </button>
+</nav>
 
 <!-- SIMULADOR SCREEN -->
 <div id="screenSimulador" class="screen active">
