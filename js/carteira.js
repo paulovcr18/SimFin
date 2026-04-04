@@ -1276,33 +1276,45 @@ function tesouroSyntheticTicker(produto) {
 
 // TESOURO_CACHE_KEY já definido em tesouro-api.js — não redeclarar aqui
 
-async function tesouroFetchPrices(titulosEspecificos = null) {
-  // Se passaram títulos específicos, usa-os. Senão, extrai dos ativos carregados
-  let titulos = [];
+async function tesouroFetchPrices(titulosEspecificos = null, forceRefresh = false) {
+  // Busca todos os títulos disponíveis na API oficial (1 requisição)
+  const { list, fromCache, cacheAgeH } = await tesouroFetchTodos(forceRefresh);
 
+  if (!list.length) return [];
+
+  // Determina conjunto de títulos a filtrar
+  let titulos = [];
   if (titulosEspecificos && titulosEspecificos.length) {
-    // Usado ao adicionar novo Tesouro: recebe título(s) do formulário
-    titulos = titulosEspecificos.map(t => tesouroNormalizarTitulo(t)).filter(Boolean);
+    titulos = titulosEspecificos;
   } else {
-    // Usado ao atualizar cotações: extrai de ativos já carregados
     const ativos = carteiraLoad().filter(a => a.tipo === 'tesouro');
-    titulos = [...new Set(
-      ativos.map(a => tesouroNormalizarTitulo(a.nome)).filter(Boolean)
-    )];
+    titulos = [...new Set(ativos.map(a => a.nome))];
   }
 
-  if (!titulos.length) return [];
+  // Para cada título da carteira, encontra correspondência na lista da B3
+  const resultado = [];
+  for (const titulo of titulos) {
+    const normalizado = tesouroNormalizarTitulo(titulo);
+    if (!normalizado) continue;
 
-  // Consultar cotações via API AA40
-  const cotacoes = await tesouroFetchMultiplos(titulos);
+    // Busca exata pelo nome do ativo primeiro
+    let match = list.find(item => item.nome === titulo);
+    // Fallback: matching fuzzy por tipo + ano
+    if (!match) match = list.find(item => tesouroMatchTitulo(normalizado, item.nome));
 
-  // Converter para formato esperado (compatível com a UI)
-  return Object.entries(cotacoes).map(([titulo, cot]) => ({
-    nome: titulo,
-    preco: cot.pu,
-    taxa: cot.taxa,
-    _fromCache: false,
-  }));
+    if (match) {
+      resultado.push({
+        nome:       titulo,       // nome original da carteira (para matching posterior)
+        nomeB3:     match.nome,   // nome canônico da B3
+        preco:      match.preco,
+        taxa:       match.taxa || 0,
+        _fromCache: fromCache,
+        _cacheAge:  cacheAgeH,
+      });
+    }
+  }
+
+  return resultado;
 }
 
 // ── Toggle tipo de ativo no formulário ──
@@ -1424,17 +1436,18 @@ async function carteiraRefresh() {
   // Atualiza Tesouro via API
   let pricesTesouro = [];
   if (tesouro.length) {
-    pricesTesouro = await tesouroFetchPrices() || [];
+    pricesTesouro = await tesouroFetchPrices(null, true) || []; // forceRefresh=true: ignora cache de 4h
   }
 
   const agora   = new Date().toISOString();
   const updated = ativos.map(a => {
     if (a.tipo === 'tesouro') {
-      const match = pricesTesouro.find(p =>
-        p.nome.toLowerCase().includes(
-          a.nome.toLowerCase().replace('tesouro ','').split(' ')[0]
-        ) && a.nome.includes(p.nome.split(' ').slice(-1)[0])
-      ) || pricesTesouro.find(p => p.nome === a.nome);
+      // Matching por nome original (preservado em p.nome) ou fuzzy por tipo+ano
+      const match = pricesTesouro.find(p => p.nome === a.nome)
+        || pricesTesouro.find(p => tesouroMatchTitulo(
+            tesouroNormalizarTitulo(a.nome),
+            p.nomeB3 || p.nome
+          ));
       if (!match) return { ...a, updatedAt: agora };
       const fromCache = match._fromCache;
       return {
