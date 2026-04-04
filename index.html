@@ -38,7 +38,7 @@ html{scroll-behavior:smooth}
 body{background:var(--bg9);color:var(--t1);font-family:var(--fb);font-size:14px;min-height:100vh;line-height:1.6}
 
 /* LAYOUT */
-.app{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+.app{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto auto 1fr;min-height:100vh}
 .topbar{
   grid-column:1/-1;background:var(--bg8);border-bottom:1px solid var(--bd);
   padding:0 20px 0 24px;display:flex;align-items:center;gap:0;
@@ -736,6 +736,118 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   .mbox{border-radius:16px;max-height:96vh}
   .nav-tabs-group{gap:1px}
 }
+
+/* ═══ MARKET TRENDS TICKER ═══ */
+.mkt-ticker{
+  grid-column:1/-1;background:var(--bg9);border-bottom:1px solid var(--bd);
+  overflow:hidden;height:36px;display:flex;align-items:center;position:relative;
+}
+.mkt-ticker-track{
+  display:flex;gap:0;white-space:nowrap;
+  animation:mkt-scroll 40s linear infinite;
+  will-change:transform;
+}
+.mkt-ticker:hover .mkt-ticker-track{animation-play-state:paused}
+.mkt-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:0 18px;
+  font-size:11px;font-family:var(--fm);border-right:1px solid var(--bd);
+  height:36px;flex-shrink:0;
+}
+.mkt-chip-name{color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:10px}
+.mkt-chip-val{color:var(--t1);font-weight:600}
+.mkt-chip-chg{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px}
+.mkt-chip-chg.up{color:var(--ac);background:var(--acg)}
+.mkt-chip-chg.dn{color:var(--re);background:var(--reg)}
+.mkt-chip-chg.nt{color:var(--t3);background:var(--bg6)}
+.mkt-ticker-label{
+  position:absolute;left:0;top:0;bottom:0;width:52px;
+  background:linear-gradient(to right,var(--bg9) 70%,transparent);
+  display:flex;align-items:center;padding-left:10px;z-index:2;pointer-events:none;
+}
+.mkt-ticker-label span{font-size:9px;font-weight:700;color:var(--ac);letter-spacing:1px;text-transform:uppercase;font-family:var(--fb)}
+.mkt-ticker-fade{
+  position:absolute;right:0;top:0;bottom:0;width:40px;
+  background:linear-gradient(to left,var(--bg9) 60%,transparent);
+  pointer-events:none;z-index:2;
+}
+@keyframes mkt-scroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+
+/* ═══ MOBILE BOTTOM NAV ═══ */
+.bottom-nav{display:none}
+
+@media(max-width:760px){
+  /* Safe area + notch fix for topbar */
+  .topbar{
+    padding-top:env(safe-area-inset-top);
+    min-height:calc(52px + env(safe-area-inset-top));
+  }
+  /* Market ticker spans full width */
+  .mkt-ticker{grid-column:1/-1}
+}
+
+@media(max-width:560px){
+  /* Hide desktop nav tabs — replaced by bottom nav */
+  .nav-tabs-group{display:none!important}
+  /* Hide secondary topbar items, keep logo + badge + more */
+  .topbar-right .action-group{display:none}
+  /* Show compact action row */
+  .topbar-mobile-actions{display:flex!important}
+
+  /* BOTTOM NAV BAR */
+  .bottom-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--bg8);
+    border-top:1px solid var(--bd);
+    z-index:300;
+    padding:6px 0;
+    padding-bottom:max(6px,env(safe-area-inset-bottom));
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 -4px 24px rgba(0,0,0,.4);
+  }
+  .bn-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;background:transparent;border:none;color:var(--t3);
+    font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;
+    transition:color .15s,transform .1s;
+    -webkit-tap-highlight-color:transparent;
+    min-height:48px;padding:4px 0;
+    position:relative;
+  }
+  .bn-btn.active{color:var(--ac)}
+  .bn-btn.active .bn-icon{transform:scale(1.15)}
+  .bn-btn:active{transform:scale(.93)}
+  .bn-icon{font-size:20px;line-height:1;transition:transform .15s}
+  .bn-label{font-size:9px;letter-spacing:.3px;margin-top:1px}
+  .bn-pip{
+    position:absolute;top:6px;right:calc(50% - 14px);
+    width:7px;height:7px;border-radius:50%;
+    background:var(--re);border:2px solid var(--bg8);
+    display:none;
+  }
+  .bn-pip.show{display:block}
+
+  /* Compact topbar for mobile */
+  .topbar{padding:0 12px 0 16px;gap:8px}
+  .topbar-left{gap:8px}
+  .topbar-right{gap:6px}
+
+  /* Spacer so content doesn't hide behind bottom nav */
+  .main{padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}
+  .sidebar{padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}
+  .screen-full{padding-bottom:calc(72px + env(safe-area-inset-bottom))!important}
+
+  /* Market ticker less tall on mobile */
+  .mkt-ticker{height:32px}
+  .mkt-chip{height:32px;padding:0 12px;gap:4px}
+}
+
+/* Topbar mobile actions slot — hidden by default */
+.topbar-mobile-actions{display:none;align-items:center;gap:4px;margin-left:auto}
 </style>
 <style id="googleidentityservice_button_styles">.qJTHM{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;color:#202124;direction:ltr;-webkit-touch-callout:none;font-family:"Roboto-Regular",arial,sans-serif;-webkit-font-smoothing:antialiased;font-weight:400;margin:0;overflow:hidden;-webkit-text-size-adjust:100%}.ynRLnc{left:-9999px;position:absolute;top:-9999px}.L6cTce{display:none}.bltWBb{overflow-wrap:break-word;word-break:break-word}.hSRGPd{color:#1a73e8;cursor:pointer;font-weight:500;text-decoration:none}.Bz112c-W3lGp{height:16px;width:16px}.Bz112c-E3DyYd{height:20px;width:20px}.Bz112c-r9oPif{height:24px;width:24px}.Bz112c-u2z5K{height:36px;width:36px}.Bz112c-uaxL4e{border-radius:10px}.LgbsSe-Bz112c{display:block}.S9gUrf-YoZ4jf{border:none;margin:0;padding:0}.S9gUrf-YoZ4jf *{border:none;margin:0;padding:0}.fFW7wc-ibnC6b>.aZ2wEe>div{border-color:#4285f4}.P1ekSe-ZMv3u{-webkit-transition:height linear .2s;transition:height linear .2s}.P1ekSe-ZMv3u>div:nth-child(1){background-color:#1a73e8!important;-webkit-transition:width linear .3s;transition:width linear .3s}.P1ekSe-ZMv3u>div:nth-child(2){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.P1ekSe-ZMv3u>div:nth-child(3){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.haAclf{display:inline-block}.nsm7Bb-HzV7m-LgbsSe{border-radius:4px;box-sizing:border-box;-webkit-transition:background-color .218s,border-color .218s;transition:background-color .218s,border-color .218s;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;-webkit-appearance:none;background-color:#fff;background-image:none;border:1px solid #dadce0;color:#3c4043;cursor:pointer;font-family:"Google Sans",arial,sans-serif;font-size:14px;height:40px;letter-spacing:.25px;outline:none;overflow:hidden;padding:0 12px;position:relative;text-align:center;vertical-align:middle;white-space:nowrap;width:auto}@media screen and (-ms-high-contrast:active){.nsm7Bb-HzV7m-LgbsSe{border:2px solid windowText;color:windowText}}@media screen and (preferes-contrast:more){.nsm7Bb-HzV7m-LgbsSe{color:#000}}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe{font-size:14px;height:32px;letter-spacing:.25px;padding:0 10px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe{font-size:11px;height:20px;letter-spacing:.3px;padding:0 8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe{padding:0;width:40px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe{width:32px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe{width:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK{border-radius:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.pSzOP-SxQuSe{border-radius:16px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.purZT-SxQuSe{border-radius:10px}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc{border:none;color:#fff}.nsm7Bb-HzV7m-LgbsSe.MFS4be-v3pZbf-Ia7Qfc{background-color:#1a73e8}.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{background-color:#202124;color:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{color:#fff}}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:18px;margin-right:8px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:14px;min-width:14px;width:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:10px;min-width:10px;width:10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin-left:8px;margin-right:-4px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:10px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:4px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:3px;border-bottom-left-radius:3px;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;align-items:center;background-color:#fff;height:36px;margin-left:-10px;margin-right:12px;min-width:36px;width:36px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c,.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:28px;margin-left:-8px;margin-right:10px;min-width:28px;width:28px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:16px;margin-left:-6px;margin-right:8px;min-width:16px;width:16px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:3px;margin-left:2px;margin-right:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:8px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;-webkit-flex-direction:row;-webkit-box-orient:horizontal;-webkit-box-direction:normal;flex-direction:row;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;-webkit-flex-wrap:nowrap;flex-wrap:nowrap;height:100%;position:relative;width:100%}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX{-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:1;-webkit-box-flex:1;flex-grow:1;font-family:"Google Sans",arial,sans-serif;font-weight:500;overflow:hidden;text-overflow:ellipsis;vertical-align:top}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-weight:300}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:0;-webkit-box-flex:0;flex-grow:0}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-MJoBVe{-webkit-transition:background-color .218s;transition:background-color .218s;bottom:0;left:0;position:absolute;right:0;top:0}.nsm7Bb-HzV7m-LgbsSe:hover,.nsm7Bb-HzV7m-LgbsSe:focus{box-shadow:none;border-color:rgb(210,227,252);outline:none}.nsm7Bb-HzV7m-LgbsSe:focus-within{outline:2px solid #00639b;border-color:transparent}.nsm7Bb-HzV7m-LgbsSe:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.08)}.nsm7Bb-HzV7m-LgbsSe:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.1)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.24)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.32)}.nsm7Bb-HzV7m-LgbsSe .n1UuX-DkfjY{border-radius:50%;display:-webkit-box;display:-webkit-flex;display:flex;height:20px;margin-left:-4px;margin-right:8px;min-width:20px;width:20px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-family:"Roboto";font-size:12px;text-align:left}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .ssJRIf,.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .fmcmS{overflow:hidden;text-overflow:ellipsis}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;color:#5f6368;fill:#5f6368;font-size:11px;font-weight:400}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#e8eaed;fill:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff,.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#000;fill:#000}}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .Bz112c{height:18px;margin:-3px -3px -3px 2px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:0;border-bottom-left-radius:0;border-top-right-radius:3px;border-bottom-right-radius:3px;margin-left:12px;margin-right:-10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.L5Fo6c-sM5MNb{border:0;display:block;left:0;position:relative;top:0}.L5Fo6c-bF1uUb{border-radius:4px;bottom:0;cursor:pointer;left:0;position:absolute;right:0;top:0}.L5Fo6c-bF1uUb:focus{border:none;outline:none}sentinel{}</style></head>
 <body>
@@ -841,9 +953,69 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
       </button>
     </div>
 
+    <!-- MOBILE: compact action buttons (shown only on mobile via CSS) -->
+    <div class="topbar-mobile-actions" id="mobileActions">
+      <button class="act-btn ac" onclick="openSaveModal()" title="Salvar">
+        <span class="act-btn-icon">💾</span>
+      </button>
+      <button class="act-btn" onclick="toggleMoreMenu(event)" title="Mais opções" style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:6px 10px">
+        <span style="font-size:15px;line-height:1;letter-spacing:1px">···</span>
+      </button>
+    </div>
   </div><!-- end topbar-right -->
 
 </header>
+
+<!-- MARKET TRENDS TICKER -->
+<div class="mkt-ticker" id="mktTicker" style="grid-column:1/-1">
+  <div class="mkt-ticker-label"><span>ao vivo</span></div>
+  <div class="mkt-ticker-track" id="mktTrack">
+    <!-- chips preenchidos por JS -->
+    <div class="mkt-chip"><span class="mkt-chip-name">IBOV</span><span class="mkt-chip-val" id="mkt-ibov-val">–</span><span class="mkt-chip-chg nt" id="mkt-ibov-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">SELIC</span><span class="mkt-chip-val" id="mkt-selic-val">–</span><span class="mkt-chip-chg nt" id="mkt-selic-chg">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">CDI</span><span class="mkt-chip-val" id="mkt-cdi-val">–</span><span class="mkt-chip-chg nt" id="mkt-cdi-chg">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IPCA</span><span class="mkt-chip-val" id="mkt-ipca-val">–</span><span class="mkt-chip-chg nt" id="mkt-ipca-chg">12m</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">USD/BRL</span><span class="mkt-chip-val" id="mkt-usd-val">–</span><span class="mkt-chip-chg nt" id="mkt-usd-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">EUR/BRL</span><span class="mkt-chip-val" id="mkt-eur-val">–</span><span class="mkt-chip-chg nt" id="mkt-eur-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IFIX</span><span class="mkt-chip-val" id="mkt-ifix-val">–</span><span class="mkt-chip-chg nt" id="mkt-ifix-chg">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">BTC/BRL</span><span class="mkt-chip-val" id="mkt-btc-val">–</span><span class="mkt-chip-chg nt" id="mkt-btc-chg">…</span></div>
+    <!-- duplicate para loop contínuo -->
+    <div class="mkt-chip"><span class="mkt-chip-name">IBOV</span><span class="mkt-chip-val" id="mkt-ibov-val2">–</span><span class="mkt-chip-chg nt" id="mkt-ibov-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">SELIC</span><span class="mkt-chip-val" id="mkt-selic-val2">–</span><span class="mkt-chip-chg nt" id="mkt-selic-chg2">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">CDI</span><span class="mkt-chip-val" id="mkt-cdi-val2">–</span><span class="mkt-chip-chg nt" id="mkt-cdi-chg2">a.a.</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IPCA</span><span class="mkt-chip-val" id="mkt-ipca-val2">–</span><span class="mkt-chip-chg nt" id="mkt-ipca-chg2">12m</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">USD/BRL</span><span class="mkt-chip-val" id="mkt-usd-val2">–</span><span class="mkt-chip-chg nt" id="mkt-usd-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">EUR/BRL</span><span class="mkt-chip-val" id="mkt-eur-val2">–</span><span class="mkt-chip-chg nt" id="mkt-eur-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">IFIX</span><span class="mkt-chip-val" id="mkt-ifix-val2">–</span><span class="mkt-chip-chg nt" id="mkt-ifix-chg2">…</span></div>
+    <div class="mkt-chip"><span class="mkt-chip-name">BTC/BRL</span><span class="mkt-chip-val" id="mkt-btc-val2">–</span><span class="mkt-chip-chg nt" id="mkt-btc-chg2">…</span></div>
+  </div>
+  <div class="mkt-ticker-fade"></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bn-btn active" id="bnSimulador" onclick="switchScreen('simulador')" aria-label="Simulador">
+    <span class="bn-icon">📊</span>
+    <span class="bn-label">Simulador</span>
+  </button>
+  <button class="bn-btn" id="bnFinancas" onclick="switchScreen('financas')" aria-label="Finanças">
+    <span class="bn-icon">💼</span>
+    <span class="bn-label">Finanças</span>
+  </button>
+  <button class="bn-btn" id="bnMetas" onclick="switchScreen('metas')" aria-label="Metas">
+    <span class="bn-icon">🎯</span>
+    <span class="bn-label">Metas</span>
+  </button>
+  <button class="bn-btn" id="bnReminder" onclick="switchScreen('reminder')" aria-label="Lembretes">
+    <span class="bn-icon">🔔</span>
+    <span class="bn-label">Lembretes</span>
+    <div class="bn-pip" id="bnReminderPip"></div>
+  </button>
+  <button class="bn-btn" id="bnAcoes" onclick="toggleSavesDrop(event)" aria-label="Salvos">
+    <span class="bn-icon">📁</span>
+    <span class="bn-label">Salvos</span>
+  </button>
+</nav>
 
 <!-- SIMULADOR SCREEN -->
 <div id="screenSimulador" class="screen active" style="display:contents">
@@ -4357,6 +4529,28 @@ function calcInflacaoSnaps(snaps) {
 // ABA CARTEIRA — Ativos + Cotações BRAPI + Importação CSV/XLSX
 // ════════════════════════════════════════════════════════════════
 
+// Converte valor em formato BR ("127,03" OU "127.03" do SheetJS OU "1.234,56") para float.
+// Nunca remove ponto decimal — só remove ponto de milhar quando em posição correta.
+function parseBRVal(v, fallback) {
+  const fb = fallback !== undefined ? fallback : 0;
+  const s  = String(v ?? '').replace(/[R$\s]/g, '').trim();
+  if (!s || s === '-' || s === '') return fb;
+  // Ambos separadores: "1.234,56" → BR (ponto=milhar, vírgula=decimal)
+  if (s.includes(',') && s.includes('.'))
+    return parseFloat(s.replace(/\./g, '').replace(',', '.')) || fb;
+  // Só vírgula: "127,03" → decimal BR
+  if (s.includes(','))
+    return parseFloat(s.replace(',', '.')) || fb;
+  // Só ponto: "127.03" (SheetJS) ou "1.234" (milhar BR sem decimal)
+  if (s.includes('.')) {
+    // Se o ponto está na posição de milhar: dígitos{1-3}.dígitos{3} sem mais nada
+    if (/^\d{1,3}(\.\d{3})+$/.test(s))
+      return parseFloat(s.replace(/\./g, '')) || fb;
+    return parseFloat(s) || fb; // trata como decimal
+  }
+  return parseFloat(s) || fb;
+}
+
 const CART_KEY       = 'simfin_carteira';
 const CART_TOKEN_KEY = 'simfin_brapi_token';
 const NEGOC_KEY      = 'simfin_negociacoes';
@@ -4967,7 +5161,7 @@ function carteiraExtrairB3(rows) {
   const tipoCol    = Object.keys(rows[0]).find(h => /^tipo$/i.test(h));
   const produtoCol = Object.keys(rows[0]).find(h => /^produto$/i.test(h));
 
-  const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+  const parseBR = v => parseBRVal(v, null);
 
   return rows
     .map(r => {
@@ -5008,7 +5202,7 @@ function carteiraExtrairNegociacoes(rows) {
   const precoCol  = h.find(k => /^pre[çc]o$/i.test(k));
   const valorCol  = h.find(k => /^valor$/i.test(k));
 
-  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  const parseBR  = v => parseBRVal(v, 0);
   const parseData = d => {
     const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
     return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
@@ -5041,7 +5235,7 @@ function carteiraExtrairMovimentacoes(rows) {
   const precoCol   = h.find(k => /pre[çc]o.*unit[aá]rio/i.test(k));
   const valorCol   = h.find(k => /valor.*opera[çc][aã]o/i.test(k));
 
-  const parseBR  = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || 0;
+  const parseBR  = v => parseBRVal(v, 0);
   const parseData = d => {
     const m = String(d||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);
     return m ? `${m[3]}-${m[2]}-${m[1]}` : String(d||'');
@@ -5221,7 +5415,7 @@ async function carteiraImportFile(file) {
             `Colunas não reconhecidas. Encontradas: ${Object.keys(rows[0]).join(', ')}`, 'err');
           return;
         }
-        const parseBR = v => parseFloat(String(v||'').replace(/\./g,'').replace(',','.')) || null;
+        const parseBR = v => parseBRVal(v, null);
         novos = rows
           .map(r => ({
             ticker:    (r[tickerCol]||'').toString().trim().toUpperCase().replace(/[\s.]/g,''),
@@ -5565,51 +5759,70 @@ async function carteiraAddTesouro() {
 const _carteiraRefreshOrig = carteiraRefresh;
 async function carteiraRefresh() {
   const ativos = carteiraLoad();
-  const acoes   = ativos.filter(a => a.tipo !== 'tesouro');
-  const tesouro = ativos.filter(a => a.tipo === 'tesouro');
+  if (!ativos.length) return;
+
+  // Separa por categoria (não por tipo - usamos categoria)
+  const naoTesouro = ativos.filter(a => a.categoria !== 'tesouro');
+  const tesouro    = ativos.filter(a => a.categoria === 'tesouro');
 
   const btn = document.getElementById('cartRefreshBtn');
   if (btn) { btn.textContent = '⏳ Atualizando...'; btn.disabled = true; }
 
-  // Atualiza ações via BRAPI
+  // Atualiza ações/FIIs via BRAPI
   let quotesAcoes = {};
-  if (acoes.length) {
-    const q = await carteiraBuscarCotacao(acoes.map(a => a.ticker));
-    if (q) quotesAcoes = q;
+  let brapiOk = true;
+  if (naoTesouro.length) {
+    const q = await carteiraBuscarCotacao(naoTesouro.map(a => a.ticker));
+    if (q) { quotesAcoes = q; }
+    else   { brapiOk = false; }
   }
 
-  // Atualiza Tesouro via API
+  // Atualiza Tesouro via API pública do Tesouro
   let pricesTesouro = [];
   if (tesouro.length) {
-    pricesTesouro = await tesouroFetchPrices() || [];
+    try { pricesTesouro = await tesouroFetchPrices() || []; } catch {}
   }
 
   const agora   = new Date().toISOString();
+  let   n       = 0;
   const updated = ativos.map(a => {
-    if (a.tipo === 'tesouro') {
+    if (a.categoria === 'tesouro') {
       const match = pricesTesouro.find(p =>
-        p.nome.toLowerCase().includes(
+        p.nome && a.nome && p.nome.toLowerCase().includes(
           a.nome.toLowerCase().replace('tesouro ','').split(' ')[0]
         ) && a.nome.includes(p.nome.split(' ').slice(-1)[0])
       ) || pricesTesouro.find(p => p.nome === a.nome);
-      if (!match) return { ...a, updatedAt: agora };
-      return {
-        ...a,
-        preco:     match.preco,
-        variacao:  ((match.preco - a.pmedio) / a.pmedio * 100),
-        updatedAt: agora,
-      };
+      if (!match) return a;
+      n++;
+      return { ...a, preco: match.preco,
+               variacao: a.pmedio ? ((match.preco - a.pmedio) / a.pmedio * 100) : 0,
+               updatedAt: agora };
     } else {
       const q = quotesAcoes[a.ticker];
       if (!q) return a;
-      return { ...a, preco: q.regularMarketPrice, variacao: q.regularMarketChangePercent, nome: q.shortName||q.longName||a.nome, updatedAt: agora };
+      n++;
+      return { ...a, preco: q.regularMarketPrice, variacao: q.regularMarketChangePercent,
+               nome: q.shortName||q.longName||a.nome, updatedAt: agora };
     }
   });
 
   carteiraSave(updated);
   carteiraRenderList();
   if (btn) { btn.textContent = '🔄 Atualizar cotações'; btn.disabled = false; }
-  showToast('Cotações atualizadas!', '✅', 3000);
+
+  if (!brapiOk && n === 0) {
+    const token = carteiraGetToken();
+    showToast(
+      token
+        ? 'Falha ao buscar cotações (verifique o token BRAPI)'
+        : 'Sem token BRAPI: clique no ícone 🔑 e cole seu token gratuito de brapi.dev',
+      '⚠️', 6000
+    );
+  } else if (n > 0) {
+    showToast(`${n} cotaç${n===1?'ão':'ões'} atualizadas!`, '✅', 3000);
+  } else {
+    showToast('Nenhuma cotação encontrada (tickers inválidos?)', '⚠️', 4000);
+  }
 }
 
 // ── Usar total da carteira para preencher saldo no acompanhamento ──
@@ -5669,17 +5882,103 @@ function switchScreen(screen) {
     const el = document.getElementById(cfg.el);
     if (el) el.style.display = key === screen ? cfg.display : 'none';
   });
+  // Sync desktop nav tabs
   ['tabSimulador','tabFinancas','tabMetas','tabReminder'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
   const tabMap = { simulador:'tabSimulador', financas:'tabFinancas', metas:'tabMetas', reminder:'tabReminder' };
   document.getElementById(tabMap[screen])?.classList.add('active');
+  // Sync mobile bottom nav
+  const bnMap = { simulador:'bnSimulador', financas:'bnFinancas', metas:'bnMetas', reminder:'bnReminder' };
+  ['bnSimulador','bnFinancas','bnMetas','bnReminder','bnAcoes'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  document.getElementById(bnMap[screen])?.classList.add('active');
 
   if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); }
   if (screen === 'metas')     { renderGoals(); }
   if (screen === 'reminder')  { reminderUpdateUI(); }
 }
+
+// ── Market Trends Ticker ──
+(function initMktTicker(){
+  // Dados fixos confiáveis (referência Abr/2026) + atualização via brapi se disponível
+  const STATIC = {
+    selic: { val:'13,75%', chg:'a.a.', cls:'nt' },
+    cdi:   { val:'13,65%', chg:'a.a.', cls:'nt' },
+    ipca:  { val:'5,48%',  chg:'12m',  cls:'dn' },
+  };
+
+  function fmtNum(n, decimals=2){
+    return n.toLocaleString('pt-BR',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+  }
+  function fmtChg(pct){
+    const cls = pct > 0 ? 'up' : pct < 0 ? 'dn' : 'nt';
+    const sign = pct > 0 ? '+' : '';
+    return { txt: sign + fmtNum(pct) + '%', cls };
+  }
+  function setChip(suffix, val, chgTxt, chgCls){
+    ['','2'].forEach(s => {
+      const v = document.getElementById('mkt-'+suffix+'-val'+(s==='2'?'2':''));
+      const c = document.getElementById('mkt-'+suffix+'-chg'+(s==='2'?'2':''));
+      if(v) v.textContent = val;
+      if(c){ c.textContent = chgTxt; c.className = 'mkt-chip-chg '+chgCls; }
+    });
+  }
+
+  // Preenche estáticos imediatamente
+  setChip('selic', STATIC.selic.val, STATIC.selic.chg, STATIC.selic.cls);
+  setChip('cdi',   STATIC.cdi.val,   STATIC.cdi.chg,   STATIC.cdi.cls);
+  setChip('ipca',  STATIC.ipca.val,  STATIC.ipca.chg,  STATIC.ipca.cls);
+
+  // Tenta buscar dados dinâmicos via brapi (IBOV, USD, EUR, IFIX, BTC)
+  async function fetchMkt(){
+    try {
+      const tickers = ['%5EBVSP','USDBRL=X','EURBRL=X','%5EIFIX','BTC-BRL'];
+      const url = `https://brapi.dev/api/quote/${tickers.join(',')}?fundamental=false`;
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if(!r.ok) return;
+      const data = await r.json();
+      const results = data.results || [];
+      const bySymbol = {};
+      results.forEach(q => { bySymbol[q.symbol] = q; });
+
+      const ibov = bySymbol['^BVSP'] || bySymbol['%5EBVSP'];
+      if(ibov){
+        const chg = fmtChg(ibov.regularMarketChangePercent||0);
+        setChip('ibov', fmtNum(ibov.regularMarketPrice||0,0)+' pts', chg.txt, chg.cls);
+      }
+      const usd = bySymbol['USDBRL=X'];
+      if(usd){
+        const chg = fmtChg(usd.regularMarketChangePercent||0);
+        setChip('usd', 'R$ '+fmtNum(usd.regularMarketPrice||0), chg.txt, chg.cls);
+      }
+      const eur = bySymbol['EURBRL=X'];
+      if(eur){
+        const chg = fmtChg(eur.regularMarketChangePercent||0);
+        setChip('eur', 'R$ '+fmtNum(eur.regularMarketPrice||0), chg.txt, chg.cls);
+      }
+      const ifix = bySymbol['^IFIX'] || bySymbol['%5EIFIX'];
+      if(ifix){
+        const chg = fmtChg(ifix.regularMarketChangePercent||0);
+        setChip('ifix', fmtNum(ifix.regularMarketPrice||0,0), chg.txt, chg.cls);
+      }
+      const btc = bySymbol['BTC-BRL'];
+      if(btc){
+        const chg = fmtChg(btc.regularMarketChangePercent||0);
+        const bVal = btc.regularMarketPrice>=1000
+          ? 'R$ '+fmtNum(btc.regularMarketPrice/1000,1)+'k'
+          : 'R$ '+fmtNum(btc.regularMarketPrice||0,0);
+        setChip('btc', bVal, chg.txt, chg.cls);
+      }
+    } catch(e){ /* silently ignore — dados estáticos já estão */ }
+  }
+
+  fetchMkt();
+  // Atualiza a cada 5 min
+  setInterval(fetchMkt, 5*60*1000);
+})();
 
 // ── Storage helpers ──
 function loadTrack() {
