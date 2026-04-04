@@ -152,3 +152,68 @@ document.addEventListener('keydown',e=>{
 
 updAno();
 calc();
+
+// ── Market Trends Ticker ──
+(function initMktTicker(){
+  function fmtNum(n, decimals=2){
+    return n.toLocaleString('pt-BR',{minimumFractionDigits:decimals,maximumFractionDigits:decimals});
+  }
+  function fmtChg(pct){
+    const cls = pct > 0 ? 'up' : pct < 0 ? 'dn' : 'nt';
+    const sign = pct > 0 ? '+' : '';
+    return { txt: sign + fmtNum(pct) + '%', cls };
+  }
+  function setChip(suffix, val, chgTxt, chgCls){
+    ['','2'].forEach(s => {
+      const v = document.getElementById('mkt-'+suffix+'-val'+(s==='2'?'2':''));
+      const c = document.getElementById('mkt-'+suffix+'-chg'+(s==='2'?'2':''));
+      if(v) v.textContent = val;
+      if(c){ c.textContent = chgTxt; c.className = 'mkt-chip-chg '+chgCls; }
+    });
+  }
+
+  async function fetchMkt(){
+    try {
+      const tickers = ['%5EBVSP','USDBRL=X','EURBRL=X','%5EIFIX','BTC-BRL'];
+      const url = `https://brapi.dev/api/quote/${tickers.join(',')}?fundamental=false`;
+      const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if(!r.ok) return;
+      const data = await r.json();
+      const results = data.results || [];
+      const bySymbol = {};
+      results.forEach(q => { bySymbol[q.symbol] = q; });
+
+      const ibov = bySymbol['^BVSP'] || bySymbol['%5EBVSP'];
+      if(ibov){
+        const chg = fmtChg(ibov.regularMarketChangePercent||0);
+        setChip('ibov', fmtNum(ibov.regularMarketPrice||0,0)+' pts', chg.txt, chg.cls);
+      }
+      const usd = bySymbol['USDBRL=X'];
+      if(usd){
+        const chg = fmtChg(usd.regularMarketChangePercent||0);
+        setChip('usd', 'R$ '+fmtNum(usd.regularMarketPrice||0), chg.txt, chg.cls);
+      }
+      const eur = bySymbol['EURBRL=X'];
+      if(eur){
+        const chg = fmtChg(eur.regularMarketChangePercent||0);
+        setChip('eur', 'R$ '+fmtNum(eur.regularMarketPrice||0), chg.txt, chg.cls);
+      }
+      const ifix = bySymbol['^IFIX'] || bySymbol['%5EIFIX'];
+      if(ifix){
+        const chg = fmtChg(ifix.regularMarketChangePercent||0);
+        setChip('ifix', fmtNum(ifix.regularMarketPrice||0,0), chg.txt, chg.cls);
+      }
+      const btc = bySymbol['BTC-BRL'];
+      if(btc){
+        const chg = fmtChg(btc.regularMarketChangePercent||0);
+        const bVal = btc.regularMarketPrice>=1000
+          ? 'R$ '+fmtNum(btc.regularMarketPrice/1000,1)+'k'
+          : 'R$ '+fmtNum(btc.regularMarketPrice||0,0);
+        setChip('btc', bVal, chg.txt, chg.cls);
+      }
+    } catch(e){}
+  }
+
+  fetchMkt();
+  setInterval(fetchMkt, 5*60*1000);
+})();
