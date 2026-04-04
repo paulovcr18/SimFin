@@ -17,12 +17,19 @@ function switchScreen(screen) {
     const el = document.getElementById(cfg.el);
     if (el) el.style.display = key === screen ? cfg.display : 'none';
   });
+  // Sync desktop nav tabs
   ['tabSimulador','tabFinancas','tabMetas','tabReminder'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
   const tabMap = { simulador:'tabSimulador', financas:'tabFinancas', metas:'tabMetas', reminder:'tabReminder' };
   document.getElementById(tabMap[screen])?.classList.add('active');
+  // Sync mobile bottom nav
+  const bnMap = { simulador:'bnSimulador', financas:'bnFinancas', metas:'bnMetas', reminder:'bnReminder' };
+  ['bnSimulador','bnFinancas','bnMetas','bnReminder'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  document.getElementById(bnMap[screen])?.classList.add('active');
 
   if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); }
   if (screen === 'metas')     { renderGoals(); }
