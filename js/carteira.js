@@ -451,6 +451,34 @@ function carteiraRenderList() {
 
   // ── Tabela de ativos ──
   const sorted = [...ativos].sort((a,b) => (b.preco||0)*(b.qtd||0) - (a.preco||0)*(a.qtd||0));
+
+  // Renderiza linha de detalhe Tesouro
+  function renderTesouroDetail(a) {
+    if (a.tipo !== 'tesouro') return '';
+    const tid  = `td-${a.ticker}`;
+    const st   = a._tdStatus || (a.precoEstimado ? 'estimado' : a.preco ? 'ok' : 'nao_encontrado');
+    const badgeLabel = { ok:'Cotação atualizada', estimado:'Estimado', nao_encontrado:'Não encontrado', indisponivel:'Indisponível', ambiguo:'Ambíguo', carregando:'Carregando…' };
+    const fieldsHtml = (st === 'ok' && (a.taxaCompra || a.taxaVenda || a.puCompra || a.puVenda))
+      ? `<div class="td-fields">
+          ${a.dataRef    ? `<div>Data <b>${escHtml(a.dataRef)}</b></div>` : ''}
+          ${a.taxaCompra != null ? `<div>Tx Compra <b>${a.taxaCompra.toFixed(2)}% a.a.</b></div>` : ''}
+          ${a.taxaVenda  != null ? `<div>Tx Venda <b>${a.taxaVenda.toFixed(2)}% a.a.</b></div>` : ''}
+          ${a.puCompra   != null ? `<div>PU Compra <b>R$ ${fmt(a.puCompra)}</b></div>` : ''}
+          ${a.puVenda    != null ? `<div>PU Venda <b>R$ ${fmt(a.puVenda)}</b></div>` : ''}
+        </div>` : '';
+    const ambigHtml = st === 'ambiguo' && a._tdOpcoes
+      ? `<div class="td-ambiguo">Refine o cadastro informando tipo e vencimento. Opções: ${a._tdOpcoes.map(o => escHtml(o.nome)).join(', ')}</div>` : '';
+    return `<tr class="tesouro-detail-row" id="${tid}" style="display:none">
+      <td colspan="8">
+        <div class="tesouro-detail">
+          <span class="td-badge td-badge-${st}">${badgeLabel[st]||st}</span>
+          ${fieldsHtml}${ambigHtml}
+          ${a._tdSource ? `<span style="font-size:10px;color:var(--t3);margin-left:8px">fonte: ${escHtml(a._tdSource)}</span>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }
+
   area.innerHTML = `<div class="cart-table-wrap"><table class="cart-table">
     <thead><tr>
       <th>Ativo</th>
@@ -469,7 +497,9 @@ function carteiraRenderList() {
       const pct      = total > 0 ? (valor/total*100).toFixed(1) : '0';
       const varCls   = !a.variacao ? '' : a.variacao >= 0 ? 'var(--ac)' : 'var(--re)';
       const cat      = a.categoria || 'outro';
-      return `<tr>
+      const isTes    = a.tipo === 'tesouro';
+      const expandBtn = isTes ? `<button class="cart-trow-del" onclick="carteiraToggleTesouroDetail('${a.ticker}')" title="Ver detalhes">ℹ</button>` : '';
+      return `<tr${isTes ? ` style="cursor:pointer" onclick="carteiraToggleTesouroDetail('${a.ticker}')"` : ''}>
         <td>
           <div style="display:flex;align-items:center;gap:7px">
             <div>
@@ -494,8 +524,8 @@ function carteiraRenderList() {
         <td class="r">${lucro!==null ? `<span style="color:${lucro>=0?'var(--ac)':'var(--re)'};font-size:12px">${lucro>=0?'+':''}${fmt(lucro)}<br><span style="font-size:10px">${lucroPct>=0?'+':''}${lucroPct.toFixed(1)}%</span></span>` : '<span style="color:var(--t3)">—</span>'}</td>
         <td class="r" style="color:var(--ac);font-weight:600">${valor > 0 ? fmt(valor) : '—'}</td>
         <td class="r" style="color:var(--t3)">${pct}%</td>
-        <td><button class="cart-trow-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button></td>
-      </tr>`;
+        <td onclick="event.stopPropagation()"><button class="cart-trow-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button>${expandBtn}</td>
+      </tr>${renderTesouroDetail(a)}`;
     }).join('')}</tbody>
   </table></div>`;
 
@@ -504,6 +534,13 @@ function carteiraRenderList() {
   carteiraRenderRecomendacoes();
   carteiraRenderProventos();
   carteiraRenderGanhos();
+}
+
+// ── Toggle linha de detalhe Tesouro ──────────────────────────────────────
+function carteiraToggleTesouroDetail(ticker) {
+  const row = document.getElementById(`td-${ticker}`);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
 }
 
 // ── Renderizar gráfico de alocação por categoria ──
@@ -1448,15 +1485,26 @@ async function carteiraRefresh() {
             tesouroNormalizarTitulo(a.nome),
             p.nomeB3 || p.nome
           ));
-      if (!match) return { ...a, updatedAt: agora };
+      if (!match) return { ...a, _tdStatus: 'nao_encontrado', updatedAt: agora };
       const fromCache = match._fromCache;
+
+      // Campos ricos do CKAN (podem ser null se vier da fonte B3 legado)
+      const precoFinal = match.puVenda || match.preco || null;
       return {
         ...a,
-        preco:          match.preco,
-        precoEstimado:  false,  // preço real recebido — remove flag de estimativa
-        variacao:       ((match.preco - a.pmedio) / a.pmedio * 100),
+        preco:          precoFinal,
+        precoEstimado:  !precoFinal,
+        variacao:       precoFinal && a.pmedio ? ((precoFinal - a.pmedio) / a.pmedio * 100) : a.variacao,
+        taxaCompra:     match.taxaCompra  ?? null,
+        taxaVenda:      match.taxaVenda   ?? null,
+        puCompra:       match.puCompra    ?? null,
+        puVenda:        match.puVenda     ?? null,
+        dataRef:        match.dataRef     ?? null,
+        _tdStatus:      match.status      || 'ok',
+        _tdOpcoes:      match.opcoes      ?? null,
+        _tdSource:      match._source     ?? null,
         updatedAt:      agora,
-        cotadoEm:       fromCache ? `cache ${match._cacheAge}h` : agora,
+        cotadoEm:       fromCache ? `cache ${match._cacheAge}min` : agora,
       };
     } else {
       const q = quotesAcoes[a.ticker];
@@ -1474,9 +1522,12 @@ async function carteiraRefresh() {
 
   // Feedback com aviso se Tesouro veio de cache local
   const tesouroCacheAge = pricesTesouro.find(p => p._fromCache)?._cacheAge;
-  const toastMsg = tesouroCacheAge
-    ? `Cotações atualizadas · Tesouro: dados de ${tesouroCacheAge}h atrás (Edge Function offline)`
-    : 'Cotações atualizadas!';
+  const tesouroIndisponivel = pricesTesouro.some(p => p.status === 'indisponivel');
+  const toastMsg = tesouroIndisponivel
+    ? 'Cotações atualizadas · Tesouro: serviço indisponível (sem cache)'
+    : tesouroCacheAge
+      ? `Cotações atualizadas · Tesouro: dados de ${tesouroCacheAge}min atrás (cache)`
+      : 'Cotações atualizadas!';
 
   carteiraSave(updated);
   carteiraRenderList();
