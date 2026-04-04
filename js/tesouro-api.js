@@ -1,142 +1,132 @@
 // ════════════════════════════════════════════════════════════════
-// TESOURO DIRETO — API AA40 (aposenteaos40.org)
-// Consulta cotações em tempo real via proxy público
+// TESOURO DIRETO — via Edge Function Supabase
+// Proxy server-side da API oficial da B3/Tesouro Nacional
+// Resolve CORS e elimina dependência de APIs de terceiros
 // ════════════════════════════════════════════════════════════════
 
-const TESOURO_API = 'https://www.aposenteaos40.org/fire-dash/includes/api_tesouro.php';
 const TESOURO_CACHE_KEY = 'simfin_tesouro_cache';
-const TESOURO_CACHE_TTL = 24 * 3600000; // 24 horas em ms
+const TESOURO_CACHE_TTL = 4 * 3600000; // 4 horas em ms
 
-// Mapeamento de nomes para consulta na API
-const TESOURO_TITULO_MAP = {
-  'Tesouro Prefixado 2026': { api: 'Tesouro+Prefixado', vencimento: '01-2026' },
-  'Tesouro Prefixado 2027': { api: 'Tesouro+Prefixado', vencimento: '01-2027' },
-  'Tesouro Prefixado 2029': { api: 'Tesouro+Prefixado', vencimento: '01-2029' },
-  'Tesouro Prefixado 2031': { api: 'Tesouro+Prefixado', vencimento: '01-2031' },
-  'Tesouro IPCA+ 2026': { api: 'Tesouro+IPCA%2B', vencimento: '08-2026' },
-  'Tesouro IPCA+ 2029': { api: 'Tesouro+IPCA%2B', vencimento: '05-2029' },
-  'Tesouro IPCA+ 2032': { api: 'Tesouro+IPCA%2B', vencimento: '08-2032' },
-  'Tesouro IPCA+ 2035': { api: 'Tesouro+IPCA%2B', vencimento: '05-2035' },
-  'Tesouro IPCA+ 2040': { api: 'Tesouro+IPCA%2B', vencimento: '08-2040' },
-  'Tesouro IPCA+ 2045': { api: 'Tesouro+IPCA%2B', vencimento: '05-2045' },
-  'Tesouro IPCA+ 2050': { api: 'Tesouro+IPCA%2B', vencimento: '08-2050' },
-  'Tesouro Selic 2027': { api: 'Tesouro+Selic', vencimento: '03-2027' },
-  'Tesouro Selic 2030': { api: 'Tesouro+Selic', vencimento: '03-2030' },
-  'Tesouro IGPM+ 2031': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2031' },
-  'Tesouro IGPM+ 2033': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2033' },
-  'Tesouro IGPM+ 2035': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2035' },
-  'Tesouro IGPM+ 2037': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2037' },
-  'Tesouro IGPM+ 2040': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2040' },
-  'Tesouro IGPM+ 2045': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2045' },
-  'Tesouro IGPM+ 2050': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2050' },
-  'Tesouro IGPM+ 2055': { api: 'Tesouro+IGPM%2B+com+Juros+Semestrais', vencimento: '01-2055' },
-};
-
-// ── Cache local (evita requisições excessivas) ──
+// ── Cache local: armazena a lista completa de uma vez ──
 function tesouroLoadCache() {
   try { return JSON.parse(localStorage.getItem(TESOURO_CACHE_KEY)) || {}; } catch { return {}; }
 }
 function tesouroSaveCache(cache) {
-  localStorage.setItem(TESOURO_CACHE_KEY, JSON.stringify(cache));
+  try { localStorage.setItem(TESOURO_CACHE_KEY, JSON.stringify(cache)); } catch {}
 }
-function tesouroIsCacheValid(titulo) {
+
+// ── Busca todos os títulos via Edge Function (API oficial da B3) ──
+// forceRefresh=true ignora cache e faz nova requisição à rede
+async function tesouroFetchTodos(forceRefresh = false) {
   const cache = tesouroLoadCache();
-  if (!cache[titulo]) return false;
-  const age = Date.now() - cache[titulo].ts;
-  return age < TESOURO_CACHE_TTL;
-}
+  const cacheAge = cache._fetchedAt ? Date.now() - cache._fetchedAt : Infinity;
 
-// ── Consulta cotação via API AA40 ──
-async function tesouroFetchCotacao(titulo) {
-  // Validar cache primeiro
-  if (tesouroIsCacheValid(titulo)) {
-    const cache = tesouroLoadCache();
-    return cache[titulo].data;
+  if (!forceRefresh && cacheAge < TESOURO_CACHE_TTL && cache._list?.length) {
+    return { list: cache._list, fromCache: true, cacheAgeH: Math.round(cacheAge / 3600000) };
   }
-
-  const config = TESOURO_TITULO_MAP[titulo];
-  if (!config) return null;
 
   try {
-    const url = `${TESOURO_API}?titulo=${config.api}&vencimento=${config.vencimento}`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const text = await res.text();
+    const res = await fetch(`${COTACOES_FN}?tesouro=1`, {
+      headers: { 'apikey': SUPABASE_ANON },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const list = data.results || [];
+    if (!list.length) throw new Error('Lista vazia retornada pela API');
 
-    // Parse CSV: "PU_Venda,Taxa_Compra"
-    const [pu, taxa] = text.trim().split(',').map(v => v.trim());
-    if (!pu || !taxa) return null;
-
-    const result = {
-      pu: parseFloat(pu),
-      taxa: parseFloat(taxa),
-      titulo,
-      ts: Date.now()
-    };
-
-    // Atualizar cache
-    const cache = tesouroLoadCache();
-    cache[titulo] = { data: result, ts: Date.now() };
-    tesouroSaveCache(cache);
-
-    return result;
+    tesouroSaveCache({ _fetchedAt: Date.now(), _list: list });
+    return { list, fromCache: false, cacheAgeH: 0 };
   } catch (e) {
-    console.warn('[Tesouro API]', e);
-    return null;
+    console.warn('[Tesouro] Edge Function falhou:', e.message);
+    // Fallback: retorna cache expirado se disponível
+    if (cache._list?.length) {
+      return { list: cache._list, fromCache: true, cacheAgeH: Math.round(cacheAge / 3600000) };
+    }
+    return { list: [], fromCache: false, cacheAgeH: 0 };
   }
 }
 
-// ── Batch: consultar múltiplos títulos ──
-async function tesouroFetchMultiplos(titulos) {
-  const results = {};
-  for (const titulo of titulos) {
-    const data = await tesouroFetchCotacao(titulo);
-    if (data) results[titulo] = data;
-  }
-  return results;
-}
-
-// ── Normalizar nome do título a partir de texto importado ──
+// ── Normaliza texto importado da B3 para nome canônico ──
+// Extrai tipo e ano de vencimento de strings como:
+//   "Tesouro IPCA+ 2029", "TD IPCA+ 2029", "IPCA + 2029", etc.
 function tesouroNormalizarTitulo(texto) {
-  // Remove números de série, IDs, etc. e normaliza para o formato esperado
-  const lower = String(texto).toLowerCase();
+  if (!texto) return null;
+  const s = String(texto).toLowerCase().trim();
 
-  // Prefixado
-  if (lower.includes('prefixado') || lower.includes('prefixo')) {
-    if (lower.includes('2026') || lower.includes('26')) return 'Tesouro Prefixado 2026';
-    if (lower.includes('2027') || lower.includes('27')) return 'Tesouro Prefixado 2027';
-    if (lower.includes('2029') || lower.includes('29')) return 'Tesouro Prefixado 2029';
-    if (lower.includes('2031') || lower.includes('31')) return 'Tesouro Prefixado 2031';
-  }
+  // Extrai o ano de 4 dígitos
+  const anoM = s.match(/\b(20\d{2})\b/);
+  const ano  = anoM ? anoM[1] : null;
 
-  // IPCA+
-  if (lower.includes('ipca')) {
-    if (lower.includes('2026') || lower.includes('26')) return 'Tesouro IPCA+ 2026';
-    if (lower.includes('2029') || lower.includes('29')) return 'Tesouro IPCA+ 2029';
-    if (lower.includes('2032') || lower.includes('32')) return 'Tesouro IPCA+ 2032';
-    if (lower.includes('2035') || lower.includes('35')) return 'Tesouro IPCA+ 2035';
-    if (lower.includes('2040') || lower.includes('40')) return 'Tesouro IPCA+ 2040';
-    if (lower.includes('2045') || lower.includes('45')) return 'Tesouro IPCA+ 2045';
-    if (lower.includes('2050') || lower.includes('50')) return 'Tesouro IPCA+ 2050';
-  }
-
-  // Selic
-  if (lower.includes('selic')) {
-    if (lower.includes('2027') || lower.includes('27')) return 'Tesouro Selic 2027';
-    if (lower.includes('2030') || lower.includes('30')) return 'Tesouro Selic 2030';
-  }
-
-  // IGPM+
-  if (lower.includes('igpm')) {
-    if (lower.includes('2031') || lower.includes('31')) return 'Tesouro IGPM+ 2031';
-    if (lower.includes('2033') || lower.includes('33')) return 'Tesouro IGPM+ 2033';
-    if (lower.includes('2035') || lower.includes('35')) return 'Tesouro IGPM+ 2035';
-    if (lower.includes('2037') || lower.includes('37')) return 'Tesouro IGPM+ 2037';
-    if (lower.includes('2040') || lower.includes('40')) return 'Tesouro IGPM+ 2040';
-    if (lower.includes('2045') || lower.includes('45')) return 'Tesouro IGPM+ 2045';
-    if (lower.includes('2050') || lower.includes('50')) return 'Tesouro IGPM+ 2050';
-    if (lower.includes('2055') || lower.includes('55')) return 'Tesouro IGPM+ 2055';
-  }
+  if (s.includes('ipca'))      return ano ? `Tesouro IPCA+ ${ano}`      : 'Tesouro IPCA+';
+  if (s.includes('selic'))     return ano ? `Tesouro Selic ${ano}`      : 'Tesouro Selic';
+  if (s.includes('igpm') || s.includes('igp-m')) return ano ? `Tesouro IGPM+ ${ano}` : 'Tesouro IGPM+';
+  if (s.includes('prefixado') || s.includes('prefixo') || s.includes('ltn'))
+                                return ano ? `Tesouro Prefixado ${ano}` : 'Tesouro Prefixado';
+  if (s.includes('tesouro'))   return ano ? `Tesouro ${ano}`            : null;
 
   return null;
+}
+
+// ── Matching fuzzy: título normalizado vs. nome canônico da B3 ──
+function tesouroMatchTitulo(normalizado, nomeB3) {
+  if (!normalizado || !nomeB3) return false;
+  const n = normalizado.toLowerCase();
+  const b = nomeB3.toLowerCase();
+
+  // Extrai ano dos dois lados
+  const anoN = (n.match(/\b(20\d{2})\b/) || [])[1];
+  const anoB = (b.match(/\b(20\d{2})\b/) || [])[1];
+
+  // Anos precisam bater (se ambos presentes)
+  if (anoN && anoB && anoN !== anoB) return false;
+
+  // Tipo precisa bater
+  if (n.includes('ipca')      && !b.includes('ipca'))      return false;
+  if (n.includes('selic')     && !b.includes('selic'))      return false;
+  if (n.includes('igpm')      && !b.includes('igpm'))      return false;
+  if (n.includes('prefixado') && !b.includes('prefixado')) return false;
+
+  return true;
+}
+
+// ── Busca cotação de um título específico ──
+async function tesouroFetchCotacao(titulo, forceRefresh = false) {
+  const { list } = await tesouroFetchTodos(forceRefresh);
+  const normalizado = tesouroNormalizarTitulo(titulo);
+  if (!normalizado) return null;
+
+  // Busca exata pelo nome canônico primeiro
+  let match = list.find(item => item.nome === titulo);
+  // Fallback: matching fuzzy
+  if (!match) match = list.find(item => tesouroMatchTitulo(normalizado, item.nome));
+
+  return match || null;
+}
+
+// ── Batch: consultar múltiplos títulos (1 request só) ──
+async function tesouroFetchMultiplos(titulos, forceRefresh = false) {
+  const { list, fromCache, cacheAgeH } = await tesouroFetchTodos(forceRefresh);
+  const results = {};
+
+  for (const titulo of titulos) {
+    const normalizado = tesouroNormalizarTitulo(titulo);
+    if (!normalizado) continue;
+
+    let match = list.find(item => item.nome === titulo);
+    if (!match) match = list.find(item => tesouroMatchTitulo(normalizado, item.nome));
+
+    if (match) {
+      results[titulo] = {
+        pu:         match.preco,
+        taxa:       match.taxa || 0,
+        titulo:     match.nome,
+        fromCache,
+        cacheAgeH,
+      };
+    }
+  }
+
+  return results;
 }
