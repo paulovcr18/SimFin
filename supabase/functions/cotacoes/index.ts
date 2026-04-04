@@ -8,7 +8,7 @@
 //
 // Respostas:
 //   tickers: { results: { WEGE3: { regularMarketPrice, regularMarketChangePercent, shortName, symbol } } }
-//   tesouro: { results: [{ nome, preco, venc }] }
+//   tesouro: { results: [{ nome, preco, venc, taxa }] }
 // ════════════════════════════════════════════════════════════════
 
 const CORS_HEADERS = {
@@ -37,9 +37,10 @@ Deno.serve(async (req: Request) => {
       const tData = await tRes.json() as { response?: { TrsrBdTradgList?: { TrsrBd: Record<string, unknown> }[] } };
       const list  = tData?.response?.TrsrBdTradgList ?? [];
       const results = list.map(item => ({
-        nome:  item.TrsrBd.nm  as string,
-        preco: item.TrsrBd.untrRedVal as number,
-        venc:  item.TrsrBd.mtrtyDt   as string,
+        nome:  item.TrsrBd.nm            as string,
+        preco: item.TrsrBd.untrRedVal    as number,
+        venc:  item.TrsrBd.mtrtyDt       as string,
+        taxa:  item.TrsrBd.anulInvstmtRate as number,
       }));
       return new Response(JSON.stringify({ results }), {
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
@@ -74,7 +75,6 @@ Deno.serve(async (req: Request) => {
     const rawList = data?.spark?.result ?? [];
 
     // Normaliza para o mesmo formato que o BRAPI retorna
-    // (carteira.js usa r.regularMarketPrice, r.regularMarketChangePercent, r.shortName, r.symbol)
     const results: Record<string, unknown> = {};
     for (const item of rawList) {
       const sym  = String(item.symbol ?? '').replace(/\.SA$/i, '');
