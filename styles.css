@@ -20,8 +20,9 @@ body{background:var(--bg9);color:var(--t1);font-family:var(--fb);font-size:14px;
 .app{display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr;min-height:100vh}
 .topbar{
   background:var(--bg8);border-bottom:1px solid var(--bd);
-  padding:0 20px 0 24px;display:flex;align-items:center;gap:0;
-  position:sticky;top:0;z-index:100;min-height:56px;
+  padding:env(safe-area-inset-top) 20px 0 24px;display:flex;align-items:center;gap:0;
+  position:sticky;top:0;z-index:100;
+  min-height:calc(56px + env(safe-area-inset-top));
 }
 /* Três zonas: esquerda (logo+nav) | centro (flex) | direita (ações+drive) */
 .topbar-left{display:flex;align-items:center;gap:12px;flex-shrink:0}
@@ -856,10 +857,6 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 .topbar-mobile-actions{display:none;align-items:center;gap:4px;margin-left:auto}
 
 @media(max-width:760px){
-  .topbar{
-    padding-top:env(safe-area-inset-top);
-    min-height:calc(52px + env(safe-area-inset-top));
-  }
   .mkt-ticker{grid-column:1/-1}
 }
 
@@ -902,7 +899,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   }
   .bn-pip.show{display:block}
 
-  .topbar{padding:0 12px 0 16px;gap:8px}
+  .topbar{padding:env(safe-area-inset-top) 12px 0 16px;gap:8px}
   .topbar-left{gap:8px}
   .topbar-right{gap:6px}
 
