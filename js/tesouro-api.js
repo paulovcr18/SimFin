@@ -185,6 +185,15 @@ async function tesouroFetchTodos(forceRefresh = false) {
   return { index: {}, fromCache: false, _source: null, error: 'indisponivel' };
 }
 
+// ── Filtra candidatos por tipo e ano (helper compartilhado) ──────────────
+function tesouroFiltrarCandidatos(candidatos, tipoAtivo, anoAtivo) {
+  let result = tipoAtivo
+    ? candidatos.filter(t => tesouroExtrairChave(t.nome).tipo === tipoAtivo)
+    : candidatos;
+  if (anoAtivo) result = result.filter(t => tesouroExtrairChave(t.nome).ano === anoAtivo);
+  return result;
+}
+
 // ── Resolve um ativo contra o índice (com detecção de ambiguidade) ────────
 // ativo = { nome, tipo?, venc? }
 //
@@ -204,14 +213,7 @@ async function tesouroResolveAtivo(ativo, forceRefresh = false) {
   const { tipo: tipoAtivo, ano: anoAtivo } = tesouroExtrairChave(textoCompleto);
 
   const candidatos = Object.values(index);
-
-  let filtrados = tipoAtivo
-    ? candidatos.filter(t => tesouroExtrairChave(t.nome).tipo === tipoAtivo)
-    : candidatos;
-
-  if (anoAtivo) {
-    filtrados = filtrados.filter(t => tesouroExtrairChave(t.nome).ano === anoAtivo);
-  }
+  const filtrados  = tesouroFiltrarCandidatos(candidatos, tipoAtivo, anoAtivo);
 
   if (filtrados.length === 0) return { status: 'nao_encontrado' };
   if (filtrados.length === 1) return { status: 'ok', match: filtrados[0] };
@@ -238,16 +240,12 @@ async function tesouroFetchPrices(titulosEspecificos = null, forceRefresh = fals
     return titulos.map(nome => ({ nome, status: 'indisponivel', _fromCache: false }));
   }
 
-  const resultado = [];
+  const resultado  = [];
+  const candidatos = Object.values(index);
 
   for (const titulo of titulos) {
     const { tipo: tipoAtivo, ano: anoAtivo } = tesouroExtrairChave(titulo);
-    const candidatos = Object.values(index);
-
-    let filtrados = tipoAtivo
-      ? candidatos.filter(t => tesouroExtrairChave(t.nome).tipo === tipoAtivo)
-      : candidatos;
-    if (anoAtivo) filtrados = filtrados.filter(t => tesouroExtrairChave(t.nome).ano === anoAtivo);
+    const filtrados = tesouroFiltrarCandidatos(candidatos, tipoAtivo, anoAtivo);
 
     if (filtrados.length === 0) {
       resultado.push({ nome: titulo, status: 'nao_encontrado', _fromCache: fromCache, _source });

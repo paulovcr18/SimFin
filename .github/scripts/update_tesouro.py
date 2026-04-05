@@ -111,8 +111,8 @@ def processar_csv(csv_url):
     # Agrupa por (tipo + ano_vencimento), mantém linha com data de cotação mais recente
     titulos = {}  # chave → {'_dataObj': datetime, dados...}
     total = 0
+    col_max = max(v for v in cols.values() if v is not None)
     for row in reader:
-        col_max = max(v for v in cols.values() if v is not None)
         if len(row) <= col_max:
             continue
         tipo = row[cols['titulo']].strip()

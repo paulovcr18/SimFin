@@ -1435,11 +1435,13 @@ async function carteiraRefresh() {
     pricesTesouro = await tesouroFetchPrices(null, true) || []; // forceRefresh=true: ignora cache de 4h
   }
 
+  // Mapa nome→price para O(1) lookup em vez de find() por ativo
+  const tesouroPriceMap = new Map(pricesTesouro.map(p => [p.nome, p]));
+
   const agora   = new Date().toISOString();
   const updated = ativos.map(a => {
     if (a.tipo === 'tesouro') {
-      // Matching por nome original (preservado em p.nome) ou fuzzy por tipo+ano
-      const match = pricesTesouro.find(p => p.nome === a.nome)
+      const match = tesouroPriceMap.get(a.nome)
         || pricesTesouro.find(p => tesouroMatchTitulo(
             tesouroNormalizarTitulo(a.nome),
             p.nomeB3 || p.nome
