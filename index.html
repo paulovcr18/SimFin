@@ -105,33 +105,6 @@
     <!-- Badge regime (compacto) -->
     <span class="badge" id="badgeRegime" style="color: var(--ac); border-color: var(--bda); background: var(--acg);">CLT · 2026</span>
 
-    <!-- Cenário atual -->
-    <div class="saves-wrap" id="scenarioWrap">
-      <button class="act-btn ac" onclick="toggleScenarioDrop(event)" id="scenarioBtn" title="Cenário atual">
-        <span class="act-btn-icon">📋</span>
-        <span id="scenarioBtnLabel">Cenário</span>
-      </button>
-      <div class="saves-drop" id="scenarioDrop" style="width:300px">
-        <div class="saves-drop-header">
-          <span class="saves-drop-title">📋 Cenário Atual</span>
-        </div>
-        <div style="padding:12px;display:flex;flex-direction:column;gap:8px">
-          <div>
-            <label style="font-size:11px;color:var(--t2);font-weight:500;display:block;margin-bottom:4px">Nome do cenário</label>
-            <input class="sm-input" id="scenarioName" placeholder="Ex: Planejamento 2026" maxlength="60"
-              onkeydown="if(event.key==='Enter')scenarioSave()" style="font-size:12px;padding:7px 10px">
-          </div>
-          <div id="scenarioDates" style="font-size:10px;color:var(--t3);line-height:1.6"></div>
-          <button onclick="scenarioSave()" style="width:100%;padding:8px;border-radius:7px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);font-size:11px;font-weight:600;font-family:var(--fb);cursor:pointer;transition:all .15s">💾 Salvar cenário</button>
-          <div style="border-top:1px solid var(--bd);padding-top:8px;display:flex;gap:6px">
-            <button onclick="closeScenarioDrop();exportJSON()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📦 Exportar</button>
-            <button onclick="closeScenarioDrop();triggerImport()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📂 Importar</button>
-            <button onclick="closeScenarioDrop();exportCSV()" style="flex:1;padding:6px 4px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:10px;font-weight:600;font-family:var(--fb);cursor:pointer;white-space:nowrap">📊 CSV</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- MOBILE: compact action buttons -->
     <div class="topbar-mobile-actions" id="mobileActions">
       <button class="act-btn" onclick="toggleMoreMenu(event)" title="Mais opções" style="background:var(--bg6);border:1px solid var(--bd);border-radius:8px;padding:6px 10px">
