@@ -339,7 +339,7 @@ def run():
         'P&L':           'R$ {:,.2f}',
         '% Retorno':     '{:+.2f}%',
     }
-    styled = pos_df.style.format(fmt).applymap(color_pl, subset=['P&L', '% Retorno'])
+    styled = pos_df.style.format(fmt).map(color_pl, subset=['P&L', '% Retorno'])
     st.dataframe(styled, use_container_width=True, hide_index=True)
 
     st.divider()
