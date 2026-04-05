@@ -57,7 +57,7 @@ function renderFolha(id,f){
 // ════════════════════════
 function renderBudget(rendaOp, rendaDil){
   const p=getPcts();let tP=0,tV=0;
-  document.querySelector('#tBudget tbody').innerHTML=CATS.map(c=>{
+  document.querySelector('#tBudget tbody').innerHTML=BUDGET_CATEGORIES.map(c=>{
     const pc=p[c.key],v=rendaOp*pc/100;tP+=pc;tV+=v;
     return `<tr><td>${c.label}</td>
       <td style="font-family:var(--fm);text-align:right">${pc}%</td>
@@ -293,7 +293,7 @@ function popM(idx){
     <div class="ppd">${libStatus}</div>`;
 
   // ── Donut ──
-  const catPcts=CATS.map(c=>pcts[c.key]);
+  const catPcts=BUDGET_CATEGORIES.map(c=>pcts[c.key]);
   const catVals=catPcts.map(p=>rendaOp_s*p/100);   // usa rendaOp (não diluída)
   const totalG=catVals.reduce((a,b)=>a+b,0);
   document.getElementById('dcv').textContent=fmtK(totalG);

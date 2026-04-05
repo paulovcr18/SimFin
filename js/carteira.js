@@ -10,6 +10,17 @@ const BRAPI_BASE     = 'https://brapi.dev/api/quote/';
 // Edge Function Supabase — proxy server-side para Yahoo Finance (resolve CORS)
 const COTACOES_FN    = 'https://qaopienbsmssjosttucn.supabase.co/functions/v1/cotacoes';
 
+// Cache para memoização de carteiramigrar()
+let _carteiraMigrarCache = { hash: null, result: null };
+
+// Função para calcular hash simples dos dados
+function _carteiraHashDados() {
+  const negocs = negocLoad();
+  const movims = movimLoad();
+  const cart = carteiraLoad();
+  return JSON.stringify({ negocs, movims, cart }).slice(0, 1000);
+}
+
 function carteiraLoad()    { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
 function carteiraSave(d)   {
   localStorage.setItem(CART_KEY, JSON.stringify(d));
@@ -81,6 +92,12 @@ function negocDedup(lista) {
 }
 
 function carteiraMigrar() {
+  // Memoização: verifica se dados mudaram desde última execução
+  const hashAtual = _carteiraHashDados();
+  if (_carteiraMigrarCache.hash === hashAtual && _carteiraMigrarCache.result !== null) {
+    return _carteiraMigrarCache.result;
+  }
+  
   // 1. Normaliza e deduplicata negociações (principal causa de PM inflado)
   const negocs  = negocLoad();
   const negocsN = negocs.map(n => ({ ...n, ticker: normalizarTicker(n.ticker) }));
@@ -156,6 +173,9 @@ function carteiraMigrar() {
       carteiraSave(base);
     }
   }
+  // Atualiza cache
+  _carteiraMigrarCache.hash = hashAtual;
+  _carteiraMigrarCache.result = true;
 }
 
 // ── Exportar transações para o Portfolio Tracker Python ─────────────

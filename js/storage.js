@@ -7,6 +7,27 @@ const STORAGE_KEY    = 'simfin_saves';      // legado — mantido para migraçã
 const SCENARIO_KEY   = 'simfin_scenario';   // cenário único atual
 const REMINDER_KEY   = 'simfin_reminder_config'; // usado por reminders.js e db.js
 
+// ── Cache em memória para localStorage — reduz JSON.parse() repetidos
+const _lsCache = {};
+function lsGet(key) {
+  if (_lsCache[key] !== undefined) return _lsCache[key];
+  const val = localStorage.getItem(key);
+  try {
+    _lsCache[key] = val ? JSON.parse(val) : null;
+  } catch {
+    _lsCache[key] = null;
+  }
+  return _lsCache[key];
+}
+function lsSet(key, val) {
+  _lsCache[key] = val;
+  localStorage.setItem(key, JSON.stringify(val));
+}
+function lsRemove(key) {
+  delete _lsCache[key];
+  localStorage.removeItem(key);
+}
+
 // ── Toast ──
 let toastTimer;
 function showToast(msg, icon='✅', dur=3000) {
