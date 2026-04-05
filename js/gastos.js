@@ -190,7 +190,7 @@ function renderGastos() {
   </div>
   <div class="gastos-line-wrap">
     <div class="ph2" style="margin-bottom:8px"><span style="font-size:13px">📈</span><span class="pt" style="font-size:12px">Aderência Mensal (últimos 12 meses)</span></div>
-    <canvas id="gastosLineChart" height="120"></canvas>
+    <div style="position:relative;height:120px"><canvas id="gastosLineChart"></canvas></div>
   </div>`;
 
   // ── Chart de barras comparativo ──

@@ -1006,7 +1006,7 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
 
 .gastos-line-wrap{
   background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);
-  padding:12px;height:160px;
+  padding:12px;
 }
 
 @media(max-width:760px){
