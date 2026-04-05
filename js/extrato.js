@@ -23,10 +23,11 @@ function extratoDetectarBanco(text, fileName) {
   // OFX — detectar pelo header
   if (t.includes('<ofx') || t.includes('ofxheader')) return 'ofx';
 
-  // Mercado Pago — "Data de criação";"Tipo";"Detalhe"... ou "valor bruto"/"valor líquido"
+  // Mercado Pago — cabeçalhos inglês (RELEASE_DATE, TRANSACTION_NET_AMOUNT) ou PT (valor bruto/líquido)
   if (fn.includes('mercadopago') || fn.includes('mercado_pago') || fn.includes('mercado pago')
-      || t.includes('mercado pago') || t.includes('valor bruto') || t.includes('valor liquido')
-      || t.includes('valor líquido') || (t.includes('tipo de opera') && t.includes('valor')))
+      || t.includes('mercado pago') || t.includes('release_date') || t.includes('transaction_net_amount')
+      || t.includes('valor bruto') || t.includes('valor liquido') || t.includes('valor líquido')
+      || (t.includes('tipo de opera') && t.includes('valor')))
     return 'mercadopago';
 
   // Nubank CSV — "Data","Valor","Identificador","Descrição" ou "date","title","amount"
@@ -263,40 +264,47 @@ function extratoParseGenerico(text) {
 
 // ═══ PARSER MERCADO PAGO ══════════════════════════════════════════
 function extratoParserMercadoPago(text) {
-  // Detecta separador
   const sep = text.includes(';') ? ';' : ',';
-  const { headers, rows } = extratoParseCSV(text, sep);
+  const lines = text.trim().split(/\r?\n/);
+
+  // O arquivo pode ter um bloco de resumo antes das transações.
+  // Procura a linha de cabeçalho das transações (contém data + valor).
+  const headerIdx = lines.findIndex(l => {
+    const ln = l.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return ln.includes('release_date') || ln.includes('transaction_net_amount')
+      || (ln.includes('data') && (ln.includes('valor') || ln.includes('amount')));
+  });
+
+  // Usa apenas as linhas a partir do cabeçalho de transações
+  const txnText = lines.slice(headerIdx >= 0 ? headerIdx : 0).join('\n');
+  const { headers, rows } = extratoParseCSV(txnText, sep);
   const h = headers.map(x =>
     x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/"/g, '').trim()
   );
 
-  // Colunas de data: "data de criacao", "data de saida", "data", "fecha"
-  const iData = h.findIndex(c => c.includes('data de') || c === 'data' || c === 'fecha' || c === 'date');
-  // Colunas de descrição: "detalhe", "descricao", "tipo"
-  const iDesc = h.findIndex(c => c.includes('detalhe') || c.includes('descri') || c.includes('tipo'));
-  // Valor líquido tem prioridade, senão valor bruto, senão valor
-  const iValorLiq = h.findIndex(c => c.includes('valor liquido') || c.includes('valor liq'));
+  // Data: "release_date", "data de criacao", "data"
+  const iData = h.findIndex(c => c.includes('release_date') || c.includes('data de') || c === 'data' || c === 'fecha' || c === 'date');
+  // Descrição: "transaction_type", "detalhe", "descricao", "tipo"
+  const iDesc = h.findIndex(c => c.includes('transaction_type') || c.includes('detalhe') || c.includes('descri') || c.includes('tipo'));
+  // Valor: "transaction_net_amount" > "valor liquido" > "valor bruto" > "valor"
+  const iValorNet  = h.findIndex(c => c.includes('transaction_net_amount') || c.includes('valor liquido') || c.includes('valor liq'));
   const iValorBruto = h.findIndex(c => c.includes('valor bruto'));
-  const iValorSimples = h.findIndex(c => c === 'valor' || c.includes('monto') || c.includes('amount'));
-  const iValor = iValorLiq >= 0 ? iValorLiq : iValorBruto >= 0 ? iValorBruto : iValorSimples;
-  // Status — pula transações canceladas/recusadas
+  const iValorSimp  = h.findIndex(c => c === 'valor' || c.includes('monto') || c.includes('amount'));
+  const iValor = iValorNet >= 0 ? iValorNet : iValorBruto >= 0 ? iValorBruto : iValorSimp;
+  // Status
   const iStatus = h.findIndex(c => c.includes('status') || c.includes('estado') || c.includes('situacao'));
 
   if (iData < 0 || iValor < 0) return [];
 
   return rows.map(r => {
-    // Filtra transações não concluídas
     if (iStatus >= 0) {
       const st = (r[iStatus] || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (st.includes('cancelad') || st.includes('recusad') || st.includes('failed')
           || st.includes('rejected') || st.includes('pending') || st.includes('pendente')) return null;
     }
 
-    // Data pode vir como ISO 8601 (2024-04-02T10:30:00.000-03:00) ou DD/MM/YYYY HH:MM
-    let dataStr = (r[iData] || '').replace(/"/g, '').trim();
-    // Remove timezone e hora: pega só YYYY-MM-DD ou DD/MM/YYYY
-    dataStr = dataStr.split('T')[0].split(' ')[0];
-
+    // Remove parte de hora/timezone (ISO 8601 ou DD/MM/YYYY HH:MM)
+    let dataStr = (r[iData] || '').replace(/"/g, '').trim().split('T')[0].split(' ')[0];
     const descricao = (r[iDesc >= 0 ? iDesc : 1] || '').replace(/"/g, '').trim();
     const valor = extratoParseValor(r[iValor]);
 
