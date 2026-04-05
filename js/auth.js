@@ -219,13 +219,12 @@ async function authOnLogin(user) {
 
     authHideOverlay();
 
-    try { autoRestoreInputs(); }               catch(e) {}
-    try { updAno(); calc(); }                  catch(e) {}
-    try { carteiraMigrar(); renderCarteira(); } catch(e) {}
-    try { renderGoals(); }                     catch(e) {}
-    try { renderTrack(); }                     catch(e) {}
-    try { scenarioAutoTouch(); }               catch(e) {}
-    try { reminderUpdateUI(); reminderCheckDue(); } catch(e) {}
+    try { autoRestoreInputs(); }               catch(e) { console.error('[init]', e); }
+    try { updAno(); calc(); }                  catch(e) { console.error('[init]', e); }
+    try { carteiraMigrar(); renderCarteira(); } catch(e) { console.error('[init]', e); }
+    try { renderGoals(); }                     catch(e) { console.error('[init]', e); }
+    try { renderTrack(); }                     catch(e) { console.error('[init]', e); }
+    try { reminderUpdateUI(); reminderCheckDue(); } catch(e) { console.error('[init]', e); }
   }
 }
 
