@@ -158,10 +158,36 @@ function carteiraMigrar() {
   }
 }
 
+// ── Exportar transações para o Portfolio Tracker Python ─────────────
+function carteiraExportarTracker() {
+  const negocs = negocLoad();
+  if (!negocs.length) {
+    showToast('Nenhuma negociação importada para exportar', '⚠️', 3000);
+    return;
+  }
+  const transactions = negocs
+    .filter(n => n.qtd > 0 && n.preco > 0)
+    .map(n => ({
+      ticker:     n.ticker,
+      quantity:   n.qtd,
+      unit_price: n.preco,
+      date:       n.data,
+      operation:  n.tipo.includes('venda') ? 'SELL' : 'BUY',
+    }));
+  const payload = { transactions };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'portfolio_transactions.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`${transactions.length} transações exportadas`, '📥', 2500);
+}
+
 function carteiraLimparHistorico() {
   // 1ª confirmação
   if (!confirm(
-    '⚠️ ATENÇÃO — Esta ação é irreversível!\n\n' +
     'Isso vai apagar todos os ativos, negociações e movimentações importadas da B3.\n' +
     'Você precisará reimportar os arquivos.\n\n' +
     'Continuar?'

@@ -567,7 +567,8 @@
   <input type="hidden" id="cartBrapiToken">
   <input type="hidden" id="cartImportFile">
   <div id="cartImportStatus" style="margin-bottom:4px"></div>
-  <div style="text-align:right;margin-bottom:8px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <button onclick="carteiraExportarTracker()" style="font-size:10px;color:var(--ac);background:none;border:1px solid var(--bda);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:var(--fb)">📥 Exportar para Tracker</button>
     <button onclick="carteiraLimparHistorico()" style="font-size:10px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:var(--fb)">🗑 Limpar todo o histórico e reimportar do zero</button>
   </div>
 

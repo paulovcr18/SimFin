@@ -1,0 +1,10 @@
+{
+  "transactions": [
+    {"ticker": "PETR4", "quantity": 100, "unit_price": 28.50, "date": "2025-10-15", "operation": "BUY"},
+    {"ticker": "VALE3", "quantity": 50,  "unit_price": 75.00, "date": "2025-11-20", "operation": "BUY"},
+    {"ticker": "ITUB4", "quantity": 80,  "unit_price": 32.10, "date": "2025-12-05", "operation": "BUY"},
+    {"ticker": "PETR4", "quantity": 30,  "unit_price": 29.80, "date": "2026-01-10", "operation": "SELL"},
+    {"ticker": "VALE3", "quantity": 20,  "unit_price": 80.50, "date": "2026-02-14", "operation": "SELL"},
+    {"ticker": "ITUB4", "quantity": 40,  "unit_price": 35.00, "date": "2026-03-01", "operation": "BUY"}
+  ]
+}
