@@ -163,8 +163,22 @@ function renderChart(anos,taxa,apI,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p){
   const pessim =snapsPess.map(d=>d.pat);
   const otimis =snapsOtim.map(d=>d.pat);
 
+  // Reuse chart instead of destroy/create (big perf win on main thread)
+  if(myChart){
+    myChart.data.labels = labels;
+    myChart.data.datasets[0].data = vals;
+    myChart.data.datasets[1].data = aps;
+    myChart.data.datasets[2].data = reais;
+    myChart.data.datasets[3].data = otimis;
+    myChart.data.datasets[4].data = pessim;
+    myChart.data.datasets[2].label = `Valor Real (−${inflAnual}% inflação/ano)`;
+    myChart.data.datasets[3].label = `Otimista (+2% → ${taxa+2}% a.a.)`;
+    myChart.data.datasets[4].label = `Pessimista (−2% → ${Math.max(0,taxa-2)}% a.a.)`;
+    myChart.update('none'); // 'none' = no animation = instant
+    return;
+  }
+
   const ctx=document.getElementById('chartP').getContext('2d');
-  if(myChart)myChart.destroy();
   myChart=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[
