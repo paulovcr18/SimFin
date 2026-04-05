@@ -79,11 +79,6 @@ def fetch_prices_yf(ticker: str, start: str) -> pd.DataFrame:
 
 def fetch_prices(ticker: str, start: str, _api_key: str = '') -> pd.DataFrame:
     return fetch_prices_yf(ticker, start)
-        return df if not df.empty else pd.DataFrame(columns=['Close'])
-    df = fetch_simfin(ticker, api_key)
-    if df.empty:
-        df = fetch_brapi(ticker)  # fallback
-    return df
 
 
 def get_price_on(prices: pd.DataFrame, target_date: str) -> float | None:
