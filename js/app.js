@@ -121,15 +121,6 @@ function setRegime(pid, tipo){
     _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
   }
 
-  renderChart(anos,taxa,ap,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
-  autoSaveInputs();
-  }
-
-  function calc() {
-    clearTimeout(_calcDebounceTimer);
-    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
-  }
-
   // ── Auto-save inputs no localStorage ──
 const INPUTS_AUTOSAVE_KEY = 'simfin_last_inputs';
 
