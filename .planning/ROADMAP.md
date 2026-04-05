@@ -28,7 +28,13 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
   3. SheetJS tem hash SRI ou está servido localmente (não CDN sem integridade)
   4. Não há UI prometendo gerenciamento de cenários que não funciona — ou feature funciona ou UI não existe
   5. Duplicate entry `js/db.js` em `sw.js` removida
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Delete tracker/ and add streamlit-app deprecation notice
+- [ ] 01-02-PLAN.md — Fix Service Worker: network-only API bypass, dedup db.js, add SheetJS preload
+- [ ] 01-03-PLAN.md — Add SRI integrity hash to SheetJS CDN script tag in index.html
+- [ ] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
 
 ### Phase 2: PWA Login Performance
 **Goal**: Tornar o carregamento inicial e o login perceptivelmente mais rápidos implementando stale-while-revalidate e pré-carregamento de assets pesados.
@@ -48,7 +54,7 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
 **Success Criteria** (what must be TRUE):
   1. Página de Carteira no Streamlit carrega em <2s na segunda visita (cache ativo)
   2. Deletar uma posição localmente não é revertido no próximo login
-  3. Erros de Supabase no `maybeSingle()` de `js/db.js` são capturados e logados
+  3. Erros de Supabase no `maybySingle()` de `js/db.js` são capturados e logados
   4. `build_evolution()` não roda na íntegra a cada page load quando dados não mudaram
 **Plans**: TBD
 
