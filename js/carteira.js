@@ -1311,48 +1311,7 @@ function tesouroSyntheticTicker(produto) {
   return ('TD_' + noNum.slice(0, 5) + ano).slice(0, 14);
 }
 
-// TESOURO_CACHE_KEY já definido em tesouro-api.js — não redeclarar aqui
-
-async function tesouroFetchPrices(titulosEspecificos = null, forceRefresh = false) {
-  // Busca todos os títulos disponíveis na API oficial (1 requisição)
-  const { list, fromCache, cacheAgeH } = await tesouroFetchTodos(forceRefresh);
-
-  if (!list.length) return [];
-
-  // Determina conjunto de títulos a filtrar
-  let titulos = [];
-  if (titulosEspecificos && titulosEspecificos.length) {
-    titulos = titulosEspecificos;
-  } else {
-    const ativos = carteiraLoad().filter(a => a.tipo === 'tesouro');
-    titulos = [...new Set(ativos.map(a => a.nome))];
-  }
-
-  // Para cada título da carteira, encontra correspondência na lista da B3
-  const resultado = [];
-  for (const titulo of titulos) {
-    const normalizado = tesouroNormalizarTitulo(titulo);
-    if (!normalizado) continue;
-
-    // Busca exata pelo nome do ativo primeiro
-    let match = list.find(item => item.nome === titulo);
-    // Fallback: matching fuzzy por tipo + ano
-    if (!match) match = list.find(item => tesouroMatchTitulo(normalizado, item.nome));
-
-    if (match) {
-      resultado.push({
-        nome:       titulo,       // nome original da carteira (para matching posterior)
-        nomeB3:     match.nome,   // nome canônico da B3
-        preco:      match.preco,
-        taxa:       match.taxa || 0,
-        _fromCache: fromCache,
-        _cacheAge:  cacheAgeH,
-      });
-    }
-  }
-
-  return resultado;
-}
+// tesouroFetchPrices definido em tesouro-api.js
 
 // ── Toggle tipo de ativo no formulário ──
 function carteiraToggleTipo() {
