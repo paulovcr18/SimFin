@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════════
 // EXTRATO BANCÁRIO — Parser multi-banco (CSV + OFX)
 //
-// Bancos suportados: Nubank, Itaú, Bradesco, Inter, C6, Santander, BB
+// Bancos suportados: Nubank, Itaú, Bradesco, Inter, C6, Santander, BB, Mercado Pago
 // Dados persistidos em localStorage: simfin_extrato
 // ════════════════════════════════════════════════════════════════
 
@@ -22,6 +22,12 @@ function extratoDetectarBanco(text, fileName) {
 
   // OFX — detectar pelo header
   if (t.includes('<ofx') || t.includes('ofxheader')) return 'ofx';
+
+  // Mercado Pago — "Data de criação";"Tipo";"Detalhe"... ou "valor bruto"/"valor líquido"
+  if (fn.includes('mercadopago') || fn.includes('mercado_pago') || fn.includes('mercado pago')
+      || t.includes('mercado pago') || t.includes('valor bruto') || t.includes('valor liquido')
+      || t.includes('valor líquido') || (t.includes('tipo de opera') && t.includes('valor')))
+    return 'mercadopago';
 
   // Nubank CSV — "Data","Valor","Identificador","Descrição" ou "date","title","amount"
   if (t.includes('nubank') || (t.includes('"data"') && t.includes('"identificador"'))
@@ -255,6 +261,54 @@ function extratoParseGenerico(text) {
   })).filter(t => t.data && t.valor !== null);
 }
 
+// ═══ PARSER MERCADO PAGO ══════════════════════════════════════════
+function extratoParserMercadoPago(text) {
+  // Detecta separador
+  const sep = text.includes(';') ? ';' : ',';
+  const { headers, rows } = extratoParseCSV(text, sep);
+  const h = headers.map(x =>
+    x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/"/g, '').trim()
+  );
+
+  // Colunas de data: "data de criacao", "data de saida", "data", "fecha"
+  const iData = h.findIndex(c => c.includes('data de') || c === 'data' || c === 'fecha' || c === 'date');
+  // Colunas de descrição: "detalhe", "descricao", "tipo"
+  const iDesc = h.findIndex(c => c.includes('detalhe') || c.includes('descri') || c.includes('tipo'));
+  // Valor líquido tem prioridade, senão valor bruto, senão valor
+  const iValorLiq = h.findIndex(c => c.includes('valor liquido') || c.includes('valor liq'));
+  const iValorBruto = h.findIndex(c => c.includes('valor bruto'));
+  const iValorSimples = h.findIndex(c => c === 'valor' || c.includes('monto') || c.includes('amount'));
+  const iValor = iValorLiq >= 0 ? iValorLiq : iValorBruto >= 0 ? iValorBruto : iValorSimples;
+  // Status — pula transações canceladas/recusadas
+  const iStatus = h.findIndex(c => c.includes('status') || c.includes('estado') || c.includes('situacao'));
+
+  if (iData < 0 || iValor < 0) return [];
+
+  return rows.map(r => {
+    // Filtra transações não concluídas
+    if (iStatus >= 0) {
+      const st = (r[iStatus] || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (st.includes('cancelad') || st.includes('recusad') || st.includes('failed')
+          || st.includes('rejected') || st.includes('pending') || st.includes('pendente')) return null;
+    }
+
+    // Data pode vir como ISO 8601 (2024-04-02T10:30:00.000-03:00) ou DD/MM/YYYY HH:MM
+    let dataStr = (r[iData] || '').replace(/"/g, '').trim();
+    // Remove timezone e hora: pega só YYYY-MM-DD ou DD/MM/YYYY
+    dataStr = dataStr.split('T')[0].split(' ')[0];
+
+    const descricao = (r[iDesc >= 0 ? iDesc : 1] || '').replace(/"/g, '').trim();
+    const valor = extratoParseValor(r[iValor]);
+
+    return {
+      data: extratoParseData(dataStr),
+      descricao: descricao || 'Mercado Pago',
+      valor,
+      banco: 'Mercado Pago',
+    };
+  }).filter(t => t && t.data && t.valor !== null);
+}
+
 // ═══ PARSER OFX ═══════════════════════════════════════════════════
 function extratoParseOFX(text) {
   const txns = [];
@@ -294,8 +348,9 @@ function extratoImportar(text, fileName) {
   let txns;
 
   switch (banco) {
-    case 'ofx':       txns = extratoParseOFX(text); break;
-    case 'nubank':    txns = extratoParseNubank(text); break;
+    case 'ofx':         txns = extratoParseOFX(text); break;
+    case 'mercadopago': txns = extratoParserMercadoPago(text); break;
+    case 'nubank':      txns = extratoParseNubank(text); break;
     case 'inter':     txns = extratoParseInter(text); break;
     case 'c6':        txns = extratoParseC6(text); break;
     case 'itau':      txns = extratoParseItau(text); break;
