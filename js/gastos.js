@@ -33,8 +33,11 @@ function gastosGetOrcamento() {
   return orcamento;
 }
 
-// ── Renda operacional do simulador ───────────────────────────────
+// ── Renda operacional do simulador (usa cache centralizado) ────────
 function gastosGetRendaOperacional() {
+  if (typeof window.rendaOperacionalGlobal === 'number' && window.rendaOperacionalGlobal > 0) {
+    return window.rendaOperacionalGlobal;
+  }
   try {
     const g = id => parseFloat(document.getElementById(id)?.value) || 0;
     const f1 = calcFolha(g('p1bruto'), g('p1vr'), g('p1plr'), 1);

@@ -31,7 +31,14 @@ function setRegime(pid, tipo){
   calc();
 }
 
-function calc(){
+// ════════════════════════
+  // DEBOUNCE para calc() — Evita re-renderizações excessivas
+  // ════════════════════════
+  let _calcDebounceTimer = null;
+  // Variável global para renda operacional (cache centralizado)
+  window.rendaOperacionalGlobal = 0;
+  
+  function _calcReal(){
   const g=id=>parseFloat(document.getElementById(id).value)||0;
   const [p1b,p1v,p1p,p2b,p2v,p2p]=['p1bruto','p1vr','p1plr','p2bruto','p2vr','p2plr'].map(g);
   const f1=calcFolha(p1b,p1v,p1p,1),f2=calcFolha(p2b,p2v,p2p,2);
@@ -49,6 +56,7 @@ function calc(){
   badgeEl.style.background=allPJ?'var(--gog)':hasPJ?'var(--blg)':'var(--acg)';
   const renda   = f1.rendaReal + f2.rendaReal;   // diluída anual /12
   const rendaOp = (f1.rendaOp || f1.rendaReal) + (f2.rendaOp || f2.rendaReal);  // operacional mensal
+  window.rendaOperacionalGlobal = rendaOp;
   renderBudget(rendaOp, renda);
   const pI=g('pctInvest'),ap=rendaOp*pI/100; // aporte sobre renda operacional (alinhado com orçamento)
   const taxa=parseFloat(document.getElementById('taxaAnual').value)||10;
@@ -71,7 +79,7 @@ function calc(){
   const fgtsAnual=(f1.fgts+f2.fgts)*12;
   document.getElementById('fgtsVal').textContent=fmt(fgtsAnual);
   // Update FGTS strip label to reflect PJ note
-  const pjCount=[regime[1],regime[2]].filter(r=>r==='PJ').length;
+  const pjCount = [regime[1], regime[2]].filter(r => r === 'PJ').length;
   document.getElementById('fgtsStrip').style.opacity=fgtsAnual===0?'0.4':'1';
   document.getElementById('fgtsNote').textContent=pjCount>0
     ?`${pjCount===2?'Ambas as pessoas são PJ':'Uma pessoa é PJ'} · PJ não tem FGTS legal`
@@ -106,9 +114,23 @@ function calc(){
 
   renderChart(anos,taxa,ap,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
   autoSaveInputs();
-}
+  }
 
-// ── Auto-save inputs no localStorage ──
+  function calc() {
+    clearTimeout(_calcDebounceTimer);
+    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
+  }
+
+  renderChart(anos,taxa,ap,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
+  autoSaveInputs();
+  }
+
+  function calc() {
+    clearTimeout(_calcDebounceTimer);
+    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
+  }
+
+  // ── Auto-save inputs no localStorage ──
 const INPUTS_AUTOSAVE_KEY = 'simfin_last_inputs';
 
 function autoSaveInputs() {
@@ -151,7 +173,7 @@ document.addEventListener('keydown',e=>{
 });
 
 updAno();
-calc();
+_calcReal(); // executa imediatamente (sem debounce)
 
 // ── Market Trends Ticker ──
 (function initMktTicker(){
@@ -215,5 +237,9 @@ calc();
   }
 
   fetchMkt();
-  setInterval(fetchMkt, 5*60*1000);
+  let _mktInterval = setInterval(fetchMkt, 5*60*1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { clearInterval(_mktInterval); _mktInterval = null; }
+    else if (!_mktInterval) { _mktInterval = setInterval(fetchMkt, 5*60*1000); fetchMkt(); }
+  });
 })();
