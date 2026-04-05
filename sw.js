@@ -30,7 +30,7 @@ const LOCAL_ASSETS = [
   './js/db.js',
   './js/tesouro-api.js',
   './js/auth.js',
-  './js/db.js',
+  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
 ];
 
 // Assets externos — tentamos network, fallback para cache
