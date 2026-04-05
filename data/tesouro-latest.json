@@ -1,6 +1,70 @@
 {
-  "_source": "placeholder",
-  "_generatedAt": "2026-04-04T14:00:00Z",
-  "_note": "Este arquivo é gerado automaticamente pelo GitHub Action .github/workflows/tesouro-cache.yml",
-  "titulos": {}
+  "_source": "ckan",
+  "_generatedAt": "2026-04-05T14:06:53Z",
+  "titulos": {
+    "Tesouro IPCA+ com Juros Semestrais": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais",
+      "taxaCompra": 7.21,
+      "taxaVenda": 7.33,
+      "puCompra": 4007.58,
+      "puVenda": 3945.76,
+      "dataRef": "15/08/2060"
+    },
+    "Tesouro IPCA+": {
+      "nome": "Tesouro IPCA+",
+      "taxaCompra": 7.03,
+      "taxaVenda": 7.15,
+      "puCompra": 896.82,
+      "puVenda": 872.37,
+      "dataRef": "15/08/2050"
+    },
+    "Tesouro IGPM+ com Juros Semestrais": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais",
+      "taxaCompra": 7.0,
+      "taxaVenda": 7.1,
+      "puCompra": 3488.08,
+      "puVenda": 3454.63,
+      "dataRef": "01/01/2031"
+    },
+    "Tesouro Prefixado com Juros Semestrais": {
+      "nome": "Tesouro Prefixado com Juros Semestrais",
+      "taxaCompra": 14.15,
+      "taxaVenda": 14.27,
+      "puCompra": 810.49,
+      "puVenda": 804.86,
+      "dataRef": "01/01/2037"
+    },
+    "Tesouro Selic": {
+      "nome": "Tesouro Selic",
+      "taxaCompra": 0.09,
+      "taxaVenda": 0.1,
+      "puCompra": 18620.58,
+      "puVenda": 18601.28,
+      "dataRef": "01/03/2031"
+    },
+    "Tesouro Prefixado": {
+      "nome": "Tesouro Prefixado",
+      "taxaCompra": 14.15,
+      "taxaVenda": 14.27,
+      "puCompra": 469.17,
+      "puVenda": 466.12,
+      "dataRef": "01/01/2032"
+    },
+    "Tesouro Educa+": {
+      "nome": "Tesouro Educa+",
+      "taxaCompra": 7.1,
+      "taxaVenda": 7.22,
+      "puCompra": 1175.42,
+      "puVenda": 1148.83,
+      "dataRef": "15/12/2048"
+    },
+    "Tesouro Renda+ Aposentadoria Extra": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra",
+      "taxaCompra": 7.07,
+      "taxaVenda": 7.19,
+      "puCompra": 183.15,
+      "puVenda": 173.81,
+      "dataRef": "15/12/2084"
+    }
+  }
 }
