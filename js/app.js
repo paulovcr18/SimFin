@@ -118,7 +118,16 @@ function setRegime(pid, tipo){
 
   function calc() {
     clearTimeout(_calcDebounceTimer);
-    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 500);
+    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
+  }
+
+  renderChart(anos,taxa,ap,reaj,patI,p1b,p1v,p1p,p2b,p2v,p2p);
+  autoSaveInputs();
+  }
+
+  function calc() {
+    clearTimeout(_calcDebounceTimer);
+    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
   }
 
   // ── Auto-save inputs no localStorage ──
@@ -129,6 +138,7 @@ function autoSaveInputs() {
     const data = getInputs();
     data._regimes = { 1: regime[1], 2: regime[2] };
     localStorage.setItem(INPUTS_AUTOSAVE_KEY, JSON.stringify(data));
+    dbDebounce('autosave', () => dbPushConfig({ autosave: data }).catch(() => {}));
   } catch(e) {}
 }
 
