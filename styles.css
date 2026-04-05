@@ -927,3 +927,150 @@ tbody td:not(:first-child){text-align:right;font-family:var(--fm);font-size:12px
   .mkt-ticker{height:32px}
   .mkt-chip{height:32px;padding:0 12px;gap:4px}
 }
+
+/* ═══ SAÚDE FINANCEIRA — Dashboard ═══ */
+.saude-dashboard{margin-bottom:12px}
+.saude-cards-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+}
+.saude-card{
+  background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);
+  padding:12px;display:flex;align-items:flex-start;gap:10px;
+  transition:border-color .15s;
+}
+.saude-card:hover{border-color:rgba(255,255,255,.12)}
+.saude-card-icon{font-size:20px;line-height:1;flex-shrink:0;margin-top:2px}
+.saude-card-body{min-width:0}
+.saude-card-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.saude-card-val{font-size:20px;font-weight:700;font-family:var(--fm);line-height:1.2}
+.saude-card-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+@media(max-width:760px){
+  .saude-cards-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:400px){
+  .saude-cards-row{grid-template-columns:1fr}
+  .saude-card-val{font-size:16px}
+}
+
+/* ═══ EXTRATO BANCÁRIO ═══ */
+.extrato-resumo-bar{
+  display:flex;gap:16px;flex-wrap:wrap;padding:8px 12px;
+  background:var(--bg7);border:1px solid var(--bd);border-radius:var(--rs);
+  margin-bottom:8px;font-size:12px;font-family:var(--fm);
+}
+.extrato-table-wrap{overflow-x:auto}
+.extrato-table td{padding:6px 8px;font-size:11px}
+.extrato-cat-select{
+  font-size:10px;padding:2px 4px;border-radius:4px;
+  border:1px solid var(--bd);background:var(--bg6);color:var(--t1);
+  font-family:var(--fb);cursor:pointer;max-width:120px;
+}
+
+/* ═══ REGRAS DE CATEGORIZAÇÃO ═══ */
+.regras-list{display:flex;flex-direction:column;gap:4px}
+.regra-item{
+  display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:var(--bg6);border-radius:6px;font-size:11px;
+}
+.regra-chave{color:var(--go);font-family:var(--fm)}
+.regra-seta{color:var(--t3)}
+.regra-cat{color:var(--t1);font-weight:600}
+
+/* ═══ GASTOS — Realizado vs Simulado ═══ */
+.gastos-highlights{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;
+}
+.gastos-highlight-card{
+  background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);
+  padding:12px;text-align:center;
+}
+.gastos-hl-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.gastos-hl-val{font-size:16px;font-weight:700;font-family:var(--fm);margin-bottom:2px}
+.gastos-hl-sub{font-size:10px;color:var(--t3)}
+
+.gastos-main-grid{
+  display:grid;grid-template-columns:1.2fr 0.8fr;gap:12px;margin-bottom:12px;
+}
+.gastos-table-col,.gastos-chart-col{min-width:0}
+.gastos-chart-col{position:relative;min-height:200px}
+.gastos-compare-wrap{overflow-x:auto}
+
+.gastos-badge{
+  font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;
+  text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;
+}
+.gastos-badge-ok{background:var(--acg);color:var(--ac);border:1px solid var(--bda)}
+.gastos-badge-warn{background:var(--gog);color:var(--go);border:1px solid rgba(230,184,106,.25)}
+.gastos-badge-over{background:var(--reg);color:var(--re);border:1px solid rgba(224,108,108,.25)}
+
+.gastos-line-wrap{
+  background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);
+  padding:12px;min-height:140px;
+}
+
+@media(max-width:760px){
+  .gastos-highlights{grid-template-columns:1fr}
+  .gastos-main-grid{grid-template-columns:1fr}
+}
+
+/* ═══ INSIGHTS — Saúde Financeira ═══ */
+.saude-insight-card{
+  background:var(--bg7);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px;margin-bottom:10px;
+}
+.saude-insight-header{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px;
+}
+.saude-meta-config{display:flex;align-items:center;gap:4px}
+
+/* Gauge */
+.saude-gauge-wrap{padding:4px 0}
+.saude-gauge-bar{
+  height:12px;background:var(--bg5);border-radius:6px;overflow:hidden;position:relative;
+}
+.saude-gauge-fill{height:100%;border-radius:6px;transition:width .4s ease}
+.saude-gauge-marker{
+  position:absolute;top:-2px;width:2px;height:16px;background:var(--t2);
+  border-radius:1px;transform:translateX(-50%);
+}
+.saude-gauge-labels{
+  display:flex;justify-content:space-between;margin-top:6px;font-size:12px;font-family:var(--fm);
+}
+
+/* Benchmark */
+.bench-container{display:flex;flex-direction:column;gap:8px}
+.bench-row{display:flex;align-items:center;gap:10px}
+.bench-label{font-size:11px;color:var(--t2);min-width:110px;flex-shrink:0}
+.bench-bar-bg{flex:1;height:8px;background:var(--bg5);border-radius:4px;overflow:hidden}
+.bench-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.bench-val{font-size:11px;font-weight:600;font-family:var(--fm);min-width:80px;text-align:right}
+
+/* Projeção */
+.proj-bar-wrap{margin-bottom:12px}
+.proj-bar{height:14px;background:var(--bg5);border-radius:7px;overflow:hidden}
+.proj-bar-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--bl));border-radius:7px;transition:width .5s ease}
+.proj-details{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;
+}
+.proj-detail{
+  background:var(--bg6);border-radius:var(--rs);padding:8px 10px;
+}
+.proj-detail-label{font-size:10px;color:var(--t3);margin-bottom:2px}
+.proj-detail-val{font-size:13px;font-weight:700;font-family:var(--fm);color:var(--t1)}
+
+@media(max-width:560px){
+  .proj-details{grid-template-columns:1fr}
+  .bench-label{min-width:80px;font-size:10px}
+}
+
+/* Alertas */
+.saude-alertas{background:transparent;border:none;padding:0}
+.saude-alerta{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 14px;border-radius:var(--rs);margin-bottom:6px;
+}
+.saude-alerta-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.saude-alerta-texto{font-size:12px;color:var(--t1);font-weight:600;margin-bottom:2px}
+.saude-alerta-detalhe{font-size:11px;color:var(--t2)}

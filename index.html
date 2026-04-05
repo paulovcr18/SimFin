@@ -422,6 +422,9 @@
 <!-- FINANÇAS SCREEN — Carteira + Acompanhamento unificados -->
 <div id="screenFinancas" class="screen-full" style="display:none">
 
+  <!-- ═══ DASHBOARD SAÚDE FINANCEIRA ═══ -->
+  <div id="saudeDashboard" class="saude-dashboard"></div>
+
   <!-- ═══ SEÇÃO 1: CARTEIRA ═══ -->
   <div style="display:flex;align-items:center;gap:10px;padding:4px 0 2px">
     <div style="font-size:18px">💼</div>
@@ -718,6 +721,72 @@
     </div></div>
   </div>
 
+  <!-- ═══ SEÇÃO: EXTRATO BANCÁRIO ═══ -->
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 0 2px;border-top:1px solid var(--bd);margin-top:12px">
+    <div style="font-size:18px">🏦</div>
+    <div style="font-size:14px;font-weight:700;color:var(--t1)">Extrato Bancário</div>
+    <div style="height:1px;background:var(--bd);flex:1"></div>
+  </div>
+
+  <!-- Upload de extrato -->
+  <div class="pat-import-row" style="margin-top:8px">
+    <div class="pat-import-btn" id="extratoUploadZone"
+      onclick="document.getElementById('extratoFile').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="event.preventDefault();this.classList.remove('drag-over');extratoHandleUpload(event.dataTransfer.files[0])">
+      <div class="pat-import-btn-icon">🏦</div>
+      <div class="pat-import-btn-title">Importar Extrato Bancário</div>
+      <div class="pat-import-btn-sub">CSV ou OFX — Nubank, Itaú, Bradesco, Inter, C6, Santander, BB</div>
+      <div class="pat-import-btn-sub" style="margin-top:4px;opacity:.55">Arraste ou clique para selecionar</div>
+    </div>
+  </div>
+  <input type="file" id="extratoFile" accept=".csv,.ofx,.txt" style="display:none" onchange="extratoHandleUpload(this.files[0])">
+  <div id="extratoImportStatus" style="margin:4px 0;font-size:11px"></div>
+  <div style="text-align:right;margin-bottom:8px">
+    <button onclick="extratoLimpar()" style="font-size:10px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;font-family:var(--fb)">🗑 Limpar todas as transações</button>
+  </div>
+
+  <!-- Filtro e lista de transações -->
+  <div class="panel">
+    <div class="ph2">
+      <span style="font-size:15px">📋</span>
+      <span class="pt">Transações</span>
+      <select id="extratoMesFilter" onchange="renderExtrato()" style="margin-left:auto;font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb)"></select>
+      <span style="font-size:11px;color:var(--t3);margin-left:8px" id="extratoCount"></span>
+    </div>
+    <div class="pb"><div id="extratoListArea"></div></div>
+  </div>
+
+  <!-- Regras de categorização -->
+  <div class="panel">
+    <div class="ph2">
+      <span style="font-size:15px">🏷</span>
+      <span class="pt">Regras de Categorização</span>
+      <button onclick="categoriaRecategorizarTudo();renderExtrato();renderGastos();showToast('Recategorizado!','✅')" style="margin-left:auto;font-size:10px;padding:4px 10px;border-radius:5px;border:1px solid var(--bd);background:var(--bg6);color:var(--t2);cursor:pointer;font-family:var(--fb)">🔄 Recategorizar tudo</button>
+    </div>
+    <div class="pb"><div id="regrasCustomArea"></div></div>
+  </div>
+
+  <!-- ═══ SEÇÃO: GASTOS REALIZADOS vs. SIMULADOS ═══ -->
+  <div id="gastosPanel" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 0 2px;border-top:1px solid var(--bd);margin-top:12px">
+      <div style="font-size:18px">📊</div>
+      <div style="font-size:14px;font-weight:700;color:var(--t1)">Gastos: Realizado vs. Simulado</div>
+      <select id="gastosMesFilter" onchange="renderGastos()" style="margin-left:auto;font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb)"></select>
+      <div style="height:1px;background:var(--bd);flex:1"></div>
+    </div>
+    <div id="gastosPanelArea"></div>
+  </div>
+
+  <!-- ═══ SEÇÃO: INSIGHTS DE INVESTIMENTOS ═══ -->
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 0 2px;border-top:1px solid var(--bd);margin-top:12px">
+    <div style="font-size:18px">💡</div>
+    <div style="font-size:14px;font-weight:700;color:var(--t1)">Insights de Investimentos</div>
+    <div style="height:1px;background:var(--bd);flex:1"></div>
+  </div>
+  <div id="saudeInsightsArea"></div>
+
 </div><!-- end screenFinancas -->
 
 <!-- METAS SCREEN -->
@@ -1010,6 +1079,10 @@
 <script src="js/modals.js"></script>
 <script src="js/tesouro-api.js"></script>
 <script src="js/carteira.js"></script>
+<script src="js/categorias.js"></script>
+<script src="js/extrato.js"></script>
+<script src="js/gastos.js"></script>
+<script src="js/saude-financeira.js"></script>
 <script src="js/track.js"></script>
 
 
