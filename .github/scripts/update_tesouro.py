@@ -51,7 +51,8 @@ def detectar_colunas(headers):
 
     cols = {
         'titulo':     find(['tipo']) or find(['titulo']),
-        'data':       find(['datavenda']) or find(['data']),
+        'vencimento': find(['venc']),                           # Data Vencimento → ano p/ chave
+        'data':       find(['base']) or find(['datavenda']),    # Data Base → data da cotação
         'taxaCompra': find(['taxa', 'compra']),
         'taxaVenda':  find(['taxa', 'venda']),
         'puCompra':   find(['pu', 'compra']) or find(['unit', 'compra']),
@@ -101,27 +102,39 @@ def processar_csv(csv_url):
     headers = next(reader)
     cols = detectar_colunas(headers)
 
-    # Valida colunas obrigatórias
-    missing = [k for k, v in cols.items() if v is None]
+    # Valida colunas obrigatórias (vencimento e data são opcionais com fallback)
+    obrigatorias = ['titulo', 'taxaCompra', 'taxaVenda', 'puCompra', 'puVenda']
+    missing = [k for k in obrigatorias if cols.get(k) is None]
     if missing:
         raise RuntimeError(f'Colunas não encontradas: {missing}. Headers: {headers}')
 
-    # Agrupa por título, mantém linha com data mais recente
-    titulos = {}  # nome → {'data': datetime, dados...}
+    # Agrupa por (tipo + ano_vencimento), mantém linha com data de cotação mais recente
+    titulos = {}  # chave → {'_dataObj': datetime, dados...}
     total = 0
     for row in reader:
-        if len(row) <= max(v for v in cols.values() if v is not None):
+        col_max = max(v for v in cols.values() if v is not None)
+        if len(row) <= col_max:
             continue
-        titulo = row[cols['titulo']].strip()
-        if not titulo:
+        tipo = row[cols['titulo']].strip()
+        if not tipo:
             continue
-        data = parse_data(row[cols['data']])
-        if not data:
+
+        # Monta chave com ano de vencimento (ex: "Tesouro IPCA+ 2050")
+        venc_dt = None
+        if cols.get('vencimento') is not None:
+            venc_dt = parse_data(row[cols['vencimento']])
+        chave = f"{tipo} {venc_dt.year}" if venc_dt else tipo
+
+        # Data da cotação para comparar qual linha é mais recente
+        data_cot = None
+        if cols.get('data') is not None:
+            data_cot = parse_data(row[cols['data']])
+        if not data_cot and not venc_dt:
             continue
         total += 1
 
-        atual = titulos.get(titulo)
-        if atual and atual['_dataObj'] >= data:
+        atual = titulos.get(chave)
+        if atual and data_cot and atual.get('_dataObj') and atual['_dataObj'] >= data_cot:
             continue
 
         taxaCompra = parse_num(row[cols['taxaCompra']])
@@ -129,14 +142,14 @@ def processar_csv(csv_url):
         puCompra   = parse_num(row[cols['puCompra']])
         puVenda    = parse_num(row[cols['puVenda']])
 
-        titulos[titulo] = {
-            '_dataObj':   data,
-            'nome':       titulo,
+        titulos[chave] = {
+            '_dataObj':   data_cot,
+            'nome':       chave,
             'taxaCompra': taxaCompra,
             'taxaVenda':  taxaVenda,
             'puCompra':   puCompra,
             'puVenda':    puVenda,
-            'dataRef':    data.strftime('%d/%m/%Y'),
+            'dataRef':    data_cot.strftime('%d/%m/%Y') if data_cot else (venc_dt.strftime('%d/%m/%Y') if venc_dt else None),
         }
 
     print(f'[2] Processadas {total} linhas, {len(titulos)} títulos únicos')
