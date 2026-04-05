@@ -301,7 +301,7 @@ function popM(idx){
   if(donutChart)donutChart.destroy();
   donutChart=new Chart(dCtx,{
     type:'doughnut',
-    data:{labels:CATS.map(c=>c.label),datasets:[{data:catVals,backgroundColor:CATS.map(c=>c.color+'bb'),borderColor:CATS.map(c=>c.color),borderWidth:1.5,hoverOffset:10}]},
+    data:{labels:BUDGET_CATEGORIES.map(c=>c.label),datasets:[{data:catVals,backgroundColor:BUDGET_CATEGORIES.map(c=>c.color+'bb'),borderColor:BUDGET_CATEGORIES.map(c=>c.color),borderWidth:1.5,hoverOffset:10}]},
     options:{cutout:'68%',responsive:false,plugins:{
       legend:{display:false},
       tooltip:{backgroundColor:'#161c28',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#e8ead4',bodyColor:'#8fa0b0',
@@ -310,7 +310,7 @@ function popM(idx){
   });
 
   const maxV=Math.max(...catVals,1);
-  document.getElementById('mBudg').innerHTML=CATS.map((c,i)=>`
+  document.getElementById('mBudg').innerHTML=BUDGET_CATEGORIES.map((c,i)=>`
     <div class="mbr">
       <div class="mbrla">${c.label}</div>
       <div class="mbrbw"><div class="mbrb" style="width:${Math.round((catVals[i]/maxV)*100)}%;background:${c.color}"></div></div>
