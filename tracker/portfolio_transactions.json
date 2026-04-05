@@ -1,10 +1,417 @@
 {
   "transactions": [
-    {"ticker": "PETR4", "quantity": 100, "unit_price": 28.50, "date": "2025-10-15", "operation": "BUY"},
-    {"ticker": "VALE3", "quantity": 50,  "unit_price": 75.00, "date": "2025-11-20", "operation": "BUY"},
-    {"ticker": "ITUB4", "quantity": 80,  "unit_price": 32.10, "date": "2025-12-05", "operation": "BUY"},
-    {"ticker": "PETR4", "quantity": 30,  "unit_price": 29.80, "date": "2026-01-10", "operation": "SELL"},
-    {"ticker": "VALE3", "quantity": 20,  "unit_price": 80.50, "date": "2026-02-14", "operation": "SELL"},
-    {"ticker": "ITUB4", "quantity": 40,  "unit_price": 35.00, "date": "2026-03-01", "operation": "BUY"}
+    {
+      "ticker": "GMAT3",
+      "quantity": 200,
+      "unit_price": 4.11,
+      "date": "2026-03-19",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "HGRE11",
+      "quantity": 3,
+      "unit_price": 127.03,
+      "date": "2026-03-13",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNCA11",
+      "quantity": 5,
+      "unit_price": 95.63,
+      "date": "2026-03-13",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "MRVE3",
+      "quantity": 20,
+      "unit_price": 7.82,
+      "date": "2026-03-13",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 5,
+      "unit_price": 35.18,
+      "date": "2026-03-13",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TVRI11",
+      "quantity": 5,
+      "unit_price": 100.96,
+      "date": "2026-03-10",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "WEGE3",
+      "quantity": 10,
+      "unit_price": 47.33,
+      "date": "2026-03-10",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 10,
+      "unit_price": 39.32,
+      "date": "2026-02-10",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "ABEV3",
+      "quantity": 10,
+      "unit_price": 14.92,
+      "date": "2026-01-30",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "ABEV3",
+      "quantity": 15,
+      "unit_price": 14.99,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GARE11",
+      "quantity": 60,
+      "unit_price": 8.8,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "IVVB11",
+      "quantity": 5,
+      "unit_price": 409.41,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNRI11",
+      "quantity": 4,
+      "unit_price": 163.57,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "WEGE3",
+      "quantity": 10,
+      "unit_price": 52.96,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "XPML11",
+      "quantity": 7,
+      "unit_price": 109.52,
+      "date": "2026-01-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "BBAS3",
+      "quantity": 22,
+      "unit_price": 21.44,
+      "date": "2026-01-15",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "GARE11",
+      "quantity": 100,
+      "unit_price": 8.97,
+      "date": "2026-01-15",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GMAT3",
+      "quantity": 100,
+      "unit_price": 4.58,
+      "date": "2026-01-15",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GMAT3",
+      "quantity": 100,
+      "unit_price": 4.64,
+      "date": "2026-01-15",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GRND3",
+      "quantity": 100,
+      "unit_price": 4.6,
+      "date": "2026-01-15",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "MRVE3",
+      "quantity": 40,
+      "unit_price": 7.82,
+      "date": "2026-01-15",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GOAU4",
+      "quantity": 50,
+      "unit_price": 9.35,
+      "date": "2026-01-14",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 4,
+      "unit_price": 43.26,
+      "date": "2026-01-14",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNCA11",
+      "quantity": 4,
+      "unit_price": 96.08,
+      "date": "2026-01-09",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNSC11",
+      "quantity": 60,
+      "unit_price": 8.72,
+      "date": "2026-01-09",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "XPML11",
+      "quantity": 5,
+      "unit_price": 109.76,
+      "date": "2026-01-09",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNSC11",
+      "quantity": 20,
+      "unit_price": 8.6,
+      "date": "2025-12-10",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GMAT3",
+      "quantity": 15,
+      "unit_price": 4.83,
+      "date": "2025-12-09",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "MRVE3",
+      "quantity": 15,
+      "unit_price": 8.21,
+      "date": "2025-12-09",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GMAT3",
+      "quantity": 9,
+      "unit_price": 4.99,
+      "date": "2025-12-05",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "IGTI11",
+      "quantity": 8,
+      "unit_price": 26.21,
+      "date": "2025-12-05",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "MRVE3",
+      "quantity": 30,
+      "unit_price": 8.65,
+      "date": "2025-12-05",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 5,
+      "unit_price": 46.62,
+      "date": "2025-12-05",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GOAU4",
+      "quantity": 30,
+      "unit_price": 11.4,
+      "date": "2025-12-04",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 5,
+      "unit_price": 46.52,
+      "date": "2025-12-04",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "BBSE3",
+      "quantity": 7,
+      "unit_price": 34.74,
+      "date": "2025-12-03",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "ITSA4",
+      "quantity": 10,
+      "unit_price": 12.5,
+      "date": "2025-12-03",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "KNSC11",
+      "quantity": 4,
+      "unit_price": 8.55,
+      "date": "2025-12-03",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "WEGE3",
+      "quantity": 9,
+      "unit_price": 45.25,
+      "date": "2025-12-03",
+      "operation": "SELL"
+    },
+    {
+      "ticker": "GMAT3",
+      "quantity": 20,
+      "unit_price": 5.11,
+      "date": "2025-11-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 2,
+      "unit_price": 42.55,
+      "date": "2025-11-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNSC11",
+      "quantity": 15,
+      "unit_price": 8.62,
+      "date": "2025-11-13",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "BBAS3",
+      "quantity": 10,
+      "unit_price": 22.76,
+      "date": "2025-11-12",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "WEGE3",
+      "quantity": 5,
+      "unit_price": 44.94,
+      "date": "2025-11-12",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "BBSE3",
+      "quantity": 7,
+      "unit_price": 33.67,
+      "date": "2025-11-11",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNRI11",
+      "quantity": 2,
+      "unit_price": 145.99,
+      "date": "2025-11-11",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GOAU4",
+      "quantity": 20,
+      "unit_price": 11.04,
+      "date": "2025-11-10",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GOAU4",
+      "quantity": 5,
+      "unit_price": 10.9,
+      "date": "2025-10-30",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "WEGE3",
+      "quantity": 4,
+      "unit_price": 41.61,
+      "date": "2025-10-30",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 5,
+      "unit_price": 43.3,
+      "date": "2025-10-29",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GOAU4",
+      "quantity": 5,
+      "unit_price": 10.68,
+      "date": "2025-10-28",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "IGTI11",
+      "quantity": 5,
+      "unit_price": 24.27,
+      "date": "2025-10-28",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "BBAS3",
+      "quantity": 2,
+      "unit_price": 20.77,
+      "date": "2025-10-27",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "BBAS3",
+      "quantity": 10,
+      "unit_price": 20.6,
+      "date": "2025-10-20",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNRI11",
+      "quantity": 1,
+      "unit_price": 145.89,
+      "date": "2025-10-20",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "GARE11",
+      "quantity": 10,
+      "unit_price": 8.93,
+      "date": "2025-10-17",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "ITSA4",
+      "quantity": 10,
+      "unit_price": 11,
+      "date": "2025-10-17",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "KNRI11",
+      "quantity": 1,
+      "unit_price": 145.97,
+      "date": "2025-10-17",
+      "operation": "BUY"
+    },
+    {
+      "ticker": "TOTS3",
+      "quantity": 2,
+      "unit_price": 41.08,
+      "date": "2025-10-17",
+      "operation": "BUY"
+    }
   ]
 }
