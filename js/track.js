@@ -31,7 +31,7 @@ function switchScreen(screen) {
   });
   document.getElementById(bnMap[screen])?.classList.add('active');
 
-  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); }
+  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); renderExtrato(); renderGastos(); renderRegrasCustomizadas(); renderSaudeFinanceira(); }
   if (screen === 'metas')     { renderGoals(); }
   if (screen === 'reminder')  { reminderUpdateUI(); }
 }
