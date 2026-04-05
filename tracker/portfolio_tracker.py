@@ -6,27 +6,24 @@ Exporta do SimFin web → roda aqui → dashboard Streamlit
 Uso:
     streamlit run portfolio_tracker.py
 
-Cotações: brapi.dev (B3) | SimFin API (US)
-Configuração: arquivo .env com SIMFIN_API_KEY (opcional para ações BR)
+Cotações: yfinance (B3 via .SA | US) · cache local 4h
 """
 
 import json
 import os
-import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
-import requests
 import streamlit as st
+import yfinance as yf
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # ── Configuração ────────────────────────────────────────────────────
 CACHE_DIR   = Path.home() / 'simfin_data'
-BRAPI_BASE  = 'https://brapi.dev/api'
 TRACKER_DIR = Path(__file__).parent
 
 
@@ -34,79 +31,54 @@ TRACKER_DIR = Path(__file__).parent
 
 def is_b3(ticker: str) -> bool:
     """Tickers B3 terminam em dígito: PETR4, VALE3, ITUB4, BOVA11..."""
-    t = ticker.upper().rstrip()
+    t = ticker.upper().strip()
     return bool(t) and t[-1].isdigit()
+
+def yf_ticker(ticker: str) -> str:
+    """Converte ticker para formato Yahoo Finance (B3 adiciona .SA)."""
+    return f"{ticker}.SA" if is_b3(ticker) else ticker
 
 
 # ═══ FETCH DE COTAÇÕES ══════════════════════════════════════════════
 
-def _cache_path(ticker: str, source: str) -> Path:
+def _cache_path(ticker: str) -> Path:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    return CACHE_DIR / f"{ticker}_{source}.parquet"
+    return CACHE_DIR / f"{ticker}_yf.parquet"
 
 
 def _cache_valid(path: Path, max_age_h: int = 4) -> bool:
     if not path.exists():
         return False
-    age = datetime.now().timestamp() - path.stat().st_mtime
-    return age < max_age_h * 3600
+    return (datetime.now().timestamp() - path.stat().st_mtime) < max_age_h * 3600
 
 
-def fetch_brapi(ticker: str) -> pd.DataFrame:
-    """Cotações históricas via brapi.dev (B3). Retorna df com index=date, col=Close."""
-    cache = _cache_path(ticker, 'brapi')
+def fetch_prices_yf(ticker: str, start: str) -> pd.DataFrame:
+    """Cotações via yfinance (gratuito, sem API key). Cache local 4h."""
+    cache = _cache_path(ticker)
     if _cache_valid(cache):
-        return pd.read_parquet(cache)
+        df = pd.read_parquet(cache)
+        # Atualiza se cache não cobre até hoje
+        if not df.empty and df.index.max() >= date.today().strftime('%Y-%m-%d'):
+            return df
 
-    url = f"{BRAPI_BASE}/quote/{ticker}?range=5y&interval=1d&fundamental=false"
+    yt = yf_ticker(ticker)
     try:
-        r = requests.get(url, timeout=30)
-        r.raise_for_status()
-        results = r.json().get('results', [])
-        if not results or 'historicalDataPrice' not in results[0]:
+        raw = yf.download(yt, start=start, auto_adjust=True, progress=False)
+        if raw.empty:
             return pd.DataFrame(columns=['Close'])
-
-        hist = results[0]['historicalDataPrice']
-        df = pd.DataFrame(hist)[['date', 'close']].copy()
-        df['date'] = pd.to_datetime(df['date'], unit='s').dt.strftime('%Y-%m-%d')
-        df = df.rename(columns={'close': 'Close'}).set_index('date').sort_index()
+        df = raw[['Close']].copy()
+        df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
+        df = df.sort_index()
         df = df[df['Close'].notna() & (df['Close'] > 0)]
         df.to_parquet(cache)
         return df
     except Exception as e:
-        st.warning(f"brapi.dev [{ticker}]: {e}")
+        st.warning(f"yfinance [{ticker}]: {e}")
         return pd.DataFrame(columns=['Close'])
 
 
-def fetch_simfin(ticker: str, api_key: str) -> pd.DataFrame:
-    """Cotações via SimFin API (ações US). Requer simfin instalado."""
-    if not api_key:
-        return pd.DataFrame(columns=['Close'])
-    cache = _cache_path(ticker, 'simfin')
-    if _cache_valid(cache, max_age_h=24):
-        return pd.read_parquet(cache)
-    try:
-        import simfin as sf
-        sf.set_api_key(api_key)
-        sf.set_data_dir(str(CACHE_DIR))
-        prices = sf.load_shareprices(market='US', variant='daily', refresh_days=1)
-        tickers_avail = prices.index.get_level_values('Ticker').unique()
-        if ticker not in tickers_avail:
-            return pd.DataFrame(columns=['Close'])
-        df = prices.loc[ticker][['Close']].copy()
-        df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
-        df = df.sort_index()
-        df.to_parquet(cache)
-        return df
-    except Exception as e:
-        st.warning(f"SimFin [{ticker}]: {e}")
-        return pd.DataFrame(columns=['Close'])
-
-
-def fetch_prices(ticker: str, api_key: str = '') -> pd.DataFrame:
-    """Roteador: brapi.dev para B3, SimFin para US, brapi como fallback."""
-    if is_b3(ticker):
-        df = fetch_brapi(ticker)
+def fetch_prices(ticker: str, start: str, _api_key: str = '') -> pd.DataFrame:
+    return fetch_prices_yf(ticker, start)
         return df if not df.empty else pd.DataFrame(columns=['Close'])
     df = fetch_simfin(ticker, api_key)
     if df.empty:
@@ -226,14 +198,6 @@ def run():
     # ── Sidebar ──
     with st.sidebar:
         st.title('⚙️ Configuração')
-        api_key = st.text_input(
-            'SimFin API Key (ações US)',
-            value=os.environ.get('SIMFIN_API_KEY', ''),
-            type='password',
-            help='Obtenha em simfin.com/user/account. Necessário apenas para ações US.',
-        )
-
-        st.markdown('---')
         st.markdown('**📂 Transações**')
         default_json = TRACKER_DIR / 'portfolio_transactions.json'
         uploaded = st.file_uploader('Carregar portfolio_transactions.json', type='json')
@@ -249,7 +213,7 @@ def run():
             st.stop()
 
         st.markdown('---')
-        st.caption('Cotações B3 via **brapi.dev** · US via **SimFin API** · cache 4h')
+        st.caption('Cotações via **yfinance** (B3: .SA | US) · cache 4h')
 
     # ── Carrega transações ──
     try:
@@ -264,7 +228,7 @@ def run():
 
     # ── Busca cotações ──
     with st.spinner(f'Buscando cotações para {", ".join(tickers)}…'):
-        all_prices = {t: fetch_prices(t, api_key) for t in tickers}
+        all_prices = {t: fetch_prices(t, start_dt) for t in tickers}
 
     missing = [t for t, df in all_prices.items() if df.empty]
     if missing:
