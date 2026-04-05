@@ -66,7 +66,11 @@ def fetch_prices_yf(ticker: str, start: str) -> pd.DataFrame:
         raw = yf.download(yt, start=start, auto_adjust=True, progress=False)
         if raw.empty:
             return pd.DataFrame(columns=['Close'])
+        # yfinance >=0.2.x pode retornar MultiIndex nas colunas — achatar
+        if isinstance(raw.columns, pd.MultiIndex):
+            raw.columns = raw.columns.get_level_values(0)
         df = raw[['Close']].copy()
+        df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
         df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
         df = df.sort_index()
         df = df[df['Close'].notna() & (df['Close'] > 0)]
@@ -86,7 +90,13 @@ def get_price_on(prices: pd.DataFrame, target_date: str) -> float | None:
     if prices.empty:
         return None
     avail = prices[prices.index <= target_date]
-    return float(avail.iloc[-1]['Close']) if not avail.empty else None
+    if avail.empty:
+        return None
+    val = avail.iloc[-1]['Close']
+    # Garante escalar mesmo se vier como Series (MultiIndex residual)
+    if isinstance(val, pd.Series):
+        val = val.iloc[0]
+    return float(val)
 
 
 # ═══ CÁLCULOS DE PORTFOLIO ══════════════════════════════════════════
