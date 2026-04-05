@@ -1,0 +1,25 @@
+name: Atualizar Cache Tesouro
+
+on:
+  schedule:
+    - cron: '0 14 * * 1-5'   # 11h BRT, dias úteis
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar e processar CSV CKAN
+        run: python3 .github/scripts/update_tesouro.py
+
+      - name: Commit data/tesouro-latest.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/tesouro-latest.json
+          git diff --cached --quiet || git commit -m "chore: atualiza cotações Tesouro Direto $(date -u +%Y-%m-%d)"
+          git push
