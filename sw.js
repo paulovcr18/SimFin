@@ -30,7 +30,7 @@ const LOCAL_ASSETS = [
   './js/db.js',
   './js/tesouro-api.js',
   './js/auth.js',
-  './js/db.js',
+  'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
 ];
 
 // Assets externos — tentamos network, fallback para cache
@@ -81,6 +81,19 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') return;
+
+  // Network-only: never cache live API responses (stale prices are a UX bug)
+  const NETWORK_ONLY_HOSTS = [
+    'brapi.dev',
+    'query1.finance.yahoo.com',
+  ];
+  const NETWORK_ONLY_PATHS = [
+    'qaopienbsmssjosttucn.supabase.co/functions',
+  ];
+  const isNetworkOnly =
+    NETWORK_ONLY_HOSTS.some(h => url.hostname === h || url.hostname.endsWith('.' + h)) ||
+    NETWORK_ONLY_PATHS.some(p => url.href.includes(p));
+  if (isNetworkOnly) return; // fall through to browser default (network)
 
   event.respondWith(
     caches.match(event.request).then(cached => {
