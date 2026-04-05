@@ -31,8 +31,8 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Delete tracker/ and add streamlit-app deprecation notice
-- [ ] 01-02-PLAN.md — Fix Service Worker: network-only API bypass, dedup db.js, add SheetJS preload
+- [x] 01-01-PLAN.md — Delete tracker/ and add streamlit-app deprecation notice
+- [x] 01-02-PLAN.md — Fix Service Worker: network-only API bypass, dedup db.js, add SheetJS preload
 - [x] 01-03-PLAN.md — Add SRI integrity hash to SheetJS CDN script tag in index.html
 - [ ] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
 
