@@ -13,7 +13,7 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
 - [ ] **Phase 1: Dead Code Removal** - Deletar tracker/, corrigir SW cache e cenários quebrados
 - [ ] **Phase 2: PWA Login Performance** - Stale-while-revalidate no boot, preload SheetJS
 - [ ] **Phase 3: Portfolio Performance** - Cache build_evolution(), fix sync conflict
-- [ ] **Phase 4: External API Resilience** - Validação Yahoo Finance, CKAN assertions, rate limiting (1 plan complete)
+- [ ] **Phase 4: External API Resilience** - Validação Yahoo Finance, CKAN assertions, rate limiting
 - [ ] **Phase 5: Fiscal Calculation Tests** - Pytest para calc.py, fixture de paridade JS/Python
 
 ## Phase Details
@@ -73,12 +73,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — TBD
-- [ ] 04-02-PLAN.md — TBD
-- [x] 04-03-PLAN.md — Add assert_output and enrich CKAN column error messages; add failure diagnostic step to workflow
-
-Plans:
-- [x] 04-01-PLAN.md — Rate limiting in-memory + Yahoo Finance shape validation + catch-all 500
+- [ ] 04-01-PLAN.md — Edge Function: rate limiting (429) + Yahoo Finance shape validation (422)
+- [ ] 04-02-PLAN.md — Frontend: propagar motivo de falha da Edge Function no toast; exibir N/D para preços nulos
+- [ ] 04-03-PLAN.md — CKAN: assert_output em update_tesouro.py; step de diagnóstico no workflow
 
 ### Phase 5: Fiscal Calculation Tests
 **Goal**: Garantir que os cálculos de INSS/IRRF/FGTS não regridem silenciosamente quando as tabelas fiscais são atualizadas, e detectar divergência entre a implementação JS e Python.
