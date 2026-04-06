@@ -19,6 +19,23 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
 };
 
+// ── Rate limiting in-memory (best-effort, por isolate) ─────────────────────
+const RATE_LIMIT   = 10;   // max requests por IP por janela
+const RATE_WINDOW  = 60_000; // janela em ms (1 minuto)
+const rateLimiter  = new Map<string, { count: number; windowStart: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now    = Date.now();
+  const entry  = rateLimiter.get(ip);
+  if (!entry || now - entry.windowStart > RATE_WINDOW) {
+    rateLimiter.set(ip, { count: 1, windowStart: now });
+    return true;   // OK
+  }
+  entry.count++;
+  if (entry.count > RATE_LIMIT) return false;  // bloqueado
+  return true;
+}
+
 const TESOURO_NACIONAL_API = 'https://www.tesourodireto.com.br/json/br/com/b3/tesouro/tesouro-direto/2/prices-and-rates.json';
 const CKAN_PKG_URL         = 'https://www.tesourotransparente.gov.br/ckan/api/3/action/package_show?id=taxas-dos-titulos-ofertados-pelo-tesouro-direto';
 const CKAN_DS_URL          = 'https://www.tesourotransparente.gov.br/ckan/api/3/action/datastore_search';
@@ -43,6 +60,17 @@ Deno.serve(async (req: Request) => {
   // Preflight CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
+  }
+
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+           ?? req.headers.get('x-real-ip')
+           ?? 'unknown';
+
+  if (!checkRateLimit(ip)) {
+    return new Response(JSON.stringify({ error: 'Rate limit excedido. Tente novamente em 1 minuto.' }), {
+      status: 429,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json', 'Retry-After': '60' },
+    });
   }
 
   try {
