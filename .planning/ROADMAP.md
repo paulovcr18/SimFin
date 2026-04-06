@@ -60,7 +60,11 @@ Plans:
   2. Deletar uma posição localmente não é revertido no próximo login
   3. Erros de Supabase no `maybySingle()` de `js/db.js` são capturados e logados
   4. `build_evolution()` não roda na íntegra a cada page load quando dados não mudaram
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Cache build_evolution and price fetch with @st.cache_data in 2_Carteira.py
+- [x] 03-02-PLAN.md — Fix _dbPullCarteira merge heuristic and log maybySingle errors in db.js
 
 ### Phase 4: External API Resilience
 **Goal**: Tornar o app resiliente a mudanças de formato das APIs externas não-oficiais (Yahoo Finance, CKAN Tesouro) e dar feedback claro ao usuário quando dados não estão disponíveis.
