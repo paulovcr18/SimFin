@@ -332,6 +332,7 @@ let _lastRefreshTs = 0;
 // ── Cotações: Edge Function (Yahoo Finance proxy) com fallback BRAPI ─────────
 async function carteiraBuscarCotacao(tickers) {
   // 1ª opção: Supabase Edge Function (proxy server-side — sem CORS, sem token)
+  let edgeFnErrorMotivo = null;
   try {
     const res = await fetch(
       `${COTACOES_FN}?tickers=${tickers.join(',')}`,
@@ -342,16 +343,28 @@ async function carteiraBuscarCotacao(tickers) {
       if (data.results && Object.keys(data.results).length) {
         return data.results;  // formato idêntico ao BRAPI: { TICKER: { regularMarketPrice, ... } }
       }
+      // results vazio mas sem erro — fallthrough silencioso
+      console.warn('[cotacoes] edge fn retornou results vazio, tentando BRAPI...');
+    } else {
+      // Lê o motivo de erro (422 = formato inválido, 429 = rate limit, 500 = interno)
+      let motivo = `HTTP ${res.status}`;
+      try {
+        const errData = await res.json();
+        if (errData?.error) motivo = errData.error;
+      } catch { /* ignora parse error */ }
+      edgeFnErrorMotivo = motivo;
+      console.warn('[cotacoes] edge fn retornou', res.status, motivo);
     }
-    console.warn('[cotacoes] edge fn retornou vazio, tentando BRAPI...');
   } catch(e) {
+    edgeFnErrorMotivo = `Erro de rede: ${e.message}`;
     console.warn('[cotacoes] edge fn falhou, tentando BRAPI...', e.message);
   }
 
   // 2ª opção: BRAPI com token do usuário
   const token = carteiraGetToken();
   if (!token) {
-    showToast('Cotações indisponíveis. Se o problema persistir, configure um token em brapi.dev.', '⚠️', 5000);
+    const detail = edgeFnErrorMotivo ? ` (${edgeFnErrorMotivo})` : '';
+    showToast(`Cotações indisponíveis${detail}. Configure um token em brapi.dev para fallback.`, '⚠️', 6000);
     return null;
   }
 
@@ -374,7 +387,12 @@ async function carteiraBuscarCotacao(tickers) {
       console.error('[BRAPI]', e);
     }
   }
-  return Object.keys(map).length ? map : null;
+  if (!Object.keys(map).length) {
+    const detail = edgeFnErrorMotivo ? ` (Edge Function: ${edgeFnErrorMotivo})` : '';
+    showToast(`Cotações indisponíveis${detail}. BRAPI também falhou.`, '⚠️', 6000);
+    return null;
+  }
+  return map;
 }
 
 // ── Usar total da carteira como patrimônio no acompanhamento ──
