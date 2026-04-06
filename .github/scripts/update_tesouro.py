@@ -23,6 +23,22 @@ CKAN_BASE   = 'https://www.tesourotransparente.gov.br/ckan/api/3/action'
 PKG_ID      = 'taxas-dos-titulos-ofertados-pelo-tesouro-direto'
 OUT_PATH    = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'tesouro-latest.json')
 
+MIN_TITULOS = 5  # mínimo esperado de títulos no JSON (Tesouro tem ~8-12 normalmente)
+
+def assert_output(out):
+    """Valida estrutura do JSON de saída antes de salvar. Falha com mensagem clara."""
+    titulos = out.get('titulos', {})
+    if not isinstance(titulos, dict):
+        raise RuntimeError(f'assert_output: "titulos" não é dict, é {type(titulos).__name__}')
+    if len(titulos) < MIN_TITULOS:
+        raise RuntimeError(
+            f'assert_output: apenas {len(titulos)} título(s) no output, esperado >= {MIN_TITULOS}. '
+            f'Títulos encontrados: {list(titulos.keys())}'
+        )
+    if not out.get('_generatedAt'):
+        raise RuntimeError('assert_output: campo "_generatedAt" ausente ou vazio no output')
+    print(f'[3] assert_output OK: {len(titulos)} títulos, _generatedAt={out["_generatedAt"]}')
+
 # ── Descobre URL do CSV via package_show ───────────────────────────────────
 def descobrir_url_csv():
     url = f'{CKAN_BASE}/package_show?id={PKG_ID}'
@@ -58,6 +74,10 @@ def detectar_colunas(headers):
         'puCompra':   find(['pu', 'compra']) or find(['unit', 'compra']),
         'puVenda':    find(['pu', 'venda'])   or find(['unit', 'venda']),
     }
+    nao_mapeados = [k for k, v in cols.items() if v is None and k in ['titulo', 'taxaCompra', 'taxaVenda', 'puCompra', 'puVenda']]
+    if nao_mapeados:
+        print(f'[AVISO] Colunas obrigatórias não mapeadas: {nao_mapeados}', file=sys.stderr)
+        print(f'[AVISO] Headers reais do CSV: {headers}', file=sys.stderr)
     print(f'[2] Mapeamento de colunas: { {k: (v, headers[v] if v is not None else None) for k,v in cols.items()} }')
     return cols
 
@@ -106,7 +126,14 @@ def processar_csv(csv_url):
     obrigatorias = ['titulo', 'taxaCompra', 'taxaVenda', 'puCompra', 'puVenda']
     missing = [k for k in obrigatorias if cols.get(k) is None]
     if missing:
-        raise RuntimeError(f'Colunas não encontradas: {missing}. Headers: {headers}')
+        h_norm = [c.lower().replace(' ', '').encode('ascii', 'ignore').decode() for c in headers]
+        raise RuntimeError(
+            f'Colunas não encontradas: {missing}\n'
+            f'Headers reais: {headers}\n'
+            f'Headers normalizados: {h_norm}\n'
+            f'Dica: a heurística procura substrings como "tipo"/"titulo" para título, '
+            f'"taxa"+"compra" para taxa de compra, etc.'
+        )
 
     # Agrupa por (tipo + ano_vencimento), mantém linha com data de cotação mais recente
     titulos = {}  # chave → {'_dataObj': datetime, dados...}
@@ -174,6 +201,8 @@ def main():
         '_generatedAt': agora,
         'titulos':      titulos,
     }
+
+    assert_output(out)
 
     out_path = os.path.abspath(OUT_PATH)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
