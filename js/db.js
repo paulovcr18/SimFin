@@ -115,23 +115,35 @@ async function _dbPullCarteira(uid) {
       preco:          r.preco_atual     !== null ? parseFloat(r.preco_atual)     : null,
       cotadoEm:       r.cotado_em,
     }));
-    // Só sobrescrever se versão remota for mais recente ou se local estiver vazio
+    // Só sobrescrever se local estiver vazio OU se o remote tiver timestamp mais recente
+    // que qualquer item local. "length > length" é heurística errada — reverte deleções.
     const localCart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-    if (!localCart.length || (posicoes.length > localCart.length)) {
+    const remoteTs  = posicoes.length
+      ? Math.max(...posicoes.map(p => p.cotadoEm ? new Date(p.cotadoEm).getTime() : 0))
+      : 0;
+    const localTs   = localCart.length
+      ? Math.max(...localCart.map(p => p.cotadoEm ? new Date(p.cotadoEm).getTime() : 0))
+      : 0;
+    if (!localCart.length || remoteTs > localTs) {
       localStorage.setItem(CART_KEY, JSON.stringify(posicoes));
     }
+  }
+  if (histRes.status === 'fulfilled' && histRes.value.error) {
+    console.error('[db] carteira_historico maybySingle error:', histRes.value.error);
   }
   if (histRes.status === 'fulfilled' && histRes.value.data) {
     const h = histRes.value.data;
     if (h.negociacoes) {
       const localNegocs = JSON.parse(localStorage.getItem(NEGOC_KEY) || '[]');
-      if (!localNegocs.length || (h.negociacoes.length > localNegocs.length)) {
+      // Para negociacoes: remote só vence se local estiver vazio
+      if (!localNegocs.length) {
         localStorage.setItem(NEGOC_KEY, JSON.stringify(h.negociacoes));
       }
     }
     if (h.movimentacoes) {
       const localMovims = JSON.parse(localStorage.getItem(MOVIM_KEY) || '[]');
-      if (!localMovims.length || (h.movimentacoes.length > localMovims.length)) {
+      // Para movimentacoes: remote só vence se local estiver vazio
+      if (!localMovims.length) {
         localStorage.setItem(MOVIM_KEY, JSON.stringify(h.movimentacoes));
       }
     }
