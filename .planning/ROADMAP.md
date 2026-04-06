@@ -45,7 +45,11 @@ Plans:
   2. Sync Supabase ocorre em background sem bloquear a UI
   3. Importação de arquivo XLSX não tem delay de download do SheetJS (preloaded)
   4. Erros em `authOnLogin` aparecem no console em vez de serem engolidos silenciosamente
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [x] 02-01-PLAN.md — Stale-while-revalidate authOnLogin: render from cache immediately, sync Supabase in background
+- [ ] 02-02-PLAN.md — Simplify SheetJS injection guard in carteira.js
 
 ### Phase 3: Portfolio Performance
 **Goal**: Eliminar o gargalo O(days × tickers) em `build_evolution()` e corrigir a lógica de resolução de conflito de sync que pode reverter deleções do usuário.
