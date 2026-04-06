@@ -10,7 +10,7 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Dead Code Removal** - Deletar tracker/, corrigir SW cache e cenários quebrados
+- [x] **Phase 1: Dead Code Removal** - Deletar tracker/, corrigir SW cache e cenários quebrados (completed 2026-04-06)
 - [ ] **Phase 2: PWA Login Performance** - Stale-while-revalidate no boot, preload SheetJS
 - [ ] **Phase 3: Portfolio Performance** - Cache build_evolution(), fix sync conflict
 - [ ] **Phase 4: External API Resilience** - Validação Yahoo Finance, CKAN assertions, rate limiting
@@ -34,7 +34,7 @@ Plans:
 - [x] 01-01-PLAN.md — Delete tracker/ and add streamlit-app deprecation notice
 - [x] 01-02-PLAN.md — Fix Service Worker: network-only API bypass, dedup db.js, add SheetJS preload
 - [x] 01-03-PLAN.md — Add SRI integrity hash to SheetJS CDN script tag in index.html
-- [ ] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
+- [x] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
 
 ### Phase 2: PWA Login Performance
 **Goal**: Tornar o carregamento inicial e o login perceptivelmente mais rápidos implementando stale-while-revalidate e pré-carregamento de assets pesados.
@@ -48,8 +48,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 02-01-PLAN.md — Stale-while-revalidate authOnLogin: render from cache immediately, sync Supabase in background
-- [ ] 02-02-PLAN.md — Simplify SheetJS injection guard in carteira.js
+- [ ] 02-01-PLAN.md — Refactor authOnLogin: stale-while-revalidate sequence
+- [ ] 02-02-PLAN.md — Simplify SheetJS injection guard in carteiraParseXLSX
 
 ### Phase 3: Portfolio Performance
 **Goal**: Eliminar o gargalo O(days × tickers) em `build_evolution()` e corrigir a lógica de resolução de conflito de sync que pode reverter deleções do usuário.
