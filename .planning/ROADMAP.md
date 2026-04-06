@@ -67,7 +67,12 @@ Plans:
   2. Se CKAN mudar colunas, a GitHub Action falha com erro legível (não silencioso)
   3. Edge Function retorna HTTP 429 quando chamada excessivamente (rate limiting básico)
   4. Usuário vê "Cotações indisponíveis" com motivo quando API falha
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — TBD
+- [ ] 04-02-PLAN.md — TBD
+- [x] 04-03-PLAN.md — Add assert_output and enrich CKAN column error messages; add failure diagnostic step to workflow
 
 ### Phase 5: Fiscal Calculation Tests
 **Goal**: Garantir que os cálculos de INSS/IRRF/FGTS não regridem silenciosamente quando as tabelas fiscais são atualizadas, e detectar divergência entre a implementação JS e Python.
