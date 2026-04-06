@@ -89,4 +89,4 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [x] 05-01-PLAN.md — pytest golden-value suite for core/calc.py (31 tests, all passing)
+- [ ] 05-01-PLAN.md — Create pytest golden-salary test suite for calc.py (INSS/IRRF/CLT/PJ)
