@@ -104,42 +104,50 @@ async function _dbPullCarteira(uid) {
     sb.from('carteira_posicoes').select('*').eq('user_id', uid),
     sb.from('carteira_historico').select('*').eq('user_id', uid).maybeSingle(),
   ]);
-  if (posRes.status === 'fulfilled' && posRes.value.data) {
-    const posicoes = posRes.value.data.map(r => ({
-      ticker:         r.ticker,
-      categoria:      r.categoria,
-      nome:           r.nome,
-      qtd:            parseFloat(r.qtd),
-      pmedio:         r.preco_medio     !== null ? parseFloat(r.preco_medio)     : null,
-      ganhoRealizado: parseFloat(r.ganho_realizado),
-      preco:          r.preco_atual     !== null ? parseFloat(r.preco_atual)     : null,
-      cotadoEm:       r.cotado_em,
-    }));
-    // Só sobrescrever se versão remota for mais recente ou se local estiver vazio
-    const localCart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-    if (!localCart.length || (posicoes.length > localCart.length)) {
+  if (posRes.status === 'fulfilled') {
+    if (posRes.value.error) {
+      console.error('[db] _dbPullCarteira posicoes error:', posRes.value.error);
+    } else if (posRes.value.data) {
+      const posicoes = posRes.value.data.map(r => ({
+        ticker:         r.ticker,
+        categoria:      r.categoria,
+        nome:           r.nome,
+        qtd:            parseFloat(r.qtd),
+        pmedio:         r.preco_medio     !== null ? parseFloat(r.preco_medio)     : null,
+        ganhoRealizado: parseFloat(r.ganho_realizado),
+        preco:          r.preco_atual     !== null ? parseFloat(r.preco_atual)     : null,
+        cotadoEm:       r.cotado_em,
+      }));
+      // Remote é fonte de verdade no pull — substitui local incondicionalmente
       localStorage.setItem(CART_KEY, JSON.stringify(posicoes));
     }
+  } else {
+    console.error('[db] _dbPullCarteira posicoes rejected:', posRes.reason);
   }
-  if (histRes.status === 'fulfilled' && histRes.value.data) {
-    const h = histRes.value.data;
-    if (h.negociacoes) {
-      const localNegocs = JSON.parse(localStorage.getItem(NEGOC_KEY) || '[]');
-      if (!localNegocs.length || (h.negociacoes.length > localNegocs.length)) {
+  if (histRes.status === 'fulfilled') {
+    if (histRes.value.error) {
+      console.error('[db] _dbPullCarteira historico error:', histRes.value.error);
+    } else if (histRes.value.data) {
+      const h = histRes.value.data;
+      // Remote é fonte de verdade no pull — substitui local incondicionalmente
+      if (h.negociacoes) {
         localStorage.setItem(NEGOC_KEY, JSON.stringify(h.negociacoes));
       }
-    }
-    if (h.movimentacoes) {
-      const localMovims = JSON.parse(localStorage.getItem(MOVIM_KEY) || '[]');
-      if (!localMovims.length || (h.movimentacoes.length > localMovims.length)) {
+      if (h.movimentacoes) {
         localStorage.setItem(MOVIM_KEY, JSON.stringify(h.movimentacoes));
       }
     }
+  } else {
+    console.error('[db] _dbPullCarteira historico rejected:', histRes.reason);
   }
 }
 
 async function _dbPullConfig(uid) {
-  const { data } = await sb.from('user_config').select('*').eq('user_id', uid).maybeSingle();
+  const { data, error } = await sb.from('user_config').select('*').eq('user_id', uid).maybeSingle();
+  if (error) {
+    console.error('[db] _dbPullConfig error:', error);
+    return;
+  }
   if (!data) return;
   if (data.autosave)    localStorage.setItem(INPUTS_AUTOSAVE_KEY, JSON.stringify(data.autosave));
   if (data.brapi_token) localStorage.setItem(CART_TOKEN_KEY, data.brapi_token);
