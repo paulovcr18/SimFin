@@ -86,4 +86,7 @@ Plans:
   2. Casos de teste cobrem: limites de faixa INSS, IRRF com e sem deduções, CLT vs PJ para salários representativos
   3. Fixture "golden salary" documenta entradas e saídas esperadas como contrato
   4. Atualizar tabela INSS/IRRF para 2027 quebra pelo menos um teste (detectabilidade garantida)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] 05-01-PLAN.md — pytest golden-value suite for core/calc.py (31 tests, all passing)
