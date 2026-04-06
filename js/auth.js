@@ -209,22 +209,48 @@ async function authOnLogin(user) {
   if (!appInitialized) {
     appInitialized = true;
 
-    // Sincroniza com Supabase antes de iniciar o app:
-    // — na 1ª vez: migra localStorage → Supabase
-    // — nas demais: puxa Supabase → localStorage (dados de outro dispositivo)
-    authShowSyncLoading(true);
+    // Step 1: Schema migration — must always complete before any render
     try { await dbMigrateIfNeeded(); } catch(e) { console.warn('[db] migrate:', e); }
-    try { await dbPullAll();         } catch(e) { console.warn('[db] pull:',    e); }
-    authShowSyncLoading(false);
 
-    authHideOverlay();
+    // Step 2: Detect localStorage cache
+    const hasCache = !!localStorage.getItem('simfin_last_inputs');
 
-    try { autoRestoreInputs(); }               catch(e) { console.error('[init]', e); }
-    try { updAno(); calc(); }                  catch(e) { console.error('[init]', e); }
-    try { carteiraMigrar(); renderCarteira(); } catch(e) { console.error('[init]', e); }
-    try { renderGoals(); }                     catch(e) { console.error('[init]', e); }
-    try { renderTrack(); }                     catch(e) { console.error('[init]', e); }
-    try { reminderUpdateUI(); reminderCheckDue(); } catch(e) { console.error('[init]', e); }
+    if (hasCache) {
+      // Cache path: render immediately, sync in background
+      authHideOverlay();
+
+      try { autoRestoreInputs(); }               catch(e) { console.error('[init]', e); }
+      try { updAno(); calc(); }                  catch(e) { console.error('[init]', e); }
+      try { carteiraMigrar(); renderCarteira(); } catch(e) { console.error('[init]', e); }
+      try { renderGoals(); }                     catch(e) { console.error('[init]', e); }
+      try { renderTrack(); }                     catch(e) { console.error('[init]', e); }
+      try { reminderUpdateUI(); reminderCheckDue(); } catch(e) { console.error('[init]', e); }
+
+      // Background sync — NOT awaited; re-render affected modules when done
+      dbPullAll()
+        .then(() => {
+          try { renderCarteira(); } catch(e) { console.error('[bg-sync] renderCarteira:', e); }
+          try { renderGoals();    } catch(e) { console.error('[bg-sync] renderGoals:',    e); }
+          try { renderTrack();    } catch(e) { console.error('[bg-sync] renderTrack:',    e); }
+          try { calc();           } catch(e) { console.error('[bg-sync] calc:',           e); }
+        })
+        .catch(e => console.error('[bg-sync]', e));
+
+    } else {
+      // First-login path: no cache — await full sync before rendering
+      authShowSyncLoading(true);
+      try { await dbPullAll(); } catch(e) { console.warn('[db] pull:', e); }
+      authShowSyncLoading(false);
+
+      authHideOverlay();
+
+      try { autoRestoreInputs(); }               catch(e) { console.error('[init]', e); }
+      try { updAno(); calc(); }                  catch(e) { console.error('[init]', e); }
+      try { carteiraMigrar(); renderCarteira(); } catch(e) { console.error('[init]', e); }
+      try { renderGoals(); }                     catch(e) { console.error('[init]', e); }
+      try { renderTrack(); }                     catch(e) { console.error('[init]', e); }
+      try { reminderUpdateUI(); reminderCheckDue(); } catch(e) { console.error('[init]', e); }
+    }
   }
 }
 
