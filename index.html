@@ -178,19 +178,19 @@
     <button class="rtab active-clt" id="p1tabCLT" onclick="setRegime(1,'CLT')">💼 CLT</button>
     <button class="rtab" id="p1tabPJ" onclick="setRegime(1,'PJ')">🏢 PJ</button>
   </div>
-  <div class="ig" style="display: flex;"><label id="p1brutoLabel">Salário Bruto Mensal (R$)</label><input type="number" id="p1bruto" value="" min="0" oninput="calc()"></div>
+  <div class="ig" style="display: flex;"><label id="p1brutoLabel">Salário Bruto Mensal (R$)</label><input type="text" id="p1bruto" data-cur="money" value="" ></div>
   <!-- CLT-only fields -->
   <div id="p1cltFields" style="display: block;">
     <div class="ir">
-      <div class="ig"><label>VR/VA Mensal (R$)</label><input type="number" id="p1vr" value="" min="0" oninput="calc()"></div>
-      <div class="ig"><label>PLR Anual (R$)</label><input type="number" id="p1plr" value="" min="0" oninput="calc()"></div>
+      <div class="ig"><label>VR/VA Mensal (R$)</label><input type="text" id="p1vr" data-cur="money" value="" ></div>
+      <div class="ig"><label>PLR Anual (R$)</label><input type="text" id="p1plr" data-cur="money" value="" ></div>
     </div>
   </div>
   <!-- PJ-only fields -->
-  <div id="p1pjFields" c lass="pj-fields" style="display:none">
+  <div id="p1pjFields" class="pj-fields" style="display:none">
     <div class="pj-note">PJ: sem FGTS, 13° ou férias legais. Calcule o pró-labore e custos de empresa abaixo.</div>
     <div class="ir">
-      <div class="ig"><label>Pró-labore (R$)</label><input type="number" id="p1prolabore" value="" min="0" oninput="calc()" title="Base mínima para INSS do sócio"></div>
+      <div class="ig"><label>Pró-labore (R$)</label><input type="text" id="p1prolabore" data-cur="money" value=""  title="Base mínima para INSS do sócio"></div>
       <div class="ig"><label>Regime tributário</label>
         <select id="p1regime" onchange="calc()">
           <option value="simples">Simples Nacional</option>
@@ -199,8 +199,8 @@
       </div>
     </div>
     <div class="ir">
-      <div class="ig"><label>Faturamento Bruto (R$)</label><input type="number" id="p1fat" value="" min="0" oninput="calc()"></div>
-      <div class="ig"><label>Retirada Total (R$)</label><input type="number" id="p1retirada" value="" min="0" oninput="calc()" title="Pró-labore + distribuição de lucros"></div>
+      <div class="ig"><label>Faturamento Bruto (R$)</label><input type="text" id="p1fat" data-cur="money" value="" ></div>
+      <div class="ig"><label>Retirada Total (R$)</label><input type="text" id="p1retirada" data-cur="money" value=""  title="Pró-labore + distribuição de lucros"></div>
     </div>
     <div class="ig"><label>Reserva PJ (férias/13°) (%)</label><input type="number" id="p1reserva" value="" min="0" max="100" oninput="calc()" title="% da retirada que você guarda para férias e 13° equivalente"></div>
   </div>
@@ -211,19 +211,19 @@
     <button class="rtab active-clt" id="p2tabCLT" onclick="setRegime(2,'CLT')">💼 CLT</button>
     <button class="rtab" id="p2tabPJ" onclick="setRegime(2,'PJ')">🏢 PJ</button>
   </div>
-  <div class="ig" style="display: flex;"><label id="p2brutoLabel">Salário Bruto Mensal (R$)</label><input type="number" id="p2bruto" value="" min="0" oninput="calc()"></div>
+  <div class="ig" style="display: flex;"><label id="p2brutoLabel">Salário Bruto Mensal (R$)</label><input type="text" id="p2bruto" data-cur="money" value="" ></div>
   <!-- CLT-only fields -->
   <div id="p2cltFields" style="display: block;">
     <div class="ir">
-      <div class="ig"><label>VR/VA Mensal (R$)</label><input type="number" id="p2vr" value="" min="0" oninput="calc()"></div>
-      <div class="ig"><label>PLR Anual (R$)</label><input type="number" id="p2plr" value="" min="0" oninput="calc()"></div>
+      <div class="ig"><label>VR/VA Mensal (R$)</label><input type="text" id="p2vr" data-cur="money" value="" ></div>
+      <div class="ig"><label>PLR Anual (R$)</label><input type="text" id="p2plr" data-cur="money" value="" ></div>
     </div>
   </div>
   <!-- PJ-only fields -->
   <div id="p2pjFields" class="pj-fields" style="display:none">
     <div class="pj-note">PJ: sem FGTS, 13° ou férias legais. Calcule o pró-labore e custos de empresa abaixo.</div>
     <div class="ir">
-      <div class="ig"><label>Pró-labore (R$)</label><input type="number" id="p2prolabore" value="" min="0" oninput="calc()"></div>
+      <div class="ig"><label>Pró-labore (R$)</label><input type="text" id="p2prolabore" data-cur="money" value="" ></div>
       <div class="ig"><label>Regime tributário</label>
         <select id="p2regime" onchange="calc()">
           <option value="simples">Simples Nacional</option>
@@ -232,24 +232,24 @@
       </div>
     </div>
     <div class="ir">
-      <div class="ig"><label>Faturamento Bruto (R$)</label><input type="number" id="p2fat" value="" min="0" oninput="calc()"></div>
-      <div class="ig"><label>Retirada Total (R$)</label><input type="number" id="p2retirada" value="" min="0" oninput="calc()"></div>
+      <div class="ig"><label>Faturamento Bruto (R$)</label><input type="text" id="p2fat" data-cur="money" value="" ></div>
+      <div class="ig"><label>Retirada Total (R$)</label><input type="text" id="p2retirada" data-cur="money" value="" ></div>
     </div>
     <div class="ig"><label>Reserva PJ (férias/13°) (%)</label><input type="number" id="p2reserva" value="" min="0" max="100" oninput="calc()"></div>
   </div>
   <hr class="dv">
   <div class="stitle">📊 Rateio de Gastos (%)</div>
   <div class="ir">
-    <div class="ig"><label>🏠 Moradia</label><input type="number" id="pctMoradia" value="16" min="0" max="100" oninput="calc()"></div>
-    <div class="ig"><label>🍽 Alimentação</label><input type="number" id="pctAlimentacao" value="11" min="0" max="100" oninput="calc()"></div>
+    <div class="ig"><label>🏠 Moradia</label><input type="number" id="pctMoradia" value="16" min="0" max="100" ></div>
+    <div class="ig"><label>🍽 Alimentação</label><input type="number" id="pctAlimentacao" value="11" min="0" max="100" ></div>
   </div>
   <div class="ir">
-    <div class="ig"><label>🚗 Transporte</label><input type="number" id="pctTransporte" value="11" min="0" max="100" oninput="calc()"></div>
-    <div class="ig"><label>💡 Contas</label><input type="number" id="pctContas" value="5" min="0" max="100" oninput="calc()"></div>
+    <div class="ig"><label>🚗 Transporte</label><input type="number" id="pctTransporte" value="11" min="0" max="100" ></div>
+    <div class="ig"><label>💡 Contas</label><input type="number" id="pctContas" value="5" min="0" max="100" ></div>
   </div>
   <div class="ir">
-    <div class="ig"><label>🎉 Lazer</label><input type="number" id="pctLazer" value="11" min="0" max="100" oninput="calc()"></div>
-    <div class="ig"><label>📈 Investimento</label><input type="number" id="pctInvest" value="35" min="0" max="100" oninput="calc()"></div>
+    <div class="ig"><label>🎉 Lazer</label><input type="number" id="pctLazer" value="11" min="0" max="100" ></div>
+    <div class="ig"><label>📈 Investimento</label><input type="number" id="pctInvest" value="35" min="0" max="100" ></div>
   </div>
   <hr class="dv">
   <div class="stitle">🔮 Projeção Patrimonial</div>
@@ -266,8 +266,8 @@
     <input type="range" id="anos" min="5" max="40" value="20" step="1" oninput="updAno();calc()">
     <div class="rl"><span>5 anos</span><span id="anosLabel" style="color:var(--ac);font-weight:600">20 anos</span><span>40 anos</span></div>
   </div>
-  <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" oninput="calc()"></div>
-  <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" oninput="calc()"></div>
+  <div class="ig"><label>Reajuste Salarial Anual (%)</label><input type="number" id="reajuste" value="5" min="0" max="30" ></div>
+  <div class="ig"><label>📉 Inflação Anual Estimada (%)</label><input type="number" id="taxaInflacao" value="4.5" min="0" max="30" step="0.1" ></div>
   <!-- Patrimônio alimentado pela aba Finanças via carteiraUpdatePatrimonio() -->
   <input type="hidden" id="patInvestimentos" value="">
   <input type="hidden" id="patFGTS" value="">
@@ -385,7 +385,11 @@
   <!-- MILESTONES -->
   <div class="panel">
     <div class="ph2"><span style="font-size:16px">🏆</span><span class="pt">Marcos Financeiros da Jornada</span><span style="font-size:10px;color:var(--t3);margin-left:auto">Clique para ver snapshot</span></div>
-    <div class="pb"><div class="ms-list" id="msList"><div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Ajuste os valores para visualizar marcos financeiros</div></div></div>
+    <div class="pb">
+  <div class="ms-list" id="msList">
+    <div style="color:var(--t3);font-size:12px;text-align:center;padding:16px">Ajuste os valores para visualizar marcos financeiros</div>
+  </div>
+</div>
   </div>
 
   <!-- CHART -->
@@ -508,7 +512,7 @@
       </div>
       <div>
         <label style="font-size:11px;color:var(--t3);font-weight:600">Valor Investido (R$)</label>
-        <input id="cartTesouoValor" type="number" placeholder="Ex: 1000" step="0.01" min="0" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fb);font-size:12px">
+        <input id="cartTesouoValor" type="text" data-cur="money" placeholder="0,00" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg3);color:var(--t1);font-family:var(--fm);font-size:12px">
       </div>
     </div>
   </div>
@@ -644,11 +648,11 @@
         </div>
         <div class="track-ig">
           <label>💸 Aporte realizado (R$)</label>
-          <input type="number" id="trackAporte" min="0" placeholder="Ex: 3.200" oninput="updateTrackCalc()">
+          <input type="text" id="trackAporte" data-cur="money" placeholder="0,00" oninput="curMask(this);updateTrackCalc()">
         </div>
         <div class="track-ig">
           <label>🏦 Saldo total da carteira (R$)</label>
-          <input type="number" id="trackPatrimonio" min="0" placeholder="Ex: 51.180" oninput="updateTrackCalc()">
+          <input type="text" id="trackPatrimonio" data-cur="money" placeholder="0,00" oninput="curMask(this);updateTrackCalc()">
         </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
@@ -659,7 +663,7 @@
       <div class="track-row">
         <div class="track-ig">
           <label>💰 Valor retirado (R$)</label>
-          <input type="number" id="trackRetirada" min="0" placeholder="Ex: 5.000" oninput="updateTrackCalc()">
+          <input type="text" id="trackRetirada" data-cur="money" placeholder="0,00" oninput="curMask(this);updateTrackCalc()">
         </div>
         <div class="track-ig" style="grid-column:span 2">
           <label>📝 Motivo da retirada</label>
@@ -795,7 +799,7 @@
         </div>
         <div class="goal-ig">
           <label>💰 Valor necessário (R$)</label>
-          <input type="number" id="goalValor" min="0" placeholder="Ex: 80000" oninput="goalCalcAuto('valor')">
+          <input type="text" id="goalValor" data-cur="money" placeholder="0,00" oninput="curMask(this);goalCalcAuto('valor')">
         </div>
         <div class="goal-ig">
           <label>📅 Prazo (meses a partir de hoje)</label>
@@ -1067,6 +1071,7 @@
 <script src="js/gastos.js"></script>
 <script src="js/saude-financeira.js"></script>
 <script src="js/track.js"></script>
+<script>document.addEventListener('DOMContentLoaded', ()=>{ initCurMasks(); });</script>
 
 
 </div></body></html>

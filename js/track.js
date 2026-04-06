@@ -64,8 +64,8 @@ function getPatrimonioAnterior(mes) {
 // ── Live calculation while user types ──
 function updateTrackCalc() {
   const mes         = document.getElementById('trackMes').value;
-  const aporte      = parseFloat(document.getElementById('trackAporte').value) || 0;
-  const patrimonio  = parseFloat(document.getElementById('trackPatrimonio').value) || 0;
+  const aporte      = (typeof gP==='function'?gP('trackAporte'):parseFloat(document.getElementById('trackAporte').value))||0;
+  const patrimonio  = (typeof gP==='function'?gP('trackPatrimonio'):parseFloat(document.getElementById('trackPatrimonio').value))||0;
   const infoEl      = document.getElementById('trackCalcInfo');
   const anteriorEl  = document.getElementById('trackPatrimonioAnteriorInfo');
 
@@ -128,9 +128,9 @@ function calcTrackEntry(mes, aporte, patrimonio, retirada) {
 
 function saveTrackEntry() {
   const mes      = document.getElementById('trackMes').value;
-  const aporte   = parseFloat(document.getElementById('trackAporte').value)   || 0;
-  const patrim   = parseFloat(document.getElementById('trackPatrimonio').value)|| 0;
-  const retirada = parseFloat(document.getElementById('trackRetirada').value)  || 0;
+  const aporte   = (typeof gP==='function'?gP('trackAporte'):parseFloat(document.getElementById('trackAporte').value))||0;
+  const patrim   = (typeof gP==='function'?gP('trackPatrimonio'):parseFloat(document.getElementById('trackPatrimonio').value))||0;
+  const retirada = (typeof gP==='function'?gP('trackRetirada'):parseFloat(document.getElementById('trackRetirada').value))||0;
   const motivo   = document.getElementById('trackRetiradaMotivo').value.trim();
 
   if (!mes)   { showToast('Selecione o mês de referência', '⚠️'); return; }

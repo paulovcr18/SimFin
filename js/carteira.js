@@ -252,14 +252,15 @@ function carteiraLimparHistorico() {
 }
 
 function carteiraUpdateUI() {
-  carteiraMigrar();
-  // Carrega FGTS e Reserva salvos (sincroniza com campos da projeção)
+  // Migrar já foi feito no auth login — só renderiza aqui
+  // Sincroniza FGTS e Reserva dos campos da projeção
   const patFGTSEl    = document.getElementById('patFGTS');
   const patReservaEl = document.getElementById('patReserva');
   const fgtsCart     = document.getElementById('patFGTSCart');
   const reservaCart  = document.getElementById('patReservaCart');
   if (fgtsCart    && patFGTSEl?.value)    fgtsCart.value    = patFGTSEl.value;
   if (reservaCart && patReservaEl?.value) reservaCart.value = patReservaEl.value;
+  carteiraUpdatePatrimonio();
   carteiraRenderList();
 }
 
@@ -397,8 +398,9 @@ const CAT_ICONS  = { acao:'📈', fii:'🏢', etf:'🌐', bdr:'🌎', 'renda-fix
 function carteiraUpdatePatrimonio() {
   const ativos  = carteiraLoad();
   const b3      = ativos.reduce((s,a) => s + (a.preco||0)*(a.qtd||0), 0);
-  const fgts    = parseFloat(document.getElementById('patFGTSCart')?.value)    || 0;
-  const reserva = parseFloat(document.getElementById('patReservaCart')?.value) || 0;
+  const gV = id => { const el = document.getElementById(id); return el ? (parseFloat((el.value||'').replace(/\./g,'').replace(',','.'))||0) : 0; };
+  const fgts    = gV('patFGTSCart');
+  const reserva = gV('patReservaCart');
   const total   = b3 + fgts + reserva;
 
   // Hero
@@ -1387,7 +1389,7 @@ async function carteiraAdd() {
 
 async function carteiraAddTesouro() {
   const tipoTitulo = document.getElementById('cartTesouoTipo')?.value || 'Tesouro Selic';
-  const valor      = parseFloat(document.getElementById('cartTesouoValor')?.value) || 0;
+  const valor      = (typeof gP==='function'?gP('cartTesouoValor'):parseFloat(document.getElementById('cartTesouoValor')?.value))||0;
   const venc       = document.getElementById('cartTesouoVenc')?.value?.trim() || '';
   const statusEl   = document.getElementById('cartAddStatus');
 

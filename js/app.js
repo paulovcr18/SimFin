@@ -11,24 +11,37 @@ function setRegime(pid, tipo){
   const tabCLT=document.getElementById(`p${pid}tabCLT`);
   const tabPJ =document.getElementById(`p${pid}tabPJ`);
   const brutoLbl=document.getElementById(`p${pid}brutoLabel`);
+  const brutoRow=document.getElementById(`p${pid}bruto`).closest('.ig');
 
   if(tipo==='PJ'){
     cltEl.style.display='none';
     pjEl.style.display='flex';
+    pjEl.style.animation='none';
+    pjEl.offsetHeight;
+    pjEl.style.animation='rslide .28s ease both';
     tabCLT.className='rtab';
     tabPJ.className='rtab active-pj';
     brutoLbl.textContent='Retirada Total (R$)';
-    // Hide the bruto input row (PJ uses retirada field instead)
-    document.getElementById(`p${pid}bruto`).closest('.ig').style.display='none';
+    brutoRow.style.display='none';
+    pjEl.style.opacity='';pjEl.style.transform='';pjEl.style.transition='';
   } else {
-    cltEl.style.display='block';
     pjEl.style.display='none';
+    cltEl.style.display='block';
+    cltEl.style.animation='none';
+    cltEl.offsetHeight;
+    cltEl.style.animation='rslide .28s ease both';
+    brutoRow.style.display='flex';
+    brutoRow.style.animation='none';
+    brutoRow.offsetHeight;
+    brutoRow.style.animation='rslide .22s .06s ease both';
     tabCLT.className='rtab active-clt';
     tabPJ.className='rtab';
     brutoLbl.textContent='Salário Bruto Mensal (R$)';
-    document.getElementById(`p${pid}bruto`).closest('.ig').style.display='flex';
+    pjEl.style.opacity='';pjEl.style.transform='';pjEl.style.transition='';
+    cltEl.style.opacity='';cltEl.style.transform='';cltEl.style.transition='';
+    brutoRow.style.opacity='';brutoRow.style.transform='';brutoRow.style.transition='';
   }
-  calc();
+  _calcReal();
 }
 
 // ════════════════════════
@@ -39,8 +52,7 @@ function setRegime(pid, tipo){
   window.rendaOperacionalGlobal = 0;
   
   function _calcReal(){
-  const g=id=>parseFloat(document.getElementById(id).value)||0;
-  const [p1b,p1v,p1p,p2b,p2v,p2p]=['p1bruto','p1vr','p1plr','p2bruto','p2vr','p2plr'].map(g);
+  const [p1b,p1v,p1p,p2b,p2v,p2p]=['p1bruto','p1vr','p1plr','p2bruto','p2vr','p2plr'].map(gP);
   const f1=calcFolha(p1b,p1v,p1p,1),f2=calcFolha(p2b,p2v,p2p,2);
   renderFolha('tP1',f1);renderFolha('tP2',f2);
   // Update person labels
@@ -58,10 +70,10 @@ function setRegime(pid, tipo){
   const rendaOp = (f1.rendaOp || f1.rendaReal) + (f2.rendaOp || f2.rendaReal);  // operacional mensal
   window.rendaOperacionalGlobal = rendaOp;
   renderBudget(rendaOp, renda);
-  const pI=g('pctInvest'),ap=rendaOp*pI/100; // aporte sobre renda operacional (alinhado com orçamento)
+  const pI=gP('pctInvest'),ap=rendaOp*pI/100; // aporte sobre renda operacional (alinhado com orçamento)
   const taxa=parseFloat(document.getElementById('taxaAnual').value)||10;
   const anos=parseInt(document.getElementById('anos').value)||20;
-  const reaj=g('reajuste'),patI=g('patrimonioInicial');
+  const reaj=gP('reajuste'),patI=gP('patrimonioInicial');
   const tM=Math.pow(1+taxa/100,1/12)-1;
   let pat=patI,aporte=ap;
   for(let a=0;a<anos;a++){for(let m=0;m<12;m++)pat=pat*(1+tM)+aporte;aporte*=(1+reaj/100);}
@@ -117,9 +129,10 @@ function setRegime(pid, tipo){
   }
 
   function calc() {
-    clearTimeout(_calcDebounceTimer);
-    _calcDebounceTimer = setTimeout(() => { _calcReal(); }, 150);
+    _calcReal();
   }
+  // Expõe no escopo global para handlers HTML
+  window.calc = calc;
 
   // ── Auto-save inputs no localStorage ──
 const INPUTS_AUTOSAVE_KEY = 'simfin_last_inputs';
@@ -149,6 +162,16 @@ function autoRestoreInputs() {
       const el = document.getElementById(id);
       if (!el) return;
       el.value = val;
+    });
+    // Re-aplica mascara em campos monetários que ainda usam masking
+    document.querySelectorAll('[data-cur="money"]').forEach(el=>{
+      const num = parseFloat(el.value);
+      if(num && num > 0){
+        el.value = num.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+      }
+      el.setAttribute('inputmode','numeric');
+      el.oninput = function(){ curMask(el); if(typeof calc==='function') calc(); };
+      el.dataset._curMasked='1';
     });
     return true;
   } catch(e) { return false; }

@@ -73,7 +73,7 @@ function goalCalcAuto(changed){
 function addGoal(){
   const cat  =document.getElementById('goalCat').value;
   const name =document.getElementById('goalName').value.trim();
-  const valor=parseFloat(document.getElementById('goalValor').value)||0;
+  const valor=(typeof gP==='function'?gP('goalValor'):parseFloat(document.getElementById('goalValor').value))||0;
   const meses=parseInt(document.getElementById('goalMeses').value)||0;
   const data =document.getElementById('goalData').value;
   if(!name)  { showToast('Informe o nome da meta','⚠️'); return; }

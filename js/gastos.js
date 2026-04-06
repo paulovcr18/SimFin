@@ -39,7 +39,7 @@ function gastosGetRendaOperacional() {
     return window.rendaOperacionalGlobal;
   }
   try {
-    const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+    const g = id => (typeof gP!=='undefined'?gP(id):parseFloat(document.getElementById(id)?.value))||0;
     const f1 = calcFolha(g('p1bruto'), g('p1vr'), g('p1plr'), 1);
     const f2 = calcFolha(g('p2bruto'), g('p2vr'), g('p2plr'), 2);
     return (f1.rendaOp || f1.rendaReal) + (f2.rendaOp || f2.rendaReal);

@@ -221,7 +221,7 @@ async function authOnLogin(user) {
 
     try { autoRestoreInputs(); }               catch(e) {}
     try { updAno(); calc(); }                  catch(e) {}
-    try { carteiraMigrar(); renderCarteira(); } catch(e) {}
+    try { carteiraMigrar(); }                     catch(e) {}
     try { renderGoals(); }                     catch(e) {}
     try { renderTrack(); }                     catch(e) {}
     try { scenarioAutoTouch(); }               catch(e) {}

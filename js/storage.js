@@ -47,22 +47,53 @@ function getInputs() {
                 'pctMoradia','pctAlimentacao','pctTransporte','pctContas','pctLazer','pctInvest',
                 'taxaAnual','anos','reajuste','patrimonioInicial','taxaInflacao',
                 'p1regime','p2regime'];
+  const parseVal = el => {
+    if(el.tagName === 'SELECT') return el.value;
+    // Campos monetários: parse do valor formatado
+    if(el.dataset.cur === 'money'){
+      return parseFloat((el.value||'').replace(/\./g,'').replace(',','.')) || 0;
+    }
+    return parseFloat(el.value) || 0;
+  };
   const out = { _regime1: regime[1], _regime2: regime[2] };
   ids.forEach(id => {
     const el = document.getElementById(id);
     if(!el) return;
-    out[id] = el.tagName === 'SELECT' ? el.value : (parseFloat(el.value) || 0);
+    out[id] = parseVal(el);
   });
   return out;
 }
 
 // ── Apply inputs ──
 function applyInputs(data) {
+  const parseVal = (el, val) => {
+    if(el.tagName === 'SELECT') return val;
+    // Campos monetários: formata o valor numérico salvo
+    if(el.dataset.cur === 'money' && val && parseFloat(val) > 0){
+      return parseFloat(val).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    }
+    return val;
+  };
+  const moneyIds = ['p1bruto','p1vr','p1plr','p2bruto','p2vr','p2plr',
+                    'p1fat','p1retirada','p1prolabore',
+                    'p2fat','p2retirada','p2prolabore'];
   Object.entries(data).forEach(([id, val]) => {
     if(id.startsWith('_')) return;
     const el = document.getElementById(id);
     if (!el) return;
-    el.value = val;
+    el.value = parseVal(el, val);
+    if(moneyIds.includes(id) && val && parseFloat(val) > 0){
+      el.setAttribute('inputmode','numeric');
+      el.dataset._curMasked = '1';
+    }
+  });
+  // Init masks nos campos monetários recém-setados
+  document.querySelectorAll('[data-cur="money"]').forEach(el=>{
+    if(!el.dataset._curMasked){
+      el.setAttribute('inputmode','numeric');
+      el.oninput = function(){ curMask(this); };
+      el.dataset._curMasked = '1';
+    }
   });
   // Restore regimes
   if(data._regime1) setRegime(1, data._regime1);
