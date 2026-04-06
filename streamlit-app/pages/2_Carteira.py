@@ -3,6 +3,7 @@ Carteira B3 — posições, P&L e evolução patrimonial.
 """
 import sys; sys.path.insert(0, ".")
 import json
+import hashlib
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -87,8 +88,20 @@ missing = [t for t, df in all_prices.items() if df.empty]
 if missing:
     st.warning(f"Sem cotações para: {', '.join(missing)}")
 
-# ── Evolução diária ─────────────────────────────────────────────────
-daily = build_evolution(negocs, all_prices)
+# ── Evolução diária (cached) ─────────────────────────────────────────
+def _txns_hash(txns: list[dict]) -> str:
+    """SHA256 do payload de transações para usar como cache key."""
+    serialized = json.dumps(sorted(txns, key=lambda x: (x["date"], x["ticker"])), sort_keys=True)
+    return hashlib.sha256(serialized.encode()).hexdigest()
+
+@st.cache_data(ttl=300, show_spinner=False)
+def cached_build_evolution(txns_hash: str, negocs: list[dict], all_prices_json: str) -> pd.DataFrame:  # noqa: ARG001
+    """Wrap build_evolution com cache de 5 minutos keyed pelo hash das transações."""
+    prices = {tk: pd.read_json(js, orient="split") for tk, js in json.loads(all_prices_json).items()}
+    return build_evolution(negocs, prices)
+
+_prices_json = json.dumps({tk: df.to_json(orient="split") for tk, df in all_prices.items()})
+daily = cached_build_evolution(_txns_hash(negocs), negocs, _prices_json)
 if daily.empty:
     st.error("Não foi possível calcular a evolução — verifique as cotações.")
     st.stop()

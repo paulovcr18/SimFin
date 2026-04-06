@@ -10,7 +10,7 @@ Milestone de melhoria do SimFin focado em três eixos: remover código morto e f
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 1: Dead Code Removal** - Deletar tracker/, corrigir SW cache e cenários quebrados (completed 2026-04-06)
+- [ ] **Phase 1: Dead Code Removal** - Deletar tracker/, corrigir SW cache e cenários quebrados
 - [ ] **Phase 2: PWA Login Performance** - Stale-while-revalidate no boot, preload SheetJS
 - [ ] **Phase 3: Portfolio Performance** - Cache build_evolution(), fix sync conflict
 - [ ] **Phase 4: External API Resilience** - Validação Yahoo Finance, CKAN assertions, rate limiting
@@ -34,7 +34,7 @@ Plans:
 - [x] 01-01-PLAN.md — Delete tracker/ and add streamlit-app deprecation notice
 - [x] 01-02-PLAN.md — Fix Service Worker: network-only API bypass, dedup db.js, add SheetJS preload
 - [x] 01-03-PLAN.md — Add SRI integrity hash to SheetJS CDN script tag in index.html
-- [x] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
+- [ ] 01-04-PLAN.md — Remove broken scenario management UI; fix silent catch blocks in authOnLogin
 
 ### Phase 2: PWA Login Performance
 **Goal**: Tornar o carregamento inicial e o login perceptivelmente mais rápidos implementando stale-while-revalidate e pré-carregamento de assets pesados.
@@ -45,11 +45,7 @@ Plans:
   2. Sync Supabase ocorre em background sem bloquear a UI
   3. Importação de arquivo XLSX não tem delay de download do SheetJS (preloaded)
   4. Erros em `authOnLogin` aparecem no console em vez de serem engolidos silenciosamente
-**Plans**: 2 plans
-
-Plans:
-- [ ] 02-01-PLAN.md — Refactor authOnLogin: stale-while-revalidate sequence
-- [ ] 02-02-PLAN.md — Simplify SheetJS injection guard in carteiraParseXLSX
+**Plans**: TBD
 
 ### Phase 3: Portfolio Performance
 **Goal**: Eliminar o gargalo O(days × tickers) em `build_evolution()` e corrigir a lógica de resolução de conflito de sync que pode reverter deleções do usuário.
@@ -60,11 +56,10 @@ Plans:
   2. Deletar uma posição localmente não é revertido no próximo login
   3. Erros de Supabase no `maybySingle()` de `js/db.js` são capturados e logados
   4. `build_evolution()` não roda na íntegra a cada page load quando dados não mudaram
-**Plans**: 2 plans
+**Plans**: 1 plan
 
 Plans:
-- [ ] 03-01-PLAN.md — Cache build_evolution and price fetch with @st.cache_data in 2_Carteira.py
-- [x] 03-02-PLAN.md — Fix _dbPullCarteira merge heuristic and log maybySingle errors in db.js
+- [x] 03-01-PLAN.md — Cache build_evolution() with SHA256 key; fix remote-wins sync conflict; log maybySingle errors
 
 ### Phase 4: External API Resilience
 **Goal**: Tornar o app resiliente a mudanças de formato das APIs externas não-oficiais (Yahoo Finance, CKAN Tesouro) e dar feedback claro ao usuário quando dados não estão disponíveis.
