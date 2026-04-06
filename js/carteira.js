@@ -452,8 +452,22 @@ function carteiraUpdatePatrimonio() {
   if (patInvEl)     patInvEl.value     = b3       || '';
 }
 
+// Formata cotação: retorna "N/D" se preco é null/undefined e ativo nunca foi cotado
+function fmtCotacao(preco) {
+  if (preco === null || preco === undefined) return '<span class="cotacao-indisponivel">N/D</span>';
+  return fmt(preco);
+}
+
 // ── Renderizar lista de ativos (tabela compacta) ──
 function carteiraRenderList() {
+  // Injeta estilo para cotacao-indisponivel (executado uma vez)
+  if (!document.getElementById('_cotacaoStyle')) {
+    const s = document.createElement('style');
+    s.id = '_cotacaoStyle';
+    s.textContent = '.cotacao-indisponivel { color: #94a3b8; font-style: italic; }';
+    document.head.appendChild(s);
+  }
+
   const ativos  = carteiraLoad();
   const area    = document.getElementById('cartListArea');
   const countEl = document.getElementById('cartCount');
@@ -581,14 +595,14 @@ function carteiraRenderList() {
         <td class="r" style="color:var(--t3)">${a.pmedio ? fmt(a.pmedio) : '—'}</td>
         <td class="r">
           <div style="color:${a.precoEstimado?'var(--t3)':'var(--t1)'}">
-            ${a.precoEstimado?'<span title="Preço estimado (custo médio) — clique em Atualizar cotações para ver o valor de mercado" style="font-size:9px;color:var(--go);margin-right:2px;vertical-align:middle">~</span>':''}${a.preco ? fmt(a.preco) : '—'}
+            ${a.precoEstimado?'<span title="Preço estimado (custo médio) — clique em Atualizar cotações para ver o valor de mercado" style="font-size:9px;color:var(--go);margin-right:2px;vertical-align:middle">~</span>':''}${fmtCotacao(a.preco)}
           </div>
           ${a.precoEstimado
             ? `<div style="font-size:9px;color:var(--t3)">custo — atualizar</div>`
             : (a.variacao!=null ? `<div style="font-size:10px;color:${varCls}">${a.variacao>=0?'+':''}${a.variacao.toFixed(2)}%</div>` : '')}
         </td>
         <td class="r">${lucro!==null ? `<span style="color:${lucro>=0?'var(--ac)':'var(--re)'};font-size:12px">${lucro>=0?'+':''}${fmt(lucro)}<br><span style="font-size:10px">${lucroPct>=0?'+':''}${lucroPct.toFixed(1)}%</span></span>` : '<span style="color:var(--t3)">—</span>'}</td>
-        <td class="r" style="color:var(--ac);font-weight:600">${valor > 0 ? fmt(valor) : '—'}</td>
+        <td class="r" style="color:var(--ac);font-weight:600">${a.preco != null ? fmt(a.preco * a.qtd) : '<span class="cotacao-indisponivel">N/D</span>'}</td>
         <td class="r" style="color:var(--t3)">${pct}%</td>
         <td onclick="event.stopPropagation()"><button class="cart-trow-del" onclick="carteiraRemove('${a.ticker}')" title="Remover">🗑</button>${expandBtn}</td>
       </tr>${renderTesouroDetail(a)}`;
