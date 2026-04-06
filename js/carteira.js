@@ -1159,22 +1159,16 @@ async function carteiraParseCSV(file) {
 
 // ── Parse XLSX ──
 async function carteiraParseXLSX(file) {
-  // Carrega SheetJS dinamicamente
   if (!window.XLSX) {
-    await new Promise((res,rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
+    throw new Error('[SimFin] SheetJS (window.XLSX) não disponível. Verifique se o script foi carregado em index.html.');
   }
   return new Promise((res, rej) => {
     const reader = new FileReader();
     reader.onload = e => {
       try {
-        const wb   = XLSX.read(e.target.result, { type: 'binary' });
+        const wb   = window.XLSX.read(e.target.result, { type: 'binary' });
         const ws   = wb.Sheets[wb.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        const data = window.XLSX.utils.sheet_to_json(ws, { defval: '' });
         res(data);
       } catch(err) { rej(err); }
     };
