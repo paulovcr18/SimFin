@@ -56,6 +56,22 @@ function parseNumCkan(s: unknown): number | null {
   return isNaN(n) ? null : n;
 }
 
+// ── Validação de shape do Yahoo Finance v7/spark ───────────────────────────
+function validateYahooShape(data: unknown): { valid: true; list: Record<string, unknown>[] } | { valid: false; reason: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, reason: 'Yahoo Finance: resposta não é JSON válido' };
+  }
+  const d = data as Record<string, unknown>;
+  if (!('spark' in d)) {
+    return { valid: false, reason: 'Yahoo Finance: campo "spark" ausente — formato pode ter mudado' };
+  }
+  const spark = d.spark as Record<string, unknown> | null;
+  if (!spark || !Array.isArray(spark.result)) {
+    return { valid: false, reason: 'Yahoo Finance: spark.result não é array — formato pode ter mudado' };
+  }
+  return { valid: true, list: spark.result as Record<string, unknown>[] };
+}
+
 Deno.serve(async (req: Request) => {
   // Preflight CORS
   if (req.method === 'OPTIONS') {
@@ -177,7 +193,14 @@ Deno.serve(async (req: Request) => {
     }
 
     const data    = await yahooRes.json();
-    const rawList = data?.spark?.result ?? [];
+    const validated = validateYahooShape(data);
+    if (!validated.valid) {
+      return new Response(JSON.stringify({ error: validated.reason }), {
+        status: 422,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+    const rawList = validated.list;
 
     // Normaliza para o mesmo formato que o BRAPI retorna
     const results: Record<string, unknown> = {};
@@ -196,13 +219,21 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    if (!Object.keys(results).length && tickers.length > 0) {
+      return new Response(JSON.stringify({ error: `Yahoo Finance: nenhum preço retornado para ${tickers.join(',')} — verifique os tickers ou aguarde` }), {
+        status: 422,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({ results }), {
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     });
 
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Erro interno';
-    return new Response(JSON.stringify({ error: msg }), {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error('[cotacoes] erro interno:', message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     });
