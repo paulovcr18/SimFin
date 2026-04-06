@@ -147,6 +147,12 @@ function autoSaveInputs() {
 }
 
 function autoRestoreInputs() {
+  // Always wire up oninput handlers on money fields, regardless of saved data
+  document.querySelectorAll('[data-cur="money"]').forEach(el=>{
+    el.setAttribute('inputmode','numeric');
+    el.oninput = function(){ curMask(el); if(typeof calc==='function') calc(); };
+    el.dataset._curMasked='1';
+  });
   try {
     const saved = localStorage.getItem(INPUTS_AUTOSAVE_KEY);
     if (!saved) return false;
@@ -163,15 +169,12 @@ function autoRestoreInputs() {
       if (!el) return;
       el.value = val;
     });
-    // Re-aplica mascara em campos monetários que ainda usam masking
+    // Re-aplica mascara em campos monetários com valor salvo
     document.querySelectorAll('[data-cur="money"]').forEach(el=>{
       const num = parseFloat(el.value);
       if(num && num > 0){
         el.value = num.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
       }
-      el.setAttribute('inputmode','numeric');
-      el.oninput = function(){ curMask(el); if(typeof calc==='function') calc(); };
-      el.dataset._curMasked='1';
     });
     return true;
   } catch(e) { return false; }
