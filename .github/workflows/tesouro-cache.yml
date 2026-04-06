@@ -14,7 +14,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Baixar e processar CSV CKAN
+        id: fetch_ckan
         run: python3 .github/scripts/update_tesouro.py
+
+      - name: Diagnóstico de falha CKAN
+        if: failure() && steps.fetch_ckan.outcome == 'failure'
+        run: |
+          echo "=== FALHA ao processar CSV CKAN ==="
+          echo "Verifique se o CKAN mudou o formato das colunas."
+          echo "Consulte o output acima para ver 'Headers reais' e 'Headers normalizados'."
+          echo "URL do pacote CKAN: https://www.tesourotransparente.gov.br/ckan/dataset/taxas-dos-titulos-ofertados-pelo-tesouro-direto"
+          exit 1
 
       - name: Commit data/tesouro-latest.json
         run: |
