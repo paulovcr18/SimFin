@@ -125,6 +125,28 @@ body{background:var(--bg9);color:var(--t1);font-family:var(--fb);font-size:14px;
 /* Placeholder mais visível */
 .ig input::placeholder{color:var(--t3);opacity:.7}
 .ir{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* Rateio Panel — toggle % / R$ */
+#rateioPanel{display:flex;flex-direction:column;gap:10px}
+.ri-section{display:flex;flex-direction:column;gap:6px;background:var(--bg7);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 10px}
+.ri-section.ri-invest{border-color:var(--bda)}
+.ri-heading{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:700;margin-bottom:4px;opacity:.7}
+.ri-list{display:flex;flex-direction:column;gap:5px}
+.ri-row{display:flex;align-items:center;gap:8px;flex-direction:row;flex-wrap:wrap;padding:2px 4px;border-radius:6px;transition:background .15s}
+.ri-row:hover{background:rgba(30,38,54,.6)}
+.ri-lbl{font-size:12px;color:var(--t1);font-weight:500;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.ri-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;font-size:14px;background:var(--bg6);border:1px solid var(--bd);border-radius:6px;flex-shrink:0}
+.ri-ctrls{display:flex;align-items:center;gap:6px;flex:1;flex-wrap:wrap}
+.ri-input{background:var(--bg8);border:1px solid var(--bd);border-radius:6px;color:var(--t1);font-family:var(--fm);font-size:13px;padding:6px 8px;min-width:80px;transition:border-color .2s}
+.ri-input:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px var(--acg)}
+.ri-toggle{background:none;border:1px solid var(--bd);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;color:var(--t3);transition:all .18s;font-family:var(--fm)}
+.ri-toggle:hover{background:var(--bg6);color:var(--t1);border-color:rgba(255,255,255,.15)}
+.ri-toggle.on{background:var(--ac);color:var(--bg9);border-color:var(--ac)}
+.ri-mirror{font-family:var(--fm);font-size:11px;color:var(--t3);min-width:70px}
+.ri-total{border-top:1px solid var(--bd);padding-top:6px;margin-top:2px}
+.ri-total .ri-lbl{color:var(--t1)}
+.ri-total-pct,.ri-total-brl{font-family:var(--fm);font-size:12px;font-weight:600;color:var(--ac)}
+
 .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .pd{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .p1c{background:var(--ac)}.p2c{background:var(--go)}

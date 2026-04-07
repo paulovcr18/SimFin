@@ -56,18 +56,18 @@ function renderFolha(id,f){
 // BUDGET TABLE
 // ════════════════════════
 function renderBudget(rendaOp, rendaDil){
-  const p=getPcts();let tP=0,tV=0;
+  const p=typeof getRateioComputed==='function' ? getRateioComputed() : getPcts();let tP=0,tV=0;
   document.querySelector('#tBudget tbody').innerHTML=BUDGET_CATEGORIES.map(c=>{
-    const pc=p[c.key],v=rendaOp*pc/100;tP+=pc;tV+=v;
+    const pc=p[c.key],v=rendaOp*pc/100;tP+=pc;tV+=v;const pctStr=pc.toFixed(2);
     return `<tr><td>${c.label}</td>
-      <td style="font-family:var(--fm);text-align:right">${pc}%</td>
+      <td style="font-family:var(--fm);text-align:right">${pctStr}%</td>
       <td style="font-family:var(--fm);text-align:right;color:var(--t1)">${fmt(v)}</td>
       <td><div style="height:6px;background:var(--bg6);border-radius:3px;overflow:hidden"><div style="width:${Math.min(pc,100)}%;height:6px;border-radius:3px;background:${c.color}"></div></div>
-      <div style="font-size:10px;color:var(--t3);margin-top:2px">${pc}%</div></td></tr>`;
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">${pctStr}%</div></td></tr>`;
   }).join('');
   const over=tP>100;
   document.querySelector('#tBudget tfoot').innerHTML=`<tr class="rb"><td>Total</td>
-    <td style="font-family:var(--fm);text-align:right;color:${over?'var(--re)':'var(--ac)'}">${tP}%</td>
+    <td style="font-family:var(--fm);text-align:right;color:${over?'var(--re)':'var(--ac)'}">${tP.toFixed(2)}%</td>
     <td style="font-family:var(--fm);text-align:right">${fmt(tV)}</td>
     <td style="font-size:10px;color:${over?'var(--re)':'var(--t3)'}">${over?'⚠️ Acima de 100%':'✅ Balanceado'}</td></tr>
     <tr style="background:var(--bg6)"><td colspan="4" style="font-size:10px;color:var(--t3);padding:6px 12px">
@@ -222,7 +222,7 @@ function popM(idx){
   const s=snaps[idx];if(!s)return;
   const taxa=parseFloat(document.getElementById('taxaAnual').value)||10;
   const reaj=parseFloat(document.getElementById('reajuste').value)||5;
-  const pcts=getPcts();
+  const pcts=typeof getRateioComputed==='function' ? getRateioComputed() : getPcts();
   const tM=Math.pow(1+taxa/100,1/12)-1;
 
   document.getElementById('bPrev').disabled=idx===0;

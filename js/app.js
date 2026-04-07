@@ -1,4 +1,196 @@
 // ════════════════════════
+// STORAGE KEY (needs to be before rateio code)
+// ════════════════════════
+const INPUTS_AUTOSAVE_KEY = 'simfin_last_inputs';
+
+// ════════════════════════════════════════════
+// RATEIO PANEL — toggle % / R$ per category
+// ════════════════════════════════════════════
+const RATEIO_MODE_KEY = 'simfin_rateio_mode';
+
+// Default rates matching the original HTML defaults
+const RATEIO_DEFAULTS = {
+  pctMoradia: 16,
+  pctAlimentacao: 11,
+  pctTransporte: 11,
+  pctContas: 5,
+  pctLazer: 11,
+  pctInvest: 35,
+};
+
+function _getRateioMode() {
+  try { return JSON.parse(localStorage.getItem(RATEIO_MODE_KEY)) || {}; } catch { return {}; }
+}
+function _setRateioMode(m) { localStorage.setItem(RATEIO_MODE_KEY, JSON.stringify(m)); }
+
+/**
+ * getRateioComputed — retorna {key: pct} normalizando % e R$
+ */
+function getRateioComputed() {
+  const modes = _getRateioMode();
+  const rendaOp = window.rendaOperacionalGlobal || 0;
+  const result = {};
+  BUDGET_CATEGORIES.forEach(c => {
+    const el = document.getElementById(c.key);
+    const val = parseFloat(el?.value) || 0;
+    const isPct = modes[c.key] !== 'brl';
+    result[c.key] = isPct ? val : (rendaOp > 0 ? val / rendaOp * 100 : 0);
+  });
+  return result;
+}
+
+let _rateioRendered = false;
+
+function _getSavedRateioValue(key) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(INPUTS_AUTOSAVE_KEY) || '{}');
+    if (saved[key] !== undefined) return parseFloat(saved[key]) || RATEIO_DEFAULTS[key] || 0;
+  } catch {}
+  return RATEIO_DEFAULTS[key] || 0;
+}
+
+function _splitLabel(label) {
+  const m = label.match(/^(\p{Emoji}+)\s*(.*)$/u);
+  return m ? [m[1], m[2]] : ['', label];
+}
+
+function renderRateioPanel() {
+  const panel = document.getElementById('rateioPanel');
+  if (!panel) return;
+  const modes = _getRateioMode();
+  const rendaOp = window.rendaOperacionalGlobal || 0;
+
+  // Only build DOM once; subsequent calls just update mirrors
+  if (!_rateioRendered) {
+    const cats = BUDGET_CATEGORIES;
+    const gastoCats = cats.filter(c => c.key !== 'pctInvest');
+    const investCat = cats.find(c => c.key === 'pctInvest');
+
+    panel.innerHTML = `
+      <div class="ri-section">
+        <div class="ri-heading">Gastos</div>
+        <div class="ri-list">
+          ${gastoCats.map(c => {
+            const val = _getSavedRateioValue(c.key);
+            const [icon, name] = _splitLabel(c.label);
+            return `<div class="ri-row" data-key="${c.key}">
+              <div class="ri-lbl"><span class="ri-icon">${icon}</span>${name}</div>
+              <div class="ri-ctrls">
+                <button class="ri-toggle" onclick="toggleRateio('${c.key}')" title="Alternar entre % e R$">%</button>
+                <input type="number" id="${c.key}" class="ri-input" value="${val}"
+                  min="0" step="any" oninput="onRateioInput('${c.key}', this.value)"
+                  title="Porcentagem % (clique em % para trocar para R$)">
+                <span class="ri-mirror">—</span>
+              </div>
+            </div>`;
+          }).join('')}
+          <div class="ri-row ri-total">
+            <div class="ri-lbl"><strong>Total Gastos</strong></div>
+            <div class="ri-ctrls">
+              <span class="ri-total-pct" id="rateioTotalPct">0%</span>
+              <span class="ri-total-brl" id="rateioTotalBrl">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ri-section ri-invest">
+        <div class="ri-heading">Aporte</div>
+        <div class="ri-list">
+          <div class="ri-row" data-key="pctInvest">
+            <div class="ri-lbl"><span class="ri-icon">📈</span>Investimento</div>
+            <div class="ri-ctrls">
+              <button class="ri-toggle" onclick="toggleRateio('pctInvest')" title="Alternar entre % e R$">%</button>
+              <input type="number" id="pctInvest" class="ri-input" value="${_getSavedRateioValue('pctInvest')}"
+                min="0" step="any" oninput="onRateioInput('pctInvest', this.value)"
+                title="Porcentagem % (clique em % para trocar para R$)">
+              <span class="ri-mirror">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    _rateioRendered = true;
+    // Immediate mirror update after creating elements
+    _updateRateioMirrors(rendaOp, modes);
+  } else {
+    // Update mirrors for all rows
+    _updateRateioMirrors(rendaOp, modes);
+  }
+}
+
+function _updateRateioMirrors(rendaOp, modes) {
+  BUDGET_CATEGORIES.forEach(c => {
+    const row = document.querySelector(`.ri-row[data-key="${c.key}"]`);
+    if (!row) return;
+    const inp = row.querySelector('.ri-input');
+    const mirror = row.querySelector('.ri-mirror');
+    if (!inp || !mirror) return;
+
+    const isPct = modes[c.key] !== 'brl';
+    const val = parseFloat(inp.value) || 0;
+
+    if (isPct) {
+      inp.setAttribute('title', 'Porcentagem %');
+      const brlVal = rendaOp * val / 100;
+      mirror.textContent = fmt(brlVal);
+    } else {
+      inp.setAttribute('title', 'Valor em R$');
+      const pctVal = rendaOp > 0 ? (val / rendaOp * 100) : 0;
+      mirror.textContent = pctVal.toFixed(2) + '%';
+    }
+
+    // Sync toggle button text
+    const btn = row.querySelector('.ri-toggle');
+    if (btn) btn.textContent = isPct ? '%' : 'R$';
+  });
+
+  // Update totals row
+  const totalPct = document.getElementById('rateioTotalPct');
+  const totalBrl = document.getElementById('rateioTotalBrl');
+  if (totalPct && totalBrl) {
+    let sumPct = 0;
+    BUDGET_CATEGORIES.forEach(c => {
+      const row = document.querySelector(`.ri-row[data-key="${c.key}"]`);
+      if (!row) return;
+      const inp = row.querySelector('.ri-input');
+      const isPct = modes[c.key] !== 'brl';
+      const val = parseFloat(inp?.value) || 0;
+      sumPct += isPct ? val : (rendaOp > 0 ? val / rendaOp * 100 : 0);
+    });
+    totalPct.textContent = sumPct.toFixed(2) + '%';
+    totalBrl.textContent = fmt(rendaOp * sumPct / 100);
+  }
+}
+
+function toggleRateio(key) {
+  const modes = _getRateioMode();
+  const isPct = modes[key] !== 'brl';
+  modes[key] = isPct ? 'brl' : 'pct';
+  _setRateioMode(modes);
+
+  // Convert current value in the input
+  const row = document.querySelector(`.ri-row[data-key="${key}"]`);
+  if (!row) return;
+  const inp = row.querySelector('.ri-input');
+  if (!inp) return;
+  const rendaOp = window.rendaOperacionalGlobal || 0;
+  const val = parseFloat(inp.value) || 0;
+
+  if (isPct) {
+    inp.value = rendaOp > 0 ? parseFloat((rendaOp * val / 100).toFixed(2)) : 0;
+  } else {
+    inp.value = rendaOp > 0 ? parseFloat((val / rendaOp * 100).toFixed(2)) : 0;
+  }
+
+  _updateRateioMirrors(rendaOp, modes);
+  calc();
+}
+
+function onRateioInput(key, value) {
+  calc();
+}
+
+// ════════════════════════
 // MAIN CALC
 // ════════════════════════
 // ════════════════════════
@@ -69,8 +261,9 @@ function setRegime(pid, tipo){
   const renda   = f1.rendaReal + f2.rendaReal;   // diluída anual /12
   const rendaOp = (f1.rendaOp || f1.rendaReal) + (f2.rendaOp || f2.rendaReal);  // operacional mensal
   window.rendaOperacionalGlobal = rendaOp;
+  renderRateioPanel();
   renderBudget(rendaOp, renda);
-  const pI=gP('pctInvest'),ap=rendaOp*pI/100; // aporte sobre renda operacional (alinhado com orçamento)
+  const rates=getRateioComputed(), pI=rates.pctInvest, ap=rendaOp*pI/100; // aporte sobre renda operacional (alinhado com orçamento)
   const taxa=parseFloat(document.getElementById('taxaAnual').value)||10;
   const anos=parseInt(document.getElementById('anos').value)||20;
   const reaj=gP('reajuste'),patI=gP('patrimonioInicial');
@@ -135,7 +328,6 @@ function setRegime(pid, tipo){
   window.calc = calc;
 
   // ── Auto-save inputs no localStorage ──
-const INPUTS_AUTOSAVE_KEY = 'simfin_last_inputs';
 
 function autoSaveInputs() {
   try {
