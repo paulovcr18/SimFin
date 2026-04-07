@@ -229,10 +229,11 @@ async function authOnLogin(user) {
       // Background sync — NOT awaited; re-render affected modules when done
       dbPullAll()
         .then(() => {
-          try { renderCarteira(); } catch(e) { console.error('[bg-sync] renderCarteira:', e); }
-          try { renderGoals();    } catch(e) { console.error('[bg-sync] renderGoals:',    e); }
-          try { renderTrack();    } catch(e) { console.error('[bg-sync] renderTrack:',    e); }
-          try { calc();           } catch(e) { console.error('[bg-sync] calc:',           e); }
+          try { autoRestoreInputs(); } catch(e) { console.error('[bg-sync] autoRestoreInputs:', e); }
+          try { renderCarteira(); }    catch(e) { console.error('[bg-sync] renderCarteira:', e); }
+          try { renderGoals();    }    catch(e) { console.error('[bg-sync] renderGoals:',    e); }
+          try { renderTrack();    }    catch(e) { console.error('[bg-sync] renderTrack:',    e); }
+          try { calc();           }    catch(e) { console.error('[bg-sync] calc:',           e); }
         })
         .catch(e => console.error('[bg-sync]', e));
 

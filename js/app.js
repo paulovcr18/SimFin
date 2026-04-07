@@ -338,6 +338,26 @@ function autoSaveInputs() {
   } catch(e) {}
 }
 
+async function saveSimulacao() {
+  if (!currentUser) {
+    showToast('Faça login para salvar a simulação', '⚠️', 4000);
+    return;
+  }
+  const btn = document.getElementById('btnSalvarSimulacao');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  try {
+    const data = getInputs();
+    data._regimes = { 1: regime[1], 2: regime[2] };
+    localStorage.setItem(INPUTS_AUTOSAVE_KEY, JSON.stringify(data));
+    await dbPushConfig({ autosave: data });
+    showToast('Simulação salva! Disponível em qualquer dispositivo.', '💾');
+  } catch(e) {
+    showToast('Erro ao salvar. Verifique a conexão.', '❌', 4000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar Simulação'; }
+  }
+}
+
 function autoRestoreInputs() {
   // Always wire up oninput handlers on money fields, regardless of saved data
   document.querySelectorAll('[data-cur="money"]').forEach(el=>{

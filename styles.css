@@ -49,6 +49,11 @@ body{background:var(--bg9);color:var(--t1);font-family:var(--fb);font-size:14px;
 .act-btn-icon{font-size:13px;line-height:1}
 .act-sep{width:1px;height:18px;background:var(--bd);margin:0 2px;flex-shrink:0}
 
+/* Save simulation button */
+.save-sim-btn{width:100%;padding:10px 0;border-radius:8px;border:1px solid var(--bda);background:var(--acg);color:var(--ac);font-size:13px;font-weight:700;font-family:var(--fb);cursor:pointer;transition:all .18s;letter-spacing:.01em}
+.save-sim-btn:hover{background:var(--ac);color:var(--bg1);border-color:var(--ac)}
+.save-sim-btn:disabled{opacity:.5;cursor:not-allowed}
+
 /* More menu — removido */
 
 /* GitHub publish button */
