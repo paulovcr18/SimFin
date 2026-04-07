@@ -694,12 +694,22 @@ function renderCompareChart(entries, baseline) {
 
   let blPats = null;
   if (baseline) {
+    const [by, bm] = baseline.definidoEm.split('-').map(Number);
+    // Ancora a linha no patrimônio real do mês do Dia 0 (ou do primeiro mês >= Dia 0)
+    const dia0Entry = entries.find(e => {
+      const [ey, em] = e.mes.split('-').map(Number);
+      return (ey - by) * 12 + (em - bm) >= 0;
+    });
+    const anchorReal = dia0Entry ? dia0Entry.patrimonio : 0;
+    const anchorProj = baselinePatNoMes(0, baseline) || 0;
+    const offset = anchorReal - anchorProj;
+
     blPats = entries.map(e => {
-      const [by, bm] = baseline.definidoEm.split('-').map(Number);
       const [ey, em] = e.mes.split('-').map(Number);
       const mesesDesde = (ey - by) * 12 + (em - bm);
       if (mesesDesde < 0) return null;
-      return baselinePatNoMes(mesesDesde, baseline);
+      const proj = baselinePatNoMes(mesesDesde, baseline);
+      return proj !== null ? proj + offset : null;
     });
     datasets.push({
       label: 'Projeção Dia 0',
@@ -778,6 +788,13 @@ function renderBaselineDeviationTable(entries, baseline) {
   panel.style.display = 'block';
 
   const [by, bm] = baseline.definidoEm.split('-').map(Number);
+  const dia0Entry = entries.find(e => {
+    const [ey, em] = e.mes.split('-').map(Number);
+    return (ey - by) * 12 + (em - bm) >= 0;
+  });
+  const anchorReal = dia0Entry ? dia0Entry.patrimonio : 0;
+  const anchorProj = baselinePatNoMes(0, baseline) || 0;
+  const offset = anchorReal - anchorProj;
 
   const rows = entries.map(e => {
     const [ey, em] = e.mes.split('-').map(Number);
@@ -786,7 +803,8 @@ function renderBaselineDeviationTable(entries, baseline) {
     if (mesesDesde < 0) {
       return `<tr><td>${label}</td><td class="neu">—</td><td class="neu">Antes do Dia 0</td><td>—</td></tr>`;
     }
-    const esperado = baselinePatNoMes(mesesDesde, baseline);
+    const proj = baselinePatNoMes(mesesDesde, baseline);
+    const esperado = proj !== null ? proj + offset : null;
     if (esperado === null) return '';
     const desvio = e.patrimonio - esperado;
     const pct    = esperado > 0 ? (desvio / esperado * 100) : 0;
