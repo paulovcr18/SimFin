@@ -162,6 +162,65 @@ function scenarioAutoTouch() {
   scenarioBtnUpdate();
 }
 
+// ════════════════════════════════════════════════════════════════
+// DIA 0 — BASELINE (projeção congelada para comparação futura)
+// ════════════════════════════════════════════════════════════════
+
+const BASELINE_KEY = 'simfin_baseline';
+
+function baselineLoad() {
+  try { return JSON.parse(localStorage.getItem(BASELINE_KEY)) || null; } catch { return null; }
+}
+
+function baselineSave() {
+  if (typeof snaps === 'undefined' || snaps.length < 2) {
+    showToast('Calcule a simulação primeiro', '⚠️', 2500); return;
+  }
+  const now = new Date();
+  const mes = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const payload = {
+    definidoEm: mes,
+    definidoEmISO: now.toISOString(),
+    snaps: JSON.parse(JSON.stringify(snaps)),
+    inputs: getInputs()
+  };
+  localStorage.setItem(BASELINE_KEY, JSON.stringify(payload));
+  dbPushConfig({ baseline: payload }).catch(() => {});
+  baselineBannerUpdate();
+  showToast('Dia 0 definido para ' + new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}), '📌', 3000);
+}
+
+function baselineClear() {
+  if (!confirm('Remover o Dia 0? O histórico de acompanhamento não é afetado.')) return;
+  localStorage.removeItem(BASELINE_KEY);
+  dbPushConfig({ baseline: null }).catch(() => {});
+  baselineBannerUpdate();
+}
+
+function baselineBannerUpdate() {
+  const el = document.getElementById('dia0Banner');
+  if (!el) return;
+  const bl = baselineLoad();
+  if (!bl) {
+    el.innerHTML = `<div class="dia0-prompt">
+      <span>📌 Defina o <strong>Dia 0</strong> para acompanhar sua evolução vs. a projeção original</span>
+      <button onclick="baselineSave()" class="btn-dia0-set">Definir agora</button>
+    </div>`;
+    el.style.display = 'block';
+    return;
+  }
+  const label = new Date(bl.definidoEm+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const s0    = bl.snaps[0]?.patrimonio || 0;
+  const s1    = bl.snaps[1]?.patrimonio || 0;
+  const sLast = bl.snaps[bl.snaps.length-1]?.patrimonio || 0;
+  el.innerHTML = `<div class="dia0-active">
+    <span class="dia0-label">📌 Dia 0: <strong>${label}</strong></span>
+    <span class="dia0-snap">Ano 0: ${fmt(s0)} → Ano 1: ${fmt(s1)} → Ano ${bl.snaps.length-1}: ${fmt(sLast)}</span>
+    <button onclick="baselineClear()" class="btn-dia0-clear" title="Remover baseline">✕ Redefinir</button>
+  </div>`;
+  el.style.display = 'block';
+}
+
 // ── Dropdown ──
 function toggleScenarioDrop(e) {
   e.stopPropagation();

@@ -159,6 +159,8 @@ async function _dbPullConfig(uid) {
     localStorage.setItem(REMINDER_KEY, JSON.stringify(data.lembretes));
   if (data.scenario && data.scenario.name)
     localStorage.setItem(SCENARIO_KEY, JSON.stringify(data.scenario));
+  if (data.baseline && data.baseline.definidoEm)
+    localStorage.setItem(BASELINE_KEY, JSON.stringify(data.baseline));
 }
 
 // ═════════════════════════════════════════════════════════════════════════════

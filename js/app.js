@@ -403,3 +403,4 @@ document.addEventListener('keydown',e=>{
 
 updAno();
 _calcReal(); // executa imediatamente (sem debounce)
+baselineBannerUpdate();

@@ -237,6 +237,7 @@
   <input type="hidden" id="patrimonioInicial" value="0">
   <hr class="dv">
   <button id="btnSalvarSimulacao" class="save-sim-btn" onclick="saveSimulacao()">💾 Salvar Simulação</button>
+  <button id="btnDia0" class="save-sim-btn" style="margin-top:6px;background:rgba(240,160,75,0.12);border:1px solid rgba(240,160,75,0.35);color:#f0a04b" onclick="baselineSave()" title="Salvar projeção atual como referência de Dia 0">📌 Definir Dia 0</button>
 </aside>
 
 <!-- MAIN -->
@@ -370,6 +371,9 @@
 
 <!-- FINANÇAS SCREEN — Carteira + Acompanhamento unificados -->
 <div id="screenFinancas" class="screen-full" style="display:none">
+
+  <!-- DIA 0 BANNER -->
+  <div id="dia0Banner" style="display:none"></div>
 
   <!-- ═══ DASHBOARD SAÚDE FINANCEIRA ═══ -->
   <div id="saudeDashboard" class="saude-dashboard"></div>
@@ -654,6 +658,9 @@
     <div class="ph2"><span style="font-size:15px">📊</span><span class="pt">Realizado vs. Simulado</span></div>
     <div class="pb"><div class="compare-chart-wrap"><canvas id="compareChart"></canvas></div></div>
   </div>
+
+  <!-- PROGRESSO vs DIA 0 -->
+  <div id="baselineDeviationPanel" class="panel" style="display:none"></div>
 
   <!-- HISTÓRICO -->
   <div class="panel">

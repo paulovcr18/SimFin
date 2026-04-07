@@ -31,7 +31,7 @@ function switchScreen(screen) {
   });
   document.getElementById(bnMap[screen])?.classList.add('active');
 
-  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); renderExtrato(); renderGastos(); renderRegrasCustomizadas(); renderSaudeFinanceira(); }
+  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); renderExtrato(); renderGastos(); renderRegrasCustomizadas(); renderSaudeFinanceira(); baselineBannerUpdate(); }
   if (screen === 'metas')     { renderGoals(); }
   if (screen === 'reminder')  { reminderUpdateUI(); }
 }
@@ -182,10 +182,12 @@ function deleteTrackEntry(mes) {
 
 // ── Render everything ──
 function renderTrack() {
-  const entries = loadTrack().sort((a,b) => a.mes.localeCompare(b.mes));
+  const entries  = loadTrack().sort((a,b) => a.mes.localeCompare(b.mes));
+  const baseline = typeof baselineLoad === 'function' ? baselineLoad() : null;
   renderTrackHistory(entries);
   renderTrackInsights(entries);
-  renderCompareChart(entries);
+  renderCompareChart(entries, baseline);
+  renderBaselineDeviationTable(entries, baseline);
 }
 
 // ── History table ──
@@ -613,8 +615,21 @@ function renderTrackInsights(entries) {
   grid.innerHTML = cards.join('');
 }
 
+// ── Interpolação com baseline congelado ──
+function baselinePatNoMes(meses, baseline) {
+  const s = baseline.snaps;
+  if (!s || s.length < 2) return null;
+  const anos    = meses / 12;
+  const maxAnos = s.length - 1;
+  if (anos <= 0) return s[0].patrimonio;
+  if (anos >= maxAnos) return s[maxAnos].patrimonio;
+  const i    = Math.floor(anos);
+  const frac = anos - i;
+  return s[i].patrimonio + frac * (s[i+1].patrimonio - s[i].patrimonio);
+}
+
 // ── Compare chart ──
-function renderCompareChart(entries) {
+function renderCompareChart(entries, baseline) {
   const panel = document.getElementById('trackChartPanel');
   if (entries.length < 1) { panel.style.display = 'none'; return; }
   panel.style.display = 'block';
@@ -677,6 +692,30 @@ function renderCompareChart(entries) {
     });
   }
 
+  let blPats = null;
+  if (baseline) {
+    blPats = entries.map(e => {
+      const [by, bm] = baseline.definidoEm.split('-').map(Number);
+      const [ey, em] = e.mes.split('-').map(Number);
+      const mesesDesde = (ey - by) * 12 + (em - bm);
+      if (mesesDesde < 0) return null;
+      return baselinePatNoMes(mesesDesde, baseline);
+    });
+    datasets.push({
+      label: 'Projeção Dia 0',
+      data: blPats,
+      borderColor: '#f0a04b',
+      backgroundColor: 'rgba(240,160,75,0.05)',
+      borderWidth: 1.5,
+      borderDash: [4,4],
+      fill: false,
+      tension: 0.3,
+      pointRadius: 3,
+      pointBackgroundColor: '#f0a04b',
+      spanGaps: true,
+    });
+  }
+
   compareChart = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets },
@@ -711,6 +750,10 @@ function renderCompareChart(entries) {
                 const desvio = entries[i].patrimonio - simPats[i];
                 lines.push(`  ${desvio >= 0 ? '✅' : '⚠️'} Desvio: ${desvio >= 0 ? '+' : ''}${fmt(desvio)}`);
               }
+              if (blPats && blPats[i] !== null) {
+                const desvioBase = entries[i].patrimonio - blPats[i];
+                lines.push(`  ${desvioBase >= 0 ? '📌✅' : '📌⚠️'} vs Dia 0: ${desvioBase >= 0 ? '+' : ''}${fmt(desvioBase)}`);
+              }
               return lines;
             }
           }
@@ -725,5 +768,50 @@ function renderCompareChart(entries) {
       }
     }
   });
+}
+
+// ── Tabela de desvio vs Dia 0 ──
+function renderBaselineDeviationTable(entries, baseline) {
+  const panel = document.getElementById('baselineDeviationPanel');
+  if (!panel) return;
+  if (!baseline || entries.length === 0) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+
+  const [by, bm] = baseline.definidoEm.split('-').map(Number);
+
+  const rows = entries.map(e => {
+    const [ey, em] = e.mes.split('-').map(Number);
+    const mesesDesde = (ey - by) * 12 + (em - bm);
+    const label = new Date(e.mes+'-02').toLocaleDateString('pt-BR',{month:'short',year:'2-digit'});
+    if (mesesDesde < 0) {
+      return `<tr><td>${label}</td><td class="neu">—</td><td class="neu">Antes do Dia 0</td><td>—</td></tr>`;
+    }
+    const esperado = baselinePatNoMes(mesesDesde, baseline);
+    if (esperado === null) return '';
+    const desvio = e.patrimonio - esperado;
+    const pct    = esperado > 0 ? (desvio / esperado * 100) : 0;
+    const statusClass = desvio >= 0 ? 'pos' : pct >= -5 ? 'neu' : 'neg';
+    const statusText  = desvio >= 0 ? '✅ Acima' : pct >= -5 ? '≈ Dentro' : '⚠️ Abaixo';
+    return `<tr>
+      <td>${label}</td>
+      <td class="pos">${fmt(e.patrimonio)}</td>
+      <td class="neu">${fmt(esperado)}</td>
+      <td class="${statusClass}">${desvio >= 0 ? '+' : ''}${fmt(desvio)} (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%) ${statusText}</td>
+    </tr>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="track-section-title">📌 Progresso vs Dia 0</div>
+    <div class="track-table-wrap">
+      <table class="track-table">
+        <thead><tr>
+          <th style="text-align:left">Mês</th>
+          <th>Real</th>
+          <th>Esperado (Dia 0)</th>
+          <th>Desvio</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
 }
 
