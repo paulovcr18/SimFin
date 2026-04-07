@@ -621,11 +621,11 @@ function baselinePatNoMes(meses, baseline) {
   if (!s || s.length < 2) return null;
   const anos    = meses / 12;
   const maxAnos = s.length - 1;
-  if (anos <= 0) return s[0].patrimonio;
-  if (anos >= maxAnos) return s[maxAnos].patrimonio;
+  if (anos <= 0) return s[0].pat;
+  if (anos >= maxAnos) return s[maxAnos].pat;
   const i    = Math.floor(anos);
   const frac = anos - i;
-  return s[i].patrimonio + frac * (s[i+1].patrimonio - s[i].patrimonio);
+  return s[i].pat + frac * (s[i+1].pat - s[i].pat);
 }
 
 // ── Compare chart ──

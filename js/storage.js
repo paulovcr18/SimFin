@@ -210,9 +210,9 @@ function baselineBannerUpdate() {
     return;
   }
   const label = new Date(bl.definidoEm+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-  const s0    = bl.snaps[0]?.patrimonio || 0;
-  const s1    = bl.snaps[1]?.patrimonio || 0;
-  const sLast = bl.snaps[bl.snaps.length-1]?.patrimonio || 0;
+  const s0    = bl.snaps[0]?.pat || 0;
+  const s1    = bl.snaps[1]?.pat || 0;
+  const sLast = bl.snaps[bl.snaps.length-1]?.pat || 0;
   el.innerHTML = `<div class="dia0-active">
     <span class="dia0-label">📌 Dia 0: <strong>${label}</strong></span>
     <span class="dia0-snap">Ano 0: ${fmt(s0)} → Ano 1: ${fmt(s1)} → Ano ${bl.snaps.length-1}: ${fmt(sLast)}</span>
