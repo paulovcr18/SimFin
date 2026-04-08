@@ -97,6 +97,22 @@ function renderSaudeDashboard() {
         <div class="saude-card-sub">do caminho percorrido</div>
       </div>
     </div>
+    ${(() => {
+      const reserva  = parseFloat(document.getElementById('patReserva')?.value) || 0;
+      const pctInv   = parseFloat(document.getElementById('pctInvest')?.value) || 0;
+      const gastoMes = rendaOp > 0 ? rendaOp * (1 - pctInv / 100) : 0;
+      const mesesAut = gastoMes > 0 ? reserva / gastoMes : 0;
+      const autCor   = mesesAut >= 6 ? 'var(--ac)' : mesesAut >= 3 ? 'var(--go)' : 'var(--re)';
+      const autLabel = mesesAut >= 6 ? 'Reserva adequada' : mesesAut >= 3 ? 'Reserva parcial' : reserva > 0 ? 'Reserva insuficiente' : 'Sem reserva registrada';
+      return `<div class="saude-card">
+        <div class="saude-card-icon" style="color:${autCor}">🛡</div>
+        <div class="saude-card-body">
+          <div class="saude-card-label">Meses de Autonomia</div>
+          <div class="saude-card-val" style="color:${autCor}">${mesesAut > 0 ? mesesAut.toFixed(1) : '—'}</div>
+          <div class="saude-card-sub">${autLabel} · meta: 6 meses</div>
+        </div>
+      </div>`;
+    })()}
   </div>`;
 }
 

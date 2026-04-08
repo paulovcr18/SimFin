@@ -150,6 +150,21 @@ function reminderBuildAlerts() {
     });
   }
 
+  // 7) Alertas de desvio vs Dia 0
+  const desvioAlerts = JSON.parse(localStorage.getItem('simfin_desvio_alerts') || '[]');
+  desvioAlerts.forEach(da => {
+    const mesLabel = new Date(da.mes + '-02').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    alerts.push({
+      id: `desvio_${da.mes}`,
+      icon: '📌',
+      color: 're',
+      title: `Desvio do Dia 0 em ${mesLabel}`,
+      body: `Patrimônio ${da.pct}% abaixo do esperado (${fmt(da.real)} vs ${fmt(da.esperado)} projetado).`,
+      action: () => switchScreen('financas'),
+      actionLabel: 'Ver Acompanhamento'
+    });
+  });
+
   return alerts;
 }
 

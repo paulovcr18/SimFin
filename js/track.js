@@ -12,28 +12,30 @@ function switchScreen(screen) {
     financas:   { el:'screenFinancas',   display:'flex'     },
     metas:      { el:'screenMetas',      display:'flex'     },
     reminder:   { el:'screenReminder',   display:'flex'     },
+    relatorio:  { el:'screenRelatorio',  display:'flex'     },
   };
   Object.entries(screens).forEach(([key, cfg]) => {
     const el = document.getElementById(cfg.el);
     if (el) el.style.display = key === screen ? cfg.display : 'none';
   });
   // Sync desktop nav tabs
-  ['tabSimulador','tabFinancas','tabMetas','tabReminder'].forEach(id => {
+  ['tabSimulador','tabFinancas','tabMetas','tabReminder','tabRelatorio'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
-  const tabMap = { simulador:'tabSimulador', financas:'tabFinancas', metas:'tabMetas', reminder:'tabReminder' };
+  const tabMap = { simulador:'tabSimulador', financas:'tabFinancas', metas:'tabMetas', reminder:'tabReminder', relatorio:'tabRelatorio' };
   document.getElementById(tabMap[screen])?.classList.add('active');
   // Sync mobile bottom nav
-  const bnMap = { simulador:'bnSimulador', financas:'bnFinancas', metas:'bnMetas', reminder:'bnReminder' };
-  ['bnSimulador','bnFinancas','bnMetas','bnReminder'].forEach(id => {
+  const bnMap = { simulador:'bnSimulador', financas:'bnFinancas', metas:'bnMetas', reminder:'bnReminder', relatorio:'bnRelatorio' };
+  ['bnSimulador','bnFinancas','bnMetas','bnReminder','bnRelatorio'].forEach(id => {
     document.getElementById(id)?.classList.remove('active');
   });
   document.getElementById(bnMap[screen])?.classList.add('active');
 
-  if (screen === 'financas')  { initTrackMes(); renderTrack(); carteiraUpdateUI(); renderExtrato(); renderGastos(); renderRegrasCustomizadas(); renderSaudeFinanceira(); baselineBannerUpdate(); }
-  if (screen === 'metas')     { renderGoals(); }
-  if (screen === 'reminder')  { reminderUpdateUI(); }
+  if (screen === 'financas')   { initTrackMes(); renderTrack(); carteiraUpdateUI(); renderExtrato(); renderGastos(); renderRegrasCustomizadas(); renderSaudeFinanceira(); baselineBannerUpdate(); }
+  if (screen === 'metas')      { renderGoals(); }
+  if (screen === 'reminder')   { reminderUpdateUI(); }
+  if (screen === 'relatorio')  { renderReportScreen(); }
 }
 
 // ── Storage helpers ──
@@ -156,6 +158,7 @@ function saveTrackEntry() {
   entries.sort((a,b) => a.mes.localeCompare(b.mes));
   saveTrack(entries);
   dbPushAcompanhamento(entry).catch(() => {});
+  _checkBaselineDeviation(entry);
 
   const mesLbl = new Date(mes+'-02').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   showToast(`${mesLbl} registrado!`, '✅');
@@ -519,31 +522,31 @@ function renderTrackInsights(entries) {
       </div>`);
   }
 
-  // ── Card 6: CDI Benchmark ──
-  // Taxa CDI referência configurável — padrão 10,9% a.a. (2026)
-  // Usuário pode alterar via campo taxaAnual do simulador como proxy
-  const CDI_ANUAL = 10.9; // % — referência SELIC/CDI 2026
+  // ── Card 6: CDI/IPCA Benchmark ──
+  const CDI_ANUAL  = 14.25; // % — referência SELIC/CDI 2026
+  const IPCA_ANUAL = 5.5;   // % — referência IPCA 2026
   if (taxaMediaReal !== null) {
-    const diffCDI    = (taxaMediaReal - CDI_ANUAL).toFixed(1);
-    const diffCDINum = parseFloat(diffCDI);
-    const cdiClass   = diffCDINum >= 0 ? 'ic-green' : diffCDINum >= -3 ? 'ic-gold' : 'ic-red';
-    const cdiColor   = diffCDINum >= 0 ? 'var(--ac)' : diffCDINum >= -3 ? 'var(--go)' : 'var(--re)';
+    const diffCDI    = taxaMediaReal - CDI_ANUAL;
+    const diffIPCA   = taxaMediaReal - IPCA_ANUAL;
+    const cdiClass   = diffCDI >= 0 ? 'ic-green' : diffCDI >= -3 ? 'ic-gold' : 'ic-red';
+    const cdiColor   = diffCDI >= 0 ? 'var(--ac)' : diffCDI >= -3 ? 'var(--go)' : 'var(--re)';
+    const ipcaColor  = diffIPCA >= 0 ? 'var(--ac)' : 'var(--re)';
     cards.push(`
       <div class="insight-card ${cdiClass}">
         <div class="insight-icon">📡</div>
-        <div class="insight-title">vs. CDI (benchmark)</div>
+        <div class="insight-title">Benchmark</div>
         <div class="insight-value" style="color:${cdiColor}">
-          ${diffCDINum >= 0 ? '+' : ''}${diffCDI} p.p.
+          CDI: ${diffCDI >= 0 ? '+' : ''}${diffCDI.toFixed(1)} p.p.
         </div>
         <div class="insight-desc">
-          Sua carteira rendeu <strong>${taxaMediaReal.toFixed(1)}% a.a.</strong>
-          vs. CDI <strong>${CDI_ANUAL}% a.a.</strong><br>
-          ${diffCDINum >= 0
-            ? `🏅 Você está batendo o CDI! Carteira eficiente.`
-            : diffCDINum >= -3
-              ? 'Perto do CDI — alocação razoável para renda variável.'
-              : 'Abaixo do CDI. Considere revisar a alocação ou os custos.'}
-          <span style="font-size:9px;color:var(--t3);display:block;margin-top:4px">CDI referência ${CDI_ANUAL}% a.a. (2026)</span>
+          IPCA: <span style="color:${ipcaColor};font-weight:600">${diffIPCA >= 0 ? '+' : ''}${diffIPCA.toFixed(1)} p.p.</span><br>
+          Sua taxa <strong>${taxaMediaReal.toFixed(1)}% a.a.</strong>
+          · CDI ${CDI_ANUAL}% · IPCA ${IPCA_ANUAL}%<br>
+          ${diffCDI >= 0
+            ? 'Batendo o CDI — carteira eficiente.'
+            : diffIPCA >= 0
+              ? 'Acima da inflação, mas abaixo do CDI.'
+              : 'Abaixo da inflação. Revise a alocação.'}
         </div>
       </div>`);
   }
@@ -778,6 +781,39 @@ function renderCompareChart(entries, baseline) {
       }
     }
   });
+}
+
+// ── Verificação de desvio proativo ao salvar ──
+function _checkBaselineDeviation(entry) {
+  const bl = typeof baselineLoad === 'function' ? baselineLoad() : null;
+  if (!bl) return;
+
+  const allEntries = loadTrack().sort((a,b) => a.mes.localeCompare(b.mes));
+  const [by, bm] = bl.definidoEm.split('-').map(Number);
+  const [ey, em] = entry.mes.split('-').map(Number);
+  const mesesDesde = (ey - by) * 12 + (em - bm);
+  if (mesesDesde < 0) return;
+
+  const anchorEntry = allEntries.find(e => { const [ay,am]=e.mes.split('-').map(Number); return (ay-by)*12+(am-bm)>=0; });
+  const anchorReal  = anchorEntry ? anchorEntry.patrimonio : 0;
+  const anchorProj  = baselinePatNoMes(0, bl) || 0;
+  const offset      = anchorReal - anchorProj;
+  const esperado    = baselinePatNoMes(mesesDesde, bl) + offset;
+  const desvio      = entry.patrimonio - esperado;
+  const pct         = esperado > 0 ? (desvio / esperado) * 100 : 0;
+  const alertKey    = 'simfin_desvio_alerts';
+
+  if (pct < -5) {
+    const mesLabel = new Date(entry.mes + '-02').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    setTimeout(() => showToast(`Desvio de ${pct.toFixed(1)}% vs Dia 0 em ${mesLabel}`, '⚠️', 5000), 3200);
+    const saved = JSON.parse(localStorage.getItem(alertKey) || '[]').filter(a => a.mes !== entry.mes);
+    saved.push({ mes: entry.mes, desvio, pct: pct.toFixed(1), esperado, real: entry.patrimonio, ts: new Date().toISOString() });
+    localStorage.setItem(alertKey, JSON.stringify(saved));
+  } else {
+    const saved = JSON.parse(localStorage.getItem(alertKey) || '[]').filter(a => a.mes !== entry.mes);
+    localStorage.setItem(alertKey, JSON.stringify(saved));
+  }
+  if (typeof reminderUpdateUI === 'function') reminderUpdateUI();
 }
 
 // ── Tabela de desvio vs Dia 0 ──

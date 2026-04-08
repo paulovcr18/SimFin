@@ -101,6 +101,9 @@
       <button class="nav-tab" id="tabReminder" onclick="switchScreen('reminder')">
         <span class="nav-tab-icon">🔔</span> Alertas
       </button>
+      <button class="nav-tab" id="tabRelatorio" onclick="switchScreen('relatorio')">
+        <span class="nav-tab-icon">📄</span> Relatório
+      </button>
     </div>
   </div>
 
@@ -138,6 +141,10 @@
     <span class="bn-icon">🔔</span>
     <span class="bn-label">Alertas</span>
     <div class="bn-pip" id="bnReminderPip"></div>
+  </button>
+  <button class="bn-btn" id="bnRelatorio" onclick="switchScreen('relatorio')" aria-label="Relatório">
+    <span class="bn-icon">📄</span>
+    <span class="bn-label">Relatório</span>
   </button>
 </nav>
 
@@ -858,6 +865,140 @@
 
 </div><!-- end screenReminder -->
 
+<!-- RELATÓRIO SCREEN -->
+<div id="screenRelatorio" class="screen-full" style="display:none">
+
+  <div class="rpt-layout">
+
+    <!-- ── LEFT COLUMN: Configuration ── -->
+    <div class="rpt-col-cfg">
+
+      <!-- Dados do relatório -->
+      <div class="panel">
+        <div class="ph2"><span style="font-size:15px">📄</span><span class="pt">Dados do Relatório</span></div>
+        <div class="pb rpt-cfg-fields">
+          <div class="ig">
+            <label>Título</label>
+            <input type="text" id="rptTitulo" value="Relatório Financeiro Familiar" maxlength="80" oninput="onReportInput()" placeholder="Ex: Planejamento 2026">
+          </div>
+          <div class="ig">
+            <label>Autor / Nome</label>
+            <input type="text" id="rptAutor" maxlength="60" oninput="onReportInput()" placeholder="Ex: João e Maria Silva">
+          </div>
+          <label class="rpt-toggle-row">
+            <input type="checkbox" id="rptGraficos" checked onchange="onReportInput()">
+            <span class="rpt-toggle-label">Incluir gráficos no PDF</span>
+            <span class="rpt-toggle-desc">Captura as visualizações das telas já carregadas</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Seções -->
+      <div class="panel">
+        <div class="ph2"><span style="font-size:15px">📑</span><span class="pt">Seções</span></div>
+        <div class="pb">
+          <!-- Capa: always included -->
+          <label class="rpt-section-row rpt-section-locked">
+            <input type="checkbox" checked disabled>
+            <span class="rpt-sec-icon">🏠</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Capa &amp; Resumo Executivo</span>
+              <span class="rpt-sec-desc">Sempre incluída · métricas principais, renda, aporte e metas</span>
+            </div>
+            <span class="rpt-sec-badge">Sempre</span>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_projecao">
+            <input type="checkbox" id="rptSec_projecao" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">📈</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Projeção Patrimonial</span>
+              <span class="rpt-sec-desc">Gráfico + tabela anual de evolução do patrimônio</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_aportes">
+            <input type="checkbox" id="rptSec_aportes" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">👥</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Aportes por Pessoa</span>
+              <span class="rpt-sec-desc">Divisão de investimento, renda e extras por pessoa</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_orcamento">
+            <input type="checkbox" id="rptSec_orcamento" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">💰</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Orçamento (Rateio)</span>
+              <span class="rpt-sec-desc">Distribuição da renda mensal por categoria</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_folha">
+            <input type="checkbox" id="rptSec_folha" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">🧾</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Folha de Pagamento</span>
+              <span class="rpt-sec-desc">Detalhamento CLT/PJ, INSS, IR e benefícios</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_acompanhamento">
+            <input type="checkbox" id="rptSec_acompanhamento" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">📋</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Acompanhamento Mensal</span>
+              <span class="rpt-sec-desc">Histórico real vs simulado, desvios e taxas</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_metas">
+            <input type="checkbox" id="rptSec_metas" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">🎯</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Metas Financeiras</span>
+              <span class="rpt-sec-desc">Lista de metas com prazo e viabilidade</span>
+            </div>
+          </label>
+
+          <label class="rpt-section-row" id="rptSecRow_carteira">
+            <input type="checkbox" id="rptSec_carteira" checked onchange="onReportInput()">
+            <span class="rpt-sec-icon">💼</span>
+            <div class="rpt-sec-info">
+              <span class="rpt-sec-label">Carteira de Investimentos</span>
+              <span class="rpt-sec-desc">Posições em renda variável e renda fixa</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div><!-- end rpt-col-cfg -->
+
+    <!-- ── RIGHT COLUMN: Preview + Generate ── -->
+    <div class="rpt-col-gen">
+
+      <div class="panel">
+        <div class="ph2"><span style="font-size:15px">👁</span><span class="pt">O que será incluído</span></div>
+        <div class="pb">
+          <div id="rptPreviewArea" class="rpt-preview-area"></div>
+        </div>
+      </div>
+
+      <button class="btn-gerar-pdf" id="btnGerarPdf" onclick="generatePDF()">
+        📄 Gerar PDF
+      </button>
+
+      <div class="rpt-hint">
+        O PDF é gerado localmente no seu navegador — nenhum dado é enviado para servidores externos.
+      </div>
+
+    </div><!-- end rpt-col-gen -->
+
+  </div><!-- end rpt-layout -->
+
+</div><!-- end screenRelatorio -->
+
 <!-- ═══════ MODAL ═══════ -->
 <div class="mo" id="moOv" onclick="handleOvClick(event)">
   <div class="mbox">
@@ -1041,6 +1182,9 @@
 <script src="js/extrato.js"></script>
 <script src="js/gastos.js"></script>
 <script src="js/saude-financeira.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="js/report.js"></script>
 <script src="js/track.js"></script>
 <script>document.addEventListener('DOMContentLoaded', ()=>{ initCurMasks(); });</script>
 
