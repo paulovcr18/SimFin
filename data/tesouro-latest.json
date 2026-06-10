@@ -1,199 +1,7 @@
 {
   "_source": "ckan",
-  "_generatedAt": "2026-06-09T16:27:37Z",
+  "_generatedAt": "2026-06-10T16:54:53Z",
   "titulos": {
-    "Tesouro Prefixado 2005": {
-      "nome": "Tesouro Prefixado 2005",
-      "taxaCompra": 19.56,
-      "taxaVenda": 19.59,
-      "puCompra": 999.29,
-      "puVenda": 999.29,
-      "dataRef": "29/09/2005"
-    },
-    "Tesouro Prefixado 2006": {
-      "nome": "Tesouro Prefixado 2006",
-      "taxaCompra": 14.16,
-      "taxaVenda": 14.19,
-      "puCompra": 999.47,
-      "puVenda": 999.47,
-      "dataRef": "28/09/2006"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2024": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2024",
-      "taxaCompra": 5.97,
-      "taxaVenda": 6.09,
-      "puCompra": 4443.07,
-      "puVenda": 4441.48,
-      "dataRef": "14/08/2024"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2045": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2045",
-      "taxaCompra": 7.65,
-      "taxaVenda": 7.77,
-      "puCompra": 4004.68,
-      "puVenda": 3954.91,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2015": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2015",
-      "taxaCompra": 3.49,
-      "taxaVenda": 3.51,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "14/05/2015"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2009": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2009",
-      "taxaCompra": 3.58,
-      "taxaVenda": 3.6,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "14/05/2009"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2006": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2006",
-      "taxaCompra": 10.68,
-      "taxaVenda": 10.7,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "14/08/2006"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2031": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2031",
-      "taxaCompra": 8.47,
-      "taxaVenda": 8.59,
-      "puCompra": 7896.38,
-      "puVenda": 7861.89,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2021": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2021",
-      "taxaCompra": 4.96,
-      "taxaVenda": 5.08,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "31/03/2021"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2005": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2005",
-      "taxaCompra": 15.02,
-      "taxaVenda": 15.04,
-      "puCompra": 1877.26,
-      "puVenda": 1877.26,
-      "dataRef": "30/11/2005"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2006": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2006",
-      "taxaCompra": 11.15,
-      "taxaVenda": 11.17,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "30/11/2006"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2017": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2017",
-      "taxaCompra": 7.92,
-      "taxaVenda": 8.04,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "30/06/2017"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2011": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2011",
-      "taxaCompra": 1.79,
-      "taxaVenda": 1.81,
-      "puCompra": 2568.49,
-      "puVenda": 2568.49,
-      "dataRef": "28/02/2011"
-    },
-    "Tesouro IGPM+ com Juros Semestrais 2008": {
-      "nome": "Tesouro IGPM+ com Juros Semestrais 2008",
-      "taxaCompra": 0.0,
-      "taxaVenda": 0.0,
-      "puCompra": 2088.38,
-      "puVenda": 2088.38,
-      "dataRef": "31/03/2008"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2008": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2008",
-      "taxaCompra": 11.12,
-      "taxaVenda": 11.15,
-      "puCompra": 1047.93,
-      "puVenda": 1047.92,
-      "dataRef": "27/12/2007"
-    },
-    "Tesouro Selic 2005": {
-      "nome": "Tesouro Selic 2005",
-      "taxaCompra": 0.01,
-      "taxaVenda": 0.03,
-      "puCompra": 2205.89,
-      "puVenda": 2205.9,
-      "dataRef": "15/02/2005"
-    },
-    "Tesouro Selic 2006": {
-      "nome": "Tesouro Selic 2006",
-      "taxaCompra": -0.02,
-      "taxaVenda": 0.0,
-      "puCompra": 2595.14,
-      "puVenda": 2595.14,
-      "dataRef": "17/01/2006"
-    },
-    "Tesouro Selic 2007": {
-      "nome": "Tesouro Selic 2007",
-      "taxaCompra": -0.01,
-      "taxaVenda": 0.0,
-      "puCompra": 2979.07,
-      "puVenda": 2979.08,
-      "dataRef": "16/01/2007"
-    },
-    "Tesouro Selic 2008": {
-      "nome": "Tesouro Selic 2008",
-      "taxaCompra": -0.07,
-      "taxaVenda": -0.06,
-      "puCompra": 3480.53,
-      "puVenda": 3480.54,
-      "dataRef": "17/06/2008"
-    },
-    "Tesouro Selic 2009": {
-      "nome": "Tesouro Selic 2009",
-      "taxaCompra": -0.01,
-      "taxaVenda": 0.0,
-      "puCompra": 3820.75,
-      "puVenda": 3820.75,
-      "dataRef": "17/03/2009"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2012": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2012",
-      "taxaCompra": 10.92,
-      "taxaVenda": 10.95,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "30/12/2011"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2017": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2017",
-      "taxaCompra": 13.62,
-      "taxaVenda": 13.74,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "30/12/2016"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2014": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2014",
-      "taxaCompra": 9.93,
-      "taxaVenda": 9.96,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "31/12/2013"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2013": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2013",
-      "taxaCompra": 7.16,
-      "taxaVenda": 7.19,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "28/12/2012"
-    },
     "Tesouro Prefixado com Juros Semestrais 2021": {
       "nome": "Tesouro Prefixado com Juros Semestrais 2021",
       "taxaCompra": 2.23,
@@ -201,38 +9,6 @@
       "puCompra": 0.0,
       "puVenda": 0.0,
       "dataRef": "30/12/2020"
-    },
-    "Tesouro Selic 2012": {
-      "nome": "Tesouro Selic 2012",
-      "taxaCompra": -0.01,
-      "taxaVenda": 0.0,
-      "puCompra": 5113.25,
-      "puVenda": 5113.25,
-      "dataRef": "06/03/2012"
-    },
-    "Tesouro Selic 2013": {
-      "nome": "Tesouro Selic 2013",
-      "taxaCompra": -0.01,
-      "taxaVenda": 0.0,
-      "puCompra": 5514.92,
-      "puVenda": 5514.92,
-      "dataRef": "06/03/2013"
-    },
-    "Tesouro Selic 2014": {
-      "nome": "Tesouro Selic 2014",
-      "taxaCompra": -0.01,
-      "taxaVenda": 0.0,
-      "puCompra": 5999.03,
-      "puVenda": 5999.03,
-      "dataRef": "06/03/2014"
-    },
-    "Tesouro Selic 2015": {
-      "nome": "Tesouro Selic 2015",
-      "taxaCompra": 0.0,
-      "taxaVenda": 0.01,
-      "puCompra": 6671.02,
-      "puVenda": 6671.01,
-      "dataRef": "06/03/2015"
     },
     "Tesouro Selic 2017": {
       "nome": "Tesouro Selic 2017",
@@ -242,6 +18,30 @@
       "puVenda": 8627.71,
       "dataRef": "06/03/2017"
     },
+    "Tesouro Selic 2015": {
+      "nome": "Tesouro Selic 2015",
+      "taxaCompra": 0.0,
+      "taxaVenda": 0.01,
+      "puCompra": 6671.02,
+      "puVenda": 6671.01,
+      "dataRef": "06/03/2015"
+    },
+    "Tesouro Selic 2014": {
+      "nome": "Tesouro Selic 2014",
+      "taxaCompra": -0.01,
+      "taxaVenda": 0.0,
+      "puCompra": 5999.03,
+      "puVenda": 5999.03,
+      "dataRef": "06/03/2014"
+    },
+    "Tesouro Prefixado 2017": {
+      "nome": "Tesouro Prefixado 2017",
+      "taxaCompra": 13.62,
+      "taxaVenda": 13.74,
+      "puCompra": 998.98,
+      "puVenda": 998.97,
+      "dataRef": "30/12/2016"
+    },
     "Tesouro Prefixado 2015": {
       "nome": "Tesouro Prefixado 2015",
       "taxaCompra": 11.69,
@@ -249,6 +49,14 @@
       "puCompra": 999.12,
       "puVenda": 999.12,
       "dataRef": "31/12/2014"
+    },
+    "Tesouro Prefixado 2016": {
+      "nome": "Tesouro Prefixado 2016",
+      "taxaCompra": 14.25,
+      "taxaVenda": 14.28,
+      "puCompra": 998.94,
+      "puVenda": 998.94,
+      "dataRef": "31/12/2015"
     },
     "Tesouro Prefixado 2014": {
       "nome": "Tesouro Prefixado 2014",
@@ -258,30 +66,6 @@
       "puVenda": 999.62,
       "dataRef": "31/12/2013"
     },
-    "Tesouro Prefixado 2013": {
-      "nome": "Tesouro Prefixado 2013",
-      "taxaCompra": 7.15,
-      "taxaVenda": 7.18,
-      "puCompra": 999.72,
-      "puVenda": 999.72,
-      "dataRef": "28/12/2012"
-    },
-    "Tesouro Prefixado 2012": {
-      "nome": "Tesouro Prefixado 2012",
-      "taxaCompra": 10.92,
-      "taxaVenda": 10.95,
-      "puCompra": 1000.41,
-      "puVenda": 1000.41,
-      "dataRef": "30/12/2011"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2020": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2020",
-      "taxaCompra": -1.78,
-      "taxaVenda": -1.66,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "14/08/2020"
-    },
     "Tesouro IPCA+ com Juros Semestrais 2017": {
       "nome": "Tesouro IPCA+ com Juros Semestrais 2017",
       "taxaCompra": 9.1,
@@ -289,22 +73,6 @@
       "puCompra": 0.0,
       "puVenda": 0.0,
       "dataRef": "12/05/2017"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2035": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2035",
-      "taxaCompra": 8.06,
-      "taxaVenda": 8.18,
-      "puCompra": 4160.61,
-      "puVenda": 4127.18,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2012": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2012",
-      "taxaCompra": 3.03,
-      "taxaVenda": 3.05,
-      "puCompra": 0.0,
-      "puVenda": 0.0,
-      "dataRef": "14/08/2012"
     },
     "Tesouro IPCA+ com Juros Semestrais 2013": {
       "nome": "Tesouro IPCA+ com Juros Semestrais 2013",
@@ -314,21 +82,61 @@
       "puVenda": 0.0,
       "dataRef": "14/05/2013"
     },
-    "Tesouro IPCA+ 2024": {
-      "nome": "Tesouro IPCA+ 2024",
+    "Tesouro IPCA+ com Juros Semestrais 2020": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2020",
+      "taxaCompra": -1.78,
+      "taxaVenda": -1.66,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "14/08/2020"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2045": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2045",
+      "taxaCompra": 7.68,
+      "taxaVenda": 7.8,
+      "puCompra": 3994.42,
+      "puVenda": 3944.86,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2024": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2024",
       "taxaCompra": 5.97,
       "taxaVenda": 6.09,
-      "puCompra": 4315.49,
-      "puVenda": 4313.95,
+      "puCompra": 4443.07,
+      "puVenda": 4441.48,
       "dataRef": "14/08/2024"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2035": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2035",
+      "taxaCompra": 8.1,
+      "taxaVenda": 8.22,
+      "puCompra": 4152.03,
+      "puVenda": 4118.71,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2015": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2015",
+      "taxaCompra": 3.49,
+      "taxaVenda": 3.51,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "14/05/2015"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2050": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2050",
+      "taxaCompra": 7.59,
+      "taxaVenda": 7.71,
+      "puCompra": 4023.28,
+      "puVenda": 3969.14,
+      "dataRef": "09/06/2026"
     },
     "Tesouro IPCA+ 2035": {
       "nome": "Tesouro IPCA+ 2035",
-      "taxaCompra": 7.98,
-      "taxaVenda": 8.1,
-      "puCompra": 2389.34,
-      "puVenda": 2364.78,
-      "dataRef": "08/06/2026"
+      "taxaCompra": 8.02,
+      "taxaVenda": 8.14,
+      "puCompra": 2382.61,
+      "puVenda": 2358.14,
+      "dataRef": "09/06/2026"
     },
     "Tesouro IPCA+ 2015": {
       "nome": "Tesouro IPCA+ 2015",
@@ -338,21 +146,117 @@
       "puVenda": 2629.21,
       "dataRef": "14/05/2015"
     },
-    "Tesouro Prefixado com Juros Semestrais 2010": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2010",
-      "taxaCompra": 10.14,
-      "taxaVenda": 10.17,
-      "puCompra": 1048.8,
-      "puVenda": 1048.8,
-      "dataRef": "30/06/2010"
+    "Tesouro IPCA+ 2019": {
+      "nome": "Tesouro IPCA+ 2019",
+      "taxaCompra": -0.94,
+      "taxaVenda": -0.82,
+      "puCompra": 3224.89,
+      "puVenda": 3224.89,
+      "dataRef": "14/05/2019"
     },
-    "Tesouro Selic 2010": {
-      "nome": "Tesouro Selic 2010",
-      "taxaCompra": 0.0,
-      "taxaVenda": 0.01,
-      "puCompra": 4166.92,
-      "puVenda": 4166.92,
-      "dataRef": "16/03/2010"
+    "Tesouro IPCA+ 2024": {
+      "nome": "Tesouro IPCA+ 2024",
+      "taxaCompra": 5.97,
+      "taxaVenda": 6.09,
+      "puCompra": 4315.49,
+      "puVenda": 4313.95,
+      "dataRef": "14/08/2024"
+    },
+    "Tesouro IGPM+ com Juros Semestrais 2017": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2017",
+      "taxaCompra": 7.92,
+      "taxaVenda": 8.04,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "30/06/2017"
+    },
+    "Tesouro IGPM+ com Juros Semestrais 2031": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2031",
+      "taxaCompra": 8.54,
+      "taxaVenda": 8.66,
+      "puCompra": 7881.96,
+      "puVenda": 7847.58,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IGPM+ com Juros Semestrais 2021": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2021",
+      "taxaCompra": 4.96,
+      "taxaVenda": 5.08,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "31/03/2021"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2014": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2014",
+      "taxaCompra": 9.93,
+      "taxaVenda": 9.96,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "31/12/2013"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2023": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2023",
+      "taxaCompra": 14.08,
+      "taxaVenda": 14.2,
+      "puCompra": 0.0,
+      "puVenda": 1047.7,
+      "dataRef": "29/12/2022"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2017": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2017",
+      "taxaCompra": 13.62,
+      "taxaVenda": 13.74,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "30/12/2016"
+    },
+    "Tesouro Selic 2013": {
+      "nome": "Tesouro Selic 2013",
+      "taxaCompra": -0.01,
+      "taxaVenda": 0.0,
+      "puCompra": 5514.92,
+      "puVenda": 5514.92,
+      "dataRef": "06/03/2013"
+    },
+    "Tesouro IGPM+ com Juros Semestrais 2011": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2011",
+      "taxaCompra": 1.79,
+      "taxaVenda": 1.81,
+      "puCompra": 2568.49,
+      "puVenda": 2568.49,
+      "dataRef": "28/02/2011"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2011": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2011",
+      "taxaCompra": 10.64,
+      "taxaVenda": 10.67,
+      "puCompra": 1047.96,
+      "puVenda": 1047.96,
+      "dataRef": "29/12/2010"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2012": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2012",
+      "taxaCompra": 10.92,
+      "taxaVenda": 10.95,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "30/12/2011"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2013": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2013",
+      "taxaCompra": 7.16,
+      "taxaVenda": 7.19,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "28/12/2012"
+    },
+    "Tesouro Selic 2012": {
+      "nome": "Tesouro Selic 2012",
+      "taxaCompra": -0.01,
+      "taxaVenda": 0.0,
+      "puCompra": 5113.25,
+      "puVenda": 5113.25,
+      "dataRef": "06/03/2012"
     },
     "Tesouro Selic 2011": {
       "nome": "Tesouro Selic 2011",
@@ -362,29 +266,37 @@
       "puVenda": 4586.6,
       "dataRef": "09/03/2011"
     },
-    "Tesouro Prefixado 2009": {
-      "nome": "Tesouro Prefixado 2009",
-      "taxaCompra": 8.67,
-      "taxaVenda": 8.7,
-      "puCompra": 1000.0,
-      "puVenda": 1000.0,
-      "dataRef": "30/09/2009"
+    "Tesouro Prefixado 2011": {
+      "nome": "Tesouro Prefixado 2011",
+      "taxaCompra": 12.23,
+      "taxaVenda": 12.26,
+      "puCompra": 1000.91,
+      "puVenda": 1000.91,
+      "dataRef": "30/06/2011"
     },
-    "Tesouro Prefixado 2010": {
-      "nome": "Tesouro Prefixado 2010",
-      "taxaCompra": 10.14,
-      "taxaVenda": 10.17,
-      "puCompra": 1000.0,
-      "puVenda": 1000.0,
-      "dataRef": "30/06/2010"
+    "Tesouro Prefixado 2012": {
+      "nome": "Tesouro Prefixado 2012",
+      "taxaCompra": 10.92,
+      "taxaVenda": 10.95,
+      "puCompra": 1000.41,
+      "puVenda": 1000.41,
+      "dataRef": "30/12/2011"
     },
-    "Tesouro Prefixado 2008": {
-      "nome": "Tesouro Prefixado 2008",
-      "taxaCompra": 13.62,
-      "taxaVenda": 13.65,
-      "puCompra": 1000.0,
-      "puVenda": 1000.0,
-      "dataRef": "30/09/2008"
+    "Tesouro Prefixado 2013": {
+      "nome": "Tesouro Prefixado 2013",
+      "taxaCompra": 7.15,
+      "taxaVenda": 7.18,
+      "puCompra": 999.72,
+      "puVenda": 999.72,
+      "dataRef": "28/12/2012"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2012": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2012",
+      "taxaCompra": 3.03,
+      "taxaVenda": 3.05,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "14/08/2012"
     },
     "Tesouro IPCA+ com Juros Semestrais 2011": {
       "nome": "Tesouro IPCA+ com Juros Semestrais 2011",
@@ -402,21 +314,69 @@
       "puVenda": 1982.95,
       "dataRef": "12/08/2010"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2008": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2008",
-      "taxaCompra": 6.17,
-      "taxaVenda": 6.19,
-      "puCompra": 1814.85,
-      "puVenda": 1814.85,
-      "dataRef": "14/08/2008"
+    "Tesouro Prefixado 2010": {
+      "nome": "Tesouro Prefixado 2010",
+      "taxaCompra": 10.14,
+      "taxaVenda": 10.17,
+      "puCompra": 1000.0,
+      "puVenda": 1000.0,
+      "dataRef": "30/06/2010"
     },
-    "Tesouro Prefixado com Juros Semestrais 2011": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2011",
-      "taxaCompra": 10.64,
-      "taxaVenda": 10.67,
-      "puCompra": 1047.96,
-      "puVenda": 1047.96,
-      "dataRef": "29/12/2010"
+    "Tesouro Prefixado com Juros Semestrais 2010": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2010",
+      "taxaCompra": 10.14,
+      "taxaVenda": 10.17,
+      "puCompra": 1048.8,
+      "puVenda": 1048.8,
+      "dataRef": "30/06/2010"
+    },
+    "Tesouro IGPM+ com Juros Semestrais 2008": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2008",
+      "taxaCompra": 0.0,
+      "taxaVenda": 0.0,
+      "puCompra": 2088.38,
+      "puVenda": 2088.38,
+      "dataRef": "31/03/2008"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2008": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2008",
+      "taxaCompra": 11.12,
+      "taxaVenda": 11.15,
+      "puCompra": 1047.93,
+      "puVenda": 1047.92,
+      "dataRef": "27/12/2007"
+    },
+    "Tesouro Selic 2008": {
+      "nome": "Tesouro Selic 2008",
+      "taxaCompra": -0.07,
+      "taxaVenda": -0.06,
+      "puCompra": 3480.53,
+      "puVenda": 3480.54,
+      "dataRef": "17/06/2008"
+    },
+    "Tesouro Selic 2009": {
+      "nome": "Tesouro Selic 2009",
+      "taxaCompra": -0.01,
+      "taxaVenda": 0.0,
+      "puCompra": 3820.75,
+      "puVenda": 3820.75,
+      "dataRef": "17/03/2009"
+    },
+    "Tesouro Selic 2010": {
+      "nome": "Tesouro Selic 2010",
+      "taxaCompra": 0.0,
+      "taxaVenda": 0.01,
+      "puCompra": 4166.92,
+      "puVenda": 4166.92,
+      "dataRef": "16/03/2010"
+    },
+    "Tesouro Prefixado 2008": {
+      "nome": "Tesouro Prefixado 2008",
+      "taxaCompra": 13.62,
+      "taxaVenda": 13.65,
+      "puCompra": 1000.0,
+      "puVenda": 1000.0,
+      "dataRef": "30/09/2008"
     },
     "Tesouro Prefixado 2007": {
       "nome": "Tesouro Prefixado 2007",
@@ -426,6 +386,30 @@
       "puVenda": 1000.0,
       "dataRef": "28/09/2007"
     },
+    "Tesouro Prefixado 2009": {
+      "nome": "Tesouro Prefixado 2009",
+      "taxaCompra": 8.67,
+      "taxaVenda": 8.7,
+      "puCompra": 1000.0,
+      "puVenda": 1000.0,
+      "dataRef": "30/09/2009"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2009": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2009",
+      "taxaCompra": 3.58,
+      "taxaVenda": 3.6,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "14/05/2009"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2008": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2008",
+      "taxaCompra": 6.17,
+      "taxaVenda": 6.19,
+      "puCompra": 1814.85,
+      "puVenda": 1814.85,
+      "dataRef": "14/08/2008"
+    },
     "Tesouro IPCA+ com Juros Semestrais 2007": {
       "nome": "Tesouro IPCA+ com Juros Semestrais 2007",
       "taxaCompra": 7.6,
@@ -434,453 +418,477 @@
       "puVenda": 0.0,
       "dataRef": "14/05/2007"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2055": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2055",
-      "taxaCompra": 7.54,
-      "taxaVenda": 7.66,
-      "puCompra": 3928.04,
-      "puVenda": 3871.25,
-      "dataRef": "08/06/2026"
+    "Tesouro Selic 2007": {
+      "nome": "Tesouro Selic 2007",
+      "taxaCompra": -0.01,
+      "taxaVenda": 0.0,
+      "puCompra": 2979.07,
+      "puVenda": 2979.08,
+      "dataRef": "16/01/2007"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2037": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2037",
-      "taxaCompra": 7.91,
-      "taxaVenda": 8.03,
-      "puCompra": 4121.52,
-      "puVenda": 4083.65,
-      "dataRef": "08/06/2026"
+    "Tesouro IGPM+ com Juros Semestrais 2006": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2006",
+      "taxaCompra": 11.15,
+      "taxaVenda": 11.17,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "30/11/2006"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2030": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2030",
-      "taxaCompra": 8.52,
-      "taxaVenda": 8.64,
-      "puCompra": 4420.85,
-      "puVenda": 4400.91,
-      "dataRef": "08/06/2026"
+    "Tesouro Prefixado 2006": {
+      "nome": "Tesouro Prefixado 2006",
+      "taxaCompra": 14.16,
+      "taxaVenda": 14.19,
+      "puCompra": 999.47,
+      "puVenda": 999.47,
+      "dataRef": "28/09/2006"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2040": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2040",
-      "taxaCompra": 7.79,
-      "taxaVenda": 7.91,
-      "puCompra": 4124.99,
-      "puVenda": 4081.39,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ com Juros Semestrais 2032": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2032",
-      "taxaCompra": 8.31,
-      "taxaVenda": 8.43,
-      "puCompra": 4315.14,
-      "puVenda": 4288.89,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2040": {
-      "nome": "Tesouro IPCA+ 2040",
-      "taxaCompra": 7.64,
-      "taxaVenda": 7.76,
-      "puCompra": 1671.4,
-      "puVenda": 1644.57,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2029": {
-      "nome": "Tesouro IPCA+ 2029",
-      "taxaCompra": 8.47,
-      "taxaVenda": 8.59,
-      "puCompra": 3728.72,
-      "puVenda": 3714.93,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2032": {
-      "nome": "Tesouro IPCA+ 2032",
-      "taxaCompra": 8.28,
-      "taxaVenda": 8.4,
-      "puCompra": 2894.87,
-      "puVenda": 2873.82,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2045": {
-      "nome": "Tesouro IPCA+ 2045",
-      "taxaCompra": 7.44,
-      "taxaVenda": 7.56,
-      "puCompra": 1223.7,
-      "puVenda": 1197.72,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2026": {
-      "nome": "Tesouro IPCA+ 2026",
-      "taxaCompra": 10.71,
-      "taxaVenda": 10.83,
-      "puCompra": 4630.99,
-      "puVenda": 4627.38,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro IPCA+ 2050": {
-      "nome": "Tesouro IPCA+ 2050",
-      "taxaCompra": 7.32,
-      "taxaVenda": 7.44,
-      "puCompra": 864.39,
-      "puVenda": 841.1,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2029": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2029",
-      "taxaCompra": 14.71,
-      "taxaVenda": 14.83,
-      "puCompra": 951.31,
-      "puVenda": 948.6,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2027": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2027",
-      "taxaCompra": 14.2,
-      "taxaVenda": 14.32,
-      "puCompra": 1021.08,
-      "puVenda": 1019.96,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2033": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2033",
-      "taxaCompra": 14.74,
-      "taxaVenda": 14.86,
-      "puCompra": 858.24,
-      "puVenda": 853.7,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2037": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2037",
-      "taxaCompra": 14.74,
-      "taxaVenda": 14.86,
-      "puCompra": 805.35,
-      "puVenda": 799.99,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2035": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2035",
-      "taxaCompra": 14.71,
-      "taxaVenda": 14.83,
-      "puCompra": 829.58,
-      "puVenda": 824.54,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2031": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2031",
-      "taxaCompra": 14.74,
-      "taxaVenda": 14.86,
-      "puCompra": 898.65,
-      "puVenda": 894.85,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2049": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2049",
-      "taxaCompra": 7.73,
-      "taxaVenda": 7.85,
-      "puCompra": 1893.57,
-      "puVenda": 1869.46,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2059": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2059",
-      "taxaCompra": 7.39,
-      "taxaVenda": 7.51,
-      "puCompra": 965.62,
-      "puVenda": 942.68,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2069": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2069",
-      "taxaCompra": 7.28,
-      "taxaVenda": 7.4,
-      "puCompra": 490.85,
-      "puVenda": 473.87,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2064": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2064",
-      "taxaCompra": 7.31,
-      "taxaVenda": 7.43,
-      "puCompra": 690.95,
-      "puVenda": 670.77,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2054": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2054",
-      "taxaCompra": 7.52,
-      "taxaVenda": 7.64,
-      "puCompra": 1349.67,
-      "puVenda": 1325.01,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2074": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2074",
-      "taxaCompra": 7.27,
-      "taxaVenda": 7.39,
-      "puCompra": 347.32,
-      "puVenda": 333.45,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2084": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2084",
-      "taxaCompra": 7.27,
-      "taxaVenda": 7.39,
-      "puCompra": 172.89,
-      "puVenda": 164.14,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Renda+ Aposentadoria Extra 2079": {
-      "nome": "Tesouro Renda+ Aposentadoria Extra 2079",
-      "taxaCompra": 7.27,
-      "taxaVenda": 7.39,
-      "puCompra": 245.03,
-      "puVenda": 233.94,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2046": {
-      "nome": "Tesouro Educa+ 2046",
-      "taxaCompra": 7.48,
-      "taxaVenda": 7.6,
-      "puCompra": 1300.14,
-      "puVenda": 1273.98,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2043": {
-      "nome": "Tesouro Educa+ 2043",
-      "taxaCompra": 7.6,
-      "taxaVenda": 7.72,
-      "puCompra": 1585.83,
-      "puVenda": 1559.13,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2036": {
-      "nome": "Tesouro Educa+ 2036",
-      "taxaCompra": 8.08,
-      "taxaVenda": 8.2,
-      "puCompra": 2549.38,
-      "puVenda": 2526.05,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2039": {
-      "nome": "Tesouro Educa+ 2039",
-      "taxaCompra": 7.8,
-      "taxaVenda": 7.92,
-      "puCompra": 2080.6,
-      "puVenda": 2054.71,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2044": {
-      "nome": "Tesouro Educa+ 2044",
-      "taxaCompra": 7.55,
-      "taxaVenda": 7.67,
-      "puCompra": 1485.2,
-      "puVenda": 1458.57,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2031": {
-      "nome": "Tesouro Educa+ 2031",
-      "taxaCompra": 8.45,
-      "taxaVenda": 8.57,
-      "puCompra": 3715.84,
-      "puVenda": 3702.24,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2032": {
-      "nome": "Tesouro Educa+ 2032",
-      "taxaCompra": 8.42,
-      "taxaVenda": 8.54,
-      "puCompra": 3431.59,
-      "puVenda": 3415.28,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2034": {
-      "nome": "Tesouro Educa+ 2034",
-      "taxaCompra": 8.29,
-      "taxaVenda": 8.41,
-      "puCompra": 2942.17,
-      "puVenda": 2921.73,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2035": {
-      "nome": "Tesouro Educa+ 2035",
-      "taxaCompra": 8.18,
-      "taxaVenda": 8.3,
-      "puCompra": 2736.85,
-      "puVenda": 2714.82,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2037": {
-      "nome": "Tesouro Educa+ 2037",
-      "taxaCompra": 7.98,
-      "taxaVenda": 8.1,
-      "puCompra": 2379.34,
-      "puVenda": 2354.95,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2041": {
-      "nome": "Tesouro Educa+ 2041",
-      "taxaCompra": 7.69,
-      "taxaVenda": 7.81,
-      "puCompra": 1815.34,
-      "puVenda": 1788.76,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2048": {
-      "nome": "Tesouro Educa+ 2048",
-      "taxaCompra": 7.41,
-      "taxaVenda": 7.53,
-      "puCompra": 1141.37,
-      "puVenda": 1115.92,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2033": {
-      "nome": "Tesouro Educa+ 2033",
-      "taxaCompra": 8.37,
-      "taxaVenda": 8.49,
-      "puCompra": 3173.76,
-      "puVenda": 3155.2,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2045": {
-      "nome": "Tesouro Educa+ 2045",
-      "taxaCompra": 7.51,
-      "taxaVenda": 7.63,
-      "puCompra": 1390.18,
-      "puVenda": 1363.73,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2038": {
-      "nome": "Tesouro Educa+ 2038",
-      "taxaCompra": 7.88,
-      "taxaVenda": 8.0,
-      "puCompra": 2225.16,
-      "puVenda": 2199.91,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2042": {
-      "nome": "Tesouro Educa+ 2042",
-      "taxaCompra": 7.64,
-      "taxaVenda": 7.76,
-      "puCompra": 1697.17,
-      "puVenda": 1670.46,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2040": {
-      "nome": "Tesouro Educa+ 2040",
-      "taxaCompra": 7.74,
-      "taxaVenda": 7.86,
-      "puCompra": 1943.56,
-      "puVenda": 1917.24,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2047": {
-      "nome": "Tesouro Educa+ 2047",
-      "taxaCompra": 7.44,
-      "taxaVenda": 7.56,
-      "puCompra": 1218.84,
-      "puVenda": 1192.99,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Educa+ 2030": {
-      "nome": "Tesouro Educa+ 2030",
-      "taxaCompra": 8.49,
-      "taxaVenda": 8.61,
-      "puCompra": 3623.56,
-      "puVenda": 3613.33,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Selic 2028": {
-      "nome": "Tesouro Selic 2028",
-      "taxaCompra": 0.02,
-      "taxaVenda": 0.03,
-      "puCompra": 19164.86,
-      "puVenda": 19151.26,
-      "dataRef": "08/06/2026"
+    "Tesouro IPCA+ com Juros Semestrais 2006": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2006",
+      "taxaCompra": 10.68,
+      "taxaVenda": 10.7,
+      "puCompra": 0.0,
+      "puVenda": 0.0,
+      "dataRef": "14/08/2006"
     },
     "Tesouro Selic 2031": {
       "nome": "Tesouro Selic 2031",
       "taxaCompra": 0.07,
       "taxaVenda": 0.08,
-      "puCompra": 19104.48,
-      "puVenda": 19085.19,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Selic 2029": {
-      "nome": "Tesouro Selic 2029",
-      "taxaCompra": 0.05,
-      "taxaVenda": 0.06,
-      "puCompra": 19147.82,
-      "puVenda": 19132.32,
-      "dataRef": "08/06/2026"
+      "puCompra": 19114.73,
+      "puVenda": 19095.46,
+      "dataRef": "09/06/2026"
     },
     "Tesouro Selic 2027": {
       "nome": "Tesouro Selic 2027",
       "taxaCompra": 0.01,
       "taxaVenda": 0.02,
-      "puCompra": 19169.93,
-      "puVenda": 19158.23,
-      "dataRef": "08/06/2026"
+      "puCompra": 19180.14,
+      "puVenda": 19168.46,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Selic 2029": {
+      "nome": "Tesouro Selic 2029",
+      "taxaCompra": 0.05,
+      "taxaVenda": 0.06,
+      "puCompra": 19158.12,
+      "puVenda": 19142.64,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Selic 2028": {
+      "nome": "Tesouro Selic 2028",
+      "taxaCompra": 0.02,
+      "taxaVenda": 0.03,
+      "puCompra": 19175.12,
+      "puVenda": 19161.5,
+      "dataRef": "09/06/2026"
     },
     "Tesouro Prefixado 2031": {
       "nome": "Tesouro Prefixado 2031",
-      "taxaCompra": 14.67,
-      "taxaVenda": 14.79,
-      "puCompra": 537.46,
-      "puVenda": 534.63,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado 2032": {
-      "nome": "Tesouro Prefixado 2032",
-      "taxaCompra": 14.7,
-      "taxaVenda": 14.82,
-      "puCompra": 468.03,
-      "puVenda": 465.07,
-      "dataRef": "08/06/2026"
-    },
-    "Tesouro Prefixado 2028": {
-      "nome": "Tesouro Prefixado 2028",
-      "taxaCompra": 14.51,
-      "taxaVenda": 14.63,
-      "puCompra": 809.09,
-      "puVenda": 807.33,
-      "dataRef": "08/06/2026"
+      "taxaCompra": 14.73,
+      "taxaVenda": 14.85,
+      "puCompra": 536.48,
+      "puVenda": 533.65,
+      "dataRef": "09/06/2026"
     },
     "Tesouro Prefixado 2027": {
       "nome": "Tesouro Prefixado 2027",
-      "taxaCompra": 14.03,
-      "taxaVenda": 14.15,
-      "puCompra": 928.2,
-      "puVenda": 927.16,
-      "dataRef": "08/06/2026"
+      "taxaCompra": 14.17,
+      "taxaVenda": 14.29,
+      "puCompra": 928.04,
+      "puVenda": 927.0,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado 2028": {
+      "nome": "Tesouro Prefixado 2028",
+      "taxaCompra": 14.72,
+      "taxaVenda": 14.84,
+      "puCompra": 807.21,
+      "puVenda": 805.46,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado 2032": {
+      "nome": "Tesouro Prefixado 2032",
+      "taxaCompra": 14.73,
+      "taxaVenda": 14.85,
+      "puCompra": 467.6,
+      "puVenda": 464.65,
+      "dataRef": "09/06/2026"
     },
     "Tesouro Prefixado 2029": {
       "nome": "Tesouro Prefixado 2029",
-      "taxaCompra": 14.72,
-      "taxaVenda": 14.84,
-      "puCompra": 704.79,
-      "puVenda": 702.53,
-      "dataRef": "08/06/2026"
+      "taxaCompra": 14.83,
+      "taxaVenda": 14.95,
+      "puCompra": 703.46,
+      "puVenda": 701.2,
+      "dataRef": "09/06/2026"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2026": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2026",
-      "taxaCompra": 10.71,
-      "taxaVenda": 10.83,
-      "puCompra": 4767.9,
-      "puVenda": 4764.18,
-      "dataRef": "08/06/2026"
+    "Tesouro IPCA+ com Juros Semestrais 2032": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2032",
+      "taxaCompra": 8.34,
+      "taxaVenda": 8.46,
+      "puCompra": 4311.15,
+      "puVenda": 4284.94,
+      "dataRef": "09/06/2026"
     },
-    "Tesouro IPCA+ com Juros Semestrais 2050": {
-      "nome": "Tesouro IPCA+ com Juros Semestrais 2050",
-      "taxaCompra": 7.57,
-      "taxaVenda": 7.69,
-      "puCompra": 4030.29,
-      "puVenda": 3975.98,
-      "dataRef": "08/06/2026"
+    "Tesouro IPCA+ com Juros Semestrais 2055": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2055",
+      "taxaCompra": 7.55,
+      "taxaVenda": 7.67,
+      "puCompra": 3925.18,
+      "puVenda": 3868.48,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2030": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2030",
+      "taxaCompra": 8.59,
+      "taxaVenda": 8.71,
+      "puCompra": 4412.62,
+      "puVenda": 4392.74,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2037": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2037",
+      "taxaCompra": 7.92,
+      "taxaVenda": 8.04,
+      "puCompra": 4120.41,
+      "puVenda": 4082.58,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2040": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2040",
+      "taxaCompra": 7.81,
+      "taxaVenda": 7.93,
+      "puCompra": 4119.89,
+      "puVenda": 4076.39,
+      "dataRef": "09/06/2026"
     },
     "Tesouro IPCA+ com Juros Semestrais 2060": {
       "nome": "Tesouro IPCA+ com Juros Semestrais 2060",
-      "taxaCompra": 7.53,
-      "taxaVenda": 7.65,
-      "puCompra": 3965.03,
-      "puVenda": 3906.58,
-      "dataRef": "08/06/2026"
+      "taxaCompra": 7.54,
+      "taxaVenda": 7.66,
+      "puCompra": 3962.03,
+      "puVenda": 3903.68,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ com Juros Semestrais 2026": {
+      "nome": "Tesouro IPCA+ com Juros Semestrais 2026",
+      "taxaCompra": 10.81,
+      "taxaVenda": 10.93,
+      "puCompra": 4769.77,
+      "puVenda": 4766.06,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2032": {
+      "nome": "Tesouro IPCA+ 2032",
+      "taxaCompra": 8.3,
+      "taxaVenda": 8.42,
+      "puCompra": 2892.96,
+      "puVenda": 2871.94,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2040": {
+      "nome": "Tesouro IPCA+ 2040",
+      "taxaCompra": 7.65,
+      "taxaVenda": 7.77,
+      "puCompra": 1669.97,
+      "puVenda": 1643.17,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2045": {
+      "nome": "Tesouro IPCA+ 2045",
+      "taxaCompra": 7.47,
+      "taxaVenda": 7.59,
+      "puCompra": 1217.83,
+      "puVenda": 1191.99,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2029": {
+      "nome": "Tesouro IPCA+ 2029",
+      "taxaCompra": 8.56,
+      "taxaVenda": 8.68,
+      "puCompra": 3721.54,
+      "puVenda": 3707.8,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2050": {
+      "nome": "Tesouro IPCA+ 2050",
+      "taxaCompra": 7.33,
+      "taxaVenda": 7.45,
+      "puCompra": 862.83,
+      "puVenda": 839.6,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro IPCA+ 2026": {
+      "nome": "Tesouro IPCA+ 2026",
+      "taxaCompra": 10.81,
+      "taxaVenda": 10.93,
+      "puCompra": 4632.81,
+      "puVenda": 4629.2,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2037": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2037",
+      "taxaCompra": 14.68,
+      "taxaVenda": 14.8,
+      "puCompra": 808.28,
+      "puVenda": 802.88,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2027": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2027",
+      "taxaCompra": 14.34,
+      "taxaVenda": 14.46,
+      "puCompra": 1020.94,
+      "puVenda": 1019.82,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2031": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2031",
+      "taxaCompra": 14.79,
+      "taxaVenda": 14.91,
+      "puCompra": 897.76,
+      "puVenda": 893.98,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2029": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2029",
+      "taxaCompra": 14.82,
+      "taxaVenda": 14.94,
+      "puCompra": 949.83,
+      "puVenda": 947.13,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2033": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2033",
+      "taxaCompra": 14.74,
+      "taxaVenda": 14.86,
+      "puCompra": 858.71,
+      "puVenda": 854.17,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Prefixado com Juros Semestrais 2035": {
+      "nome": "Tesouro Prefixado com Juros Semestrais 2035",
+      "taxaCompra": 14.69,
+      "taxaVenda": 14.81,
+      "puCompra": 830.8,
+      "puVenda": 825.75,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2084": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2084",
+      "taxaCompra": 7.26,
+      "taxaVenda": 7.38,
+      "puCompra": 173.7,
+      "puVenda": 164.92,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2079": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2079",
+      "taxaCompra": 7.26,
+      "taxaVenda": 7.38,
+      "puCompra": 246.08,
+      "puVenda": 234.93,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2059": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2059",
+      "taxaCompra": 7.4,
+      "taxaVenda": 7.52,
+      "puCompra": 964.15,
+      "puVenda": 941.25,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2049": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2049",
+      "taxaCompra": 7.75,
+      "taxaVenda": 7.87,
+      "puCompra": 1890.53,
+      "puVenda": 1866.48,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2069": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2069",
+      "taxaCompra": 7.27,
+      "taxaVenda": 7.39,
+      "puCompra": 492.5,
+      "puVenda": 475.46,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2074": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2074",
+      "taxaCompra": 7.26,
+      "taxaVenda": 7.38,
+      "puCompra": 348.65,
+      "puVenda": 334.71,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2054": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2054",
+      "taxaCompra": 7.54,
+      "taxaVenda": 7.66,
+      "puCompra": 1346.23,
+      "puVenda": 1321.65,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Renda+ Aposentadoria Extra 2064": {
+      "nome": "Tesouro Renda+ Aposentadoria Extra 2064",
+      "taxaCompra": 7.32,
+      "taxaVenda": 7.44,
+      "puCompra": 689.58,
+      "puVenda": 669.44,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2031": {
+      "nome": "Tesouro Educa+ 2031",
+      "taxaCompra": 8.53,
+      "taxaVenda": 8.65,
+      "puCompra": 3709.77,
+      "puVenda": 3696.22,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2042": {
+      "nome": "Tesouro Educa+ 2042",
+      "taxaCompra": 7.65,
+      "taxaVenda": 7.77,
+      "puCompra": 1695.76,
+      "puVenda": 1669.08,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2039": {
+      "nome": "Tesouro Educa+ 2039",
+      "taxaCompra": 7.81,
+      "taxaVenda": 7.93,
+      "puCompra": 2079.46,
+      "puVenda": 2053.59,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2035": {
+      "nome": "Tesouro Educa+ 2035",
+      "taxaCompra": 8.22,
+      "taxaVenda": 8.34,
+      "puCompra": 2731.21,
+      "puVenda": 2709.25,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2032": {
+      "nome": "Tesouro Educa+ 2032",
+      "taxaCompra": 8.48,
+      "taxaVenda": 8.6,
+      "puCompra": 3425.91,
+      "puVenda": 3409.64,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2033": {
+      "nome": "Tesouro Educa+ 2033",
+      "taxaCompra": 8.42,
+      "taxaVenda": 8.54,
+      "puCompra": 3168.18,
+      "puVenda": 3149.67,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2045": {
+      "nome": "Tesouro Educa+ 2045",
+      "taxaCompra": 7.54,
+      "taxaVenda": 7.66,
+      "puCompra": 1384.3,
+      "puVenda": 1357.97,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2040": {
+      "nome": "Tesouro Educa+ 2040",
+      "taxaCompra": 7.75,
+      "taxaVenda": 7.87,
+      "puCompra": 1942.32,
+      "puVenda": 1916.02,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2046": {
+      "nome": "Tesouro Educa+ 2046",
+      "taxaCompra": 7.5,
+      "taxaVenda": 7.62,
+      "puCompra": 1296.42,
+      "puVenda": 1270.35,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2044": {
+      "nome": "Tesouro Educa+ 2044",
+      "taxaCompra": 7.57,
+      "taxaVenda": 7.69,
+      "puCompra": 1481.5,
+      "puVenda": 1454.95,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2034": {
+      "nome": "Tesouro Educa+ 2034",
+      "taxaCompra": 8.33,
+      "taxaVenda": 8.45,
+      "puCompra": 2937.22,
+      "puVenda": 2916.83,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2047": {
+      "nome": "Tesouro Educa+ 2047",
+      "taxaCompra": 7.47,
+      "taxaVenda": 7.59,
+      "puCompra": 1213.0,
+      "puVenda": 1187.28,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2041": {
+      "nome": "Tesouro Educa+ 2041",
+      "taxaCompra": 7.7,
+      "taxaVenda": 7.82,
+      "puCompra": 1814.0,
+      "puVenda": 1787.46,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2048": {
+      "nome": "Tesouro Educa+ 2048",
+      "taxaCompra": 7.44,
+      "taxaVenda": 7.56,
+      "puCompra": 1135.58,
+      "puVenda": 1110.27,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2043": {
+      "nome": "Tesouro Educa+ 2043",
+      "taxaCompra": 7.61,
+      "taxaVenda": 7.73,
+      "puCompra": 1584.37,
+      "puVenda": 1557.7,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2038": {
+      "nome": "Tesouro Educa+ 2038",
+      "taxaCompra": 7.9,
+      "taxaVenda": 8.02,
+      "puCompra": 2222.13,
+      "puVenda": 2196.93,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2030": {
+      "nome": "Tesouro Educa+ 2030",
+      "taxaCompra": 8.57,
+      "taxaVenda": 8.69,
+      "puCompra": 3619.68,
+      "puVenda": 3609.48,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2037": {
+      "nome": "Tesouro Educa+ 2037",
+      "taxaCompra": 8.0,
+      "taxaVenda": 8.12,
+      "puCompra": 2376.54,
+      "puVenda": 2352.2,
+      "dataRef": "09/06/2026"
+    },
+    "Tesouro Educa+ 2036": {
+      "nome": "Tesouro Educa+ 2036",
+      "taxaCompra": 8.1,
+      "taxaVenda": 8.22,
+      "puCompra": 2546.87,
+      "puVenda": 2523.58,
+      "dataRef": "09/06/2026"
     },
     "Tesouro Selic 2026": {
       "nome": "Tesouro Selic 2026",
@@ -906,20 +914,20 @@
       "puVenda": 16138.39,
       "dataRef": "28/02/2025"
     },
-    "Tesouro Prefixado 2025": {
-      "nome": "Tesouro Prefixado 2025",
-      "taxaCompra": 12.2,
-      "taxaVenda": 12.32,
-      "puCompra": 999.54,
-      "puVenda": 999.07,
-      "dataRef": "30/12/2024"
-    },
     "Tesouro Prefixado com Juros Semestrais 2025": {
       "nome": "Tesouro Prefixado com Juros Semestrais 2025",
       "taxaCompra": 12.19,
       "taxaVenda": 12.31,
       "puCompra": 1048.33,
       "puVenda": 1047.84,
+      "dataRef": "30/12/2024"
+    },
+    "Tesouro Prefixado 2025": {
+      "nome": "Tesouro Prefixado 2025",
+      "taxaCompra": 12.2,
+      "taxaVenda": 12.32,
+      "puCompra": 999.54,
+      "puVenda": 999.07,
       "dataRef": "30/12/2024"
     },
     "Tesouro Selic 2024": {
@@ -945,14 +953,6 @@
       "puCompra": 12888.19,
       "puVenda": 12881.58,
       "dataRef": "28/02/2023"
-    },
-    "Tesouro Prefixado com Juros Semestrais 2023": {
-      "nome": "Tesouro Prefixado com Juros Semestrais 2023",
-      "taxaCompra": 14.08,
-      "taxaVenda": 14.2,
-      "puCompra": 0.0,
-      "puVenda": 1047.7,
-      "dataRef": "29/12/2022"
     },
     "Tesouro Prefixado 2023": {
       "nome": "Tesouro Prefixado 2023",
@@ -994,14 +994,6 @@
       "puVenda": 999.81,
       "dataRef": "30/12/2019"
     },
-    "Tesouro IPCA+ 2019": {
-      "nome": "Tesouro IPCA+ 2019",
-      "taxaCompra": -0.94,
-      "taxaVenda": -0.82,
-      "puCompra": 3224.89,
-      "puVenda": 3224.89,
-      "dataRef": "14/05/2019"
-    },
     "Tesouro Prefixado 2019": {
       "nome": "Tesouro Prefixado 2019",
       "taxaCompra": 6.54,
@@ -1018,29 +1010,37 @@
       "puVenda": 999.46,
       "dataRef": "27/12/2017"
     },
-    "Tesouro Prefixado 2017": {
-      "nome": "Tesouro Prefixado 2017",
-      "taxaCompra": 13.62,
-      "taxaVenda": 13.74,
-      "puCompra": 998.98,
-      "puVenda": 998.97,
-      "dataRef": "30/12/2016"
+    "Tesouro Prefixado 2005": {
+      "nome": "Tesouro Prefixado 2005",
+      "taxaCompra": 19.56,
+      "taxaVenda": 19.59,
+      "puCompra": 999.29,
+      "puVenda": 999.29,
+      "dataRef": "29/09/2005"
     },
-    "Tesouro Prefixado 2016": {
-      "nome": "Tesouro Prefixado 2016",
-      "taxaCompra": 14.25,
-      "taxaVenda": 14.28,
-      "puCompra": 998.94,
-      "puVenda": 998.94,
-      "dataRef": "31/12/2015"
+    "Tesouro IGPM+ com Juros Semestrais 2005": {
+      "nome": "Tesouro IGPM+ com Juros Semestrais 2005",
+      "taxaCompra": 15.02,
+      "taxaVenda": 15.04,
+      "puCompra": 1877.26,
+      "puVenda": 1877.26,
+      "dataRef": "30/11/2005"
     },
-    "Tesouro Prefixado 2011": {
-      "nome": "Tesouro Prefixado 2011",
-      "taxaCompra": 12.23,
-      "taxaVenda": 12.26,
-      "puCompra": 1000.91,
-      "puVenda": 1000.91,
-      "dataRef": "30/06/2011"
+    "Tesouro Selic 2006": {
+      "nome": "Tesouro Selic 2006",
+      "taxaCompra": -0.02,
+      "taxaVenda": 0.0,
+      "puCompra": 2595.14,
+      "puVenda": 2595.14,
+      "dataRef": "17/01/2006"
+    },
+    "Tesouro Selic 2005": {
+      "nome": "Tesouro Selic 2005",
+      "taxaCompra": 0.01,
+      "taxaVenda": 0.03,
+      "puCompra": 2205.89,
+      "puVenda": 2205.9,
+      "dataRef": "15/02/2005"
     }
   }
 }
